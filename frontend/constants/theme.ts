@@ -1,28 +1,30 @@
 import { scale, verticalScale } from "@/utils/styling";
 
 export const colors = {
-  primary: "#a3e635",
-  primaryLight: "#0ea5e9",
-  primaryDark: "#0369a1",
-  text: "#fff",
+  primary: "#0ea5e9",       // bright blue
+  primaryLight: "#7dd3fc",  // lighter blue
+  primaryDark: "#0369a1",   // deep blue
+  secondary: "#16a34a",     // green
+  secondaryLight: "#bbf7d0", // light green
+  secondaryDark: "#15803d", // deep green
+  text: "#ffffff",
   textLight: "#e5e5e5",
   textLighter: "#d4d4d4",
-  white: "#fff",
-  black: "#000",
-  rose: "#ef4444",
-  green: "#16a34a",
-  neutral50: "#fafafa",
-  neutral100: "#f5f5f5",
-  neutral200: "#e5e5e5",
-  neutral300: "#d4d4d4",
-  neutral350: "#CCCCCC",
-  neutral400: "#a3a3a3",
-  neutral500: "#737373",
-  neutral600: "#525252",
-  neutral700: "#404040",
-  neutral800: "#262626",
-  neutral900: "#171717",
+  white: "#ffffff",
+  black: "#000000",
+  neutral50: "#f9fafb",
+  neutral100: "#f3f4f6",
+  neutral200: "#e5e7eb",
+  neutral300: "#d1d5db",
+  neutral400: "#9ca3af",
+  neutral500: "#6b7280",
+  neutral600: "#4b5563",
+  neutral700: "#374151",
+  neutral800: "#1f2937",
+  neutral900: "#111827",
+  danger: "#ef4444",        // for alerts
 };
+
 
 export const spacingX = {
   _3: scale(3),
