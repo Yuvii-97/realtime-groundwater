@@ -2,14 +2,14 @@ import { Image, StyleSheet, View } from "react-native";
 import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { colors } from "@/constants/theme";
-
+import { scale,verticalScale } from "@/utils/styling";
 export default function Splash() {
   const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       router.replace("/home");
-    }, 2500); // 2.5 seconds
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral900,
   },
   logo: {
-    width: 200,
-    height: 200,
+    width: scale(200),
+    height: verticalScale(200),
   },
 });

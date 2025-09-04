@@ -5,6 +5,7 @@ export default function Layout() {
     <Drawer>
       <Drawer.Screen name="home" options={{ title: "Home" }} />
       <Drawer.Screen name="dashboard" options={{ title: "Dashboard" }} />
+      <Drawer.Screen name="groundwaterMonitoring" options={{ title: "Ground Water Monitoring" }} />
       <Drawer.Screen name="livedata" options={{ title: "Live Data" }} />
       <Drawer.Screen name="analytics" options={{ title: "Analytics" }} />
       <Drawer.Screen name="maps" options={{ title: "Maps" }} />
