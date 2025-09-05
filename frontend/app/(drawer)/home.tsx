@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 const { width } = Dimensions.get("window");
 
@@ -29,9 +30,30 @@ export default function Home() {
   };
 
   const nearbyStations = [
-    { id: 1, name: "Station A", status: "stable", distance: "2.1 km" },
-    { id: 2, name: "Station B", status: "stress", distance: "3.8 km" },
-    { id: 3, name: "Station C", status: "critical", distance: "5.2 km" },
+    {
+      id: 1,
+      name: "Station A",
+      status: "stable",
+      distance: "2.1 km",
+      latitude: 28.6139,
+      longitude: 77.209,
+    },
+    {
+      id: 2,
+      name: "Station B",
+      status: "stress",
+      distance: "3.8 km",
+      latitude: 28.6219,
+      longitude: 77.2195,
+    },
+    {
+      id: 3,
+      name: "Station C",
+      status: "critical",
+      distance: "5.2 km",
+      latitude: 28.6059,
+      longitude: 77.1985,
+    },
   ];
 
   const getStatusColor = (status: string) => {
@@ -119,11 +141,31 @@ export default function Home() {
       {/* Mini Map Section */}
       <View style={styles.mapSection}>
         <Text style={styles.sectionTitle}>Nearby DWLR Stations</Text>
-        <View style={styles.miniMap}>
-          <Text style={styles.mapPlaceholder}>🗺️ Interactive Map</Text>
-          <Text style={styles.mapSubtext}>
-            Tap stations for detailed trends
-          </Text>
+        <View style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: 28.6139,
+              longitude: 77.209,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            }}
+            showsUserLocation={true}
+            showsMyLocationButton={true}
+          >
+            {nearbyStations.map((station) => (
+              <Marker
+                key={station.id}
+                coordinate={{
+                  latitude: station.latitude,
+                  longitude: station.longitude,
+                }}
+                title={station.name}
+                description={`Status: ${station.status} | Distance: ${station.distance}`}
+                pinColor={getStatusColor(station.status)}
+              />
+            ))}
+          </MapView>
         </View>
 
         <View style={styles.stationsList}>
@@ -358,22 +400,23 @@ const styles = StyleSheet.create({
   mapSection: {
     padding: 20,
   },
-  miniMap: {
-    backgroundColor: "#E0F7F7",
-    height: 120,
+  mapContainer: {
+    height: 200,
     borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
+    overflow: "hidden",
     marginBottom: 15,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  mapPlaceholder: {
-    fontSize: 24,
-    marginBottom: 5,
+  map: {
+    width: "100%",
+    height: "100%",
   },
-  mapSubtext: {
-    color: "#666",
-    fontSize: 12,
-  },
+
+  // Stations List Styles
   stationsList: {
     gap: 10,
   },
