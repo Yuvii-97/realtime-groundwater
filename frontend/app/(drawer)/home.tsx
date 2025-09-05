@@ -86,8 +86,10 @@ export default function Home() {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-            <Text style={styles.appName}>JalWatch</Text>
-            <Text style={styles.tagline}>Groundwater Intelligence</Text>
+            <Text style={styles.appName}>AquaSense</Text>
+            <Text style={styles.tagline}>
+              sensing and analyzing groundwater
+            </Text>
           </View>
         </View>
 
