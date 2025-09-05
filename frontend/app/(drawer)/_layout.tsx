@@ -49,7 +49,7 @@ export default function Layout() {
           backgroundColor: colors.white,
         },
         header: () => (
-          <SafeAreaView style={{ backgroundColor: "#fff" }}>
+          <SafeAreaView edges={["top"]} style={{ backgroundColor: "#fff" }}>
             <AppHeader
               onLanguageSwitch={() => console.log("Switch Language")}
               onNotificationsPress={() => console.log("Notifications")}
