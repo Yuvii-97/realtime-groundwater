@@ -11,6 +11,8 @@ import {
   DrawerItemList,
 } from "@react-navigation/drawer";
 import { scale, verticalScale } from "@/utils/styling";
+import AppHeader from "@/components/AppHeader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Layout() {
   return (
@@ -37,7 +39,6 @@ export default function Layout() {
         </DrawerContentScrollView>
       )}
       screenOptions={{
-        headerShown: false,
         drawerActiveTintColor: colors.black,
         drawerInactiveTintColor: colors.black,
         drawerLabelStyle: {
@@ -47,6 +48,14 @@ export default function Layout() {
         drawerStyle: {
           backgroundColor: colors.white,
         },
+        header: () => (
+          <SafeAreaView style={{ backgroundColor: "#fff" }}>
+            <AppHeader
+              onLanguageSwitch={() => console.log("Switch Language")}
+              onNotificationsPress={() => console.log("Notifications")}
+            />
+          </SafeAreaView>
+        ),
       }}
     >
       <Drawer.Screen
