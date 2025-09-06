@@ -7,12 +7,54 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { useTheme } from "../../hooks/useTheme";
 
 const { width } = Dimensions.get("window");
 
 export default function Home() {
+  const theme = useTheme();
+  
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      ...styles.container,
+      backgroundColor: theme.colors.background,
+    },
+    section: {
+      ...styles.section,
+      backgroundColor: theme.colors.background,
+    },
+    sectionText: {
+      ...styles.sectionText,
+      color: theme.colors.textSecondary,
+    },
+    featureItem: {
+      ...styles.featureItem,
+      backgroundColor: theme.colors.surface,
+    },
+    featureDescription: {
+      ...styles.featureDescription,
+      color: theme.colors.textSecondary,
+    },
+    stepItem: {
+      ...styles.stepItem,
+      backgroundColor: theme.colors.surface,
+    },
+    stepText: {
+      ...styles.stepText,
+      color: theme.colors.textSecondary,
+    },
+    benefitItem: {
+      ...styles.benefitItem,
+      backgroundColor: theme.colors.surface,
+    },
+    benefitDescription: {
+      ...styles.benefitDescription,
+      color: theme.colors.textSecondary,
+    },
+  });
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={dynamicStyles.container} showsVerticalScrollIndicator={false}>
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <Text style={styles.heroEmoji}>🌊</Text>
@@ -27,9 +69,9 @@ export default function Home() {
       </View>
 
       {/* Why This App Section */}
-      <View style={styles.section}>
+      <View style={dynamicStyles.section}>
         <Text style={styles.sectionTitle}>Why This App?</Text>
-        <Text style={styles.sectionText}>
+        <Text style={dynamicStyles.sectionText}>
           Groundwater is the backbone of drinking water, agriculture, and
           industry. With growing demand and climate challenges, monitoring
           groundwater levels is critical. Our app provides real-time data and
@@ -38,54 +80,54 @@ export default function Home() {
       </View>
 
       {/* Key Features Section */}
-      <View style={styles.section}>
+      <View style={dynamicStyles.section}>
         <Text style={styles.sectionTitle}>Key Features</Text>
 
-        <View style={styles.featureItem}>
+        <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>📊</Text>
           <View style={styles.featureContent}>
             <Text style={styles.featureTitle}>Real-time Data</Text>
-            <Text style={styles.featureDescription}>
+            <Text style={dynamicStyles.featureDescription}>
               Track live groundwater levels from DWLR stations.
             </Text>
           </View>
         </View>
 
-        <View style={styles.featureItem}>
+        <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>🤖</Text>
           <View style={styles.featureContent}>
             <Text style={styles.featureTitle}>AI Predictions</Text>
-            <Text style={styles.featureDescription}>
+            <Text style={dynamicStyles.featureDescription}>
               Forecast future water levels with accuracy.
             </Text>
           </View>
         </View>
 
-        <View style={styles.featureItem}>
+        <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>⚠️</Text>
           <View style={styles.featureContent}>
             <Text style={styles.featureTitle}>Status & Alerts</Text>
-            <Text style={styles.featureDescription}>
+            <Text style={dynamicStyles.featureDescription}>
               Get notified about risks and warnings in your region.
             </Text>
           </View>
         </View>
 
-        <View style={styles.featureItem}>
+        <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>🗺️</Text>
           <View style={styles.featureContent}>
             <Text style={styles.featureTitle}>Interactive Map</Text>
-            <Text style={styles.featureDescription}>
+            <Text style={dynamicStyles.featureDescription}>
               Explore groundwater conditions across stations.
             </Text>
           </View>
         </View>
 
-        <View style={styles.featureItem}>
+        <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>🌐</Text>
           <View style={styles.featureContent}>
             <Text style={styles.featureTitle}>Multilingual Support</Text>
-            <Text style={styles.featureDescription}>
+            <Text style={dynamicStyles.featureDescription}>
               Access the app in your preferred language.
             </Text>
           </View>
@@ -93,58 +135,58 @@ export default function Home() {
       </View>
 
       {/* How It Works Section */}
-      <View style={styles.section}>
+      <View style={dynamicStyles.section}>
         <Text style={styles.sectionTitle}>How It Works</Text>
 
-        <View style={styles.stepItem}>
+        <View style={dynamicStyles.stepItem}>
           <Text style={styles.stepNumber}>1️⃣</Text>
-          <Text style={styles.stepText}>Select your language & location.</Text>
+          <Text style={dynamicStyles.stepText}>Select your language & location.</Text>
         </View>
 
-        <View style={styles.stepItem}>
+        <View style={dynamicStyles.stepItem}>
           <Text style={styles.stepNumber}>2️⃣</Text>
-          <Text style={styles.stepText}>
+          <Text style={dynamicStyles.stepText}>
             View current groundwater trends and AI forecasts.
           </Text>
         </View>
 
-        <View style={styles.stepItem}>
+        <View style={dynamicStyles.stepItem}>
           <Text style={styles.stepNumber}>3️⃣</Text>
-          <Text style={styles.stepText}>
+          <Text style={dynamicStyles.stepText}>
             Receive alerts and recommendations to plan ahead.
           </Text>
         </View>
       </View>
 
       {/* Why Use It Section */}
-      <View style={styles.section}>
+      <View style={dynamicStyles.section}>
         <Text style={styles.sectionTitle}>Why Use It?</Text>
 
-        <View style={styles.benefitItem}>
+        <View style={dynamicStyles.benefitItem}>
           <Text style={styles.benefitCheck}>✅</Text>
           <View style={styles.benefitContent}>
             <Text style={styles.benefitTitle}>For citizens</Text>
-            <Text style={styles.benefitDescription}>
+            <Text style={dynamicStyles.benefitDescription}>
               Stay informed about water availability.
             </Text>
           </View>
         </View>
 
-        <View style={styles.benefitItem}>
+        <View style={dynamicStyles.benefitItem}>
           <Text style={styles.benefitCheck}>✅</Text>
           <View style={styles.benefitContent}>
             <Text style={styles.benefitTitle}>For farmers</Text>
-            <Text style={styles.benefitDescription}>
+            <Text style={dynamicStyles.benefitDescription}>
               Plan irrigation wisely.
             </Text>
           </View>
         </View>
 
-        <View style={styles.benefitItem}>
+        <View style={dynamicStyles.benefitItem}>
           <Text style={styles.benefitCheck}>✅</Text>
           <View style={styles.benefitContent}>
             <Text style={styles.benefitTitle}>For policymakers</Text>
-            <Text style={styles.benefitDescription}>
+            <Text style={dynamicStyles.benefitDescription}>
               Support sustainable groundwater management.
             </Text>
           </View>

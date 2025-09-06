@@ -1,7 +1,12 @@
 import { Stack } from "expo-router";
+import { SettingsProvider } from "../contexts/SettingsContext";
 
 const StackLayout = () => {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <SettingsProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </SettingsProvider>
+  );
 };
 
 export default StackLayout;

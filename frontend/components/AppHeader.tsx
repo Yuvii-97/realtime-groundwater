@@ -4,6 +4,8 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { colors } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
+import { useTheme } from "../hooks/useTheme";
+import { useSettings } from "../contexts/SettingsContext";
 
 interface AppHeaderProps {
   title?: string;
@@ -19,15 +21,55 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   onNotificationsPress,
 }) => {
   const navigation = useNavigation();
+  const theme = useTheme();
+  const { language, notificationsEnabled } = useSettings();
+
+  // Simple translation example
+  const translations = {
+    en: {
+      groundWater: 'Ground Water',
+      analytics: 'Analytics',
+    },
+    hi: {
+      groundWater: 'भूजल',
+      analytics: 'विश्लेषण',
+    },
+    te: {
+      groundWater: 'భూగర్భజలాలు',
+      analytics: 'విశ్లేషణ',
+    },
+    ta: {
+      groundWater: 'நிலத்தடி நீர்',
+      analytics: 'பகுப்பாய்வு',
+    },
+  };
+
+  const t = translations[language as keyof typeof translations] || translations.en;
+
+  const dynamicStyles = StyleSheet.create({
+    header: {
+      ...styles.header,
+      backgroundColor: theme.colors.surface,
+      borderBottomColor: theme.colors.border,
+    },
+    title: {
+      ...styles.title,
+      color: theme.colors.text,
+    },
+    subtitle: {
+      ...styles.subtitle,
+      color: theme.colors.text,
+    },
+  });
 
   return (
-    <View style={styles.header}>
+    <View style={dynamicStyles.header}>
       <View style={styles.left}>
         {/* Drawer menu icon */}
         <TouchableOpacity
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         >
-          <Ionicons name="menu" size={scale(28)} color={colors.black} />
+          <Ionicons name="menu" size={scale(28)} color={theme.colors.text} />
         </TouchableOpacity>
         {showLogo && (
           <Image
@@ -37,8 +79,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           />
         )}
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>Analytics</Text>
+          <Text style={dynamicStyles.title}>{title === "Ground Water" ? t.groundWater : title}</Text>
+          <Text style={dynamicStyles.subtitle}>{t.analytics}</Text>
         </View>
       </View>
       <View style={styles.right}>
@@ -46,7 +88,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           <Ionicons
             name="language-outline"
             size={scale(28)}
-            color={colors.black}
+            color={theme.colors.text}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -54,9 +96,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           style={styles.iconButton}
         >
           <MaterialCommunityIcons
-            name="bell-outline"
+            name={notificationsEnabled ? "bell" : "bell-off"}
             size={scale(28)}
-            color={colors.black}
+            color={notificationsEnabled ? theme.colors.primary : theme.colors.textSecondary}
           />
         </TouchableOpacity>
       </View>
