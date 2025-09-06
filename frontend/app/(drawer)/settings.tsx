@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useSettings } from "../../contexts/SettingsContext";
+import { useLanguage } from "../../contexts/LanguageContext";
+import LanguageSelector from "../../components/LanguageSelector";
 
 interface LanguageOption {
   code: string;
@@ -42,6 +44,7 @@ const refreshIntervalOptions = [
 
 export default function Settings() {
   const settings = useSettings();
+  const { t } = useLanguage();
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [intervalModalVisible, setIntervalModalVisible] = useState(false);
 
@@ -149,15 +152,15 @@ export default function Settings() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={styles.headerTitle}>{t('settings')}</Text>
         <Text style={styles.headerSubtitle}>Customize your groundwater monitoring experience</Text>
       </View>
 
       {/* Appearance */}
-      <SettingSection title="Appearance">
+      <SettingSection title={t('appearance')}>
         <SettingItem
           icon="moon"
-          title="Dark Mode"
+          title={t('darkMode')}
           subtitle="Switch between light and dark theme"
           rightElement={
             <Switch
@@ -168,17 +171,13 @@ export default function Settings() {
             />
           }
         />
-        <SettingItem
-          icon="language"
-          title="Language"
-          subtitle={`${getLanguageFlag(settings.language)} ${getLanguageName(settings.language)}`}
-          onPress={() => setLanguageModalVisible(true)}
-          showArrow
-        />
       </SettingSection>
 
+      {/* Language Selector */}
+      <LanguageSelector />
+
       {/* Notifications */}
-      <SettingSection title="Notifications">
+      <SettingSection title={t('notifications')}>
         <SettingItem
           icon="notifications"
           title="Push Notifications"

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
@@ -6,6 +6,10 @@ import { colors } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
 import { useTheme } from "../hooks/useTheme";
 import { useSettings } from "../contexts/SettingsContext";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useNotifications } from "../contexts/NotificationContext";
+import LanguageSelector from "./LanguageSelector";
+import { NotificationPanel } from "./NotificationPanel";
 
 interface AppHeaderProps {
   title?: string;
@@ -22,29 +26,17 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 }) => {
   const navigation = useNavigation();
   const theme = useTheme();
-  const { language, notificationsEnabled } = useSettings();
+  const { notificationsEnabled } = useSettings();
+  const { t } = useLanguage();
+  const { unreadCount = 0 } = useNotifications() || {};
+  const [showNotificationPanel, setShowNotificationPanel] = useState(false);
 
-  // Simple translation example
-  const translations = {
-    en: {
-      groundWater: 'Ground Water',
-      analytics: 'Analytics',
-    },
-    hi: {
-      groundWater: 'भूजल',
-      analytics: 'विश्लेषण',
-    },
-    te: {
-      groundWater: 'భూగర్భజలాలు',
-      analytics: 'విశ్లేషణ',
-    },
-    ta: {
-      groundWater: 'நிலத்தடி நீர்',
-      analytics: 'பகுப்பாய்வு',
-    },
+  const handleNotificationPress = () => {
+    setShowNotificationPanel(true);
+    if (onNotificationsPress) {
+      onNotificationsPress();
+    }
   };
-
-  const t = translations[language as keyof typeof translations] || translations.en;
 
   const dynamicStyles = StyleSheet.create({
     header: {
@@ -79,29 +71,35 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           />
         )}
         <View style={styles.titleContainer}>
-          <Text style={dynamicStyles.title}>{title === "Ground Water" ? t.groundWater : title}</Text>
-          <Text style={dynamicStyles.subtitle}>{t.analytics}</Text>
+          <Text style={dynamicStyles.title}>{title === "Ground Water" ? t('groundWater') : title}</Text>
+          <Text style={dynamicStyles.subtitle}>{t('analytics')}</Text>
         </View>
       </View>
       <View style={styles.right}>
-        <TouchableOpacity onPress={onLanguageSwitch} style={styles.iconButton}>
-          <Ionicons
-            name="language-outline"
-            size={scale(28)}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
+        <LanguageSelector showAsButton={true} onLanguageSelected={onLanguageSwitch} />
         <TouchableOpacity
-          onPress={onNotificationsPress}
+          onPress={handleNotificationPress}
           style={styles.iconButton}
         >
           <MaterialCommunityIcons
             name={notificationsEnabled ? "bell" : "bell-off"}
             size={scale(28)}
-            color={notificationsEnabled ? theme.colors.primary : theme.colors.textSecondary}
+            color={theme.colors.text}
           />
+          {unreadCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.badgeText}>
+                {unreadCount > 99 ? '99+' : String(unreadCount)}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
+      
+      <NotificationPanel
+        visible={showNotificationPanel}
+        onClose={() => setShowNotificationPanel(false)}
+      />
     </View>
   );
 };
@@ -147,6 +145,24 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     marginLeft: scale(18),
+    position: "relative",
+  },
+  notificationBadge: {
+    position: "absolute",
+    top: -scale(4),
+    right: -scale(4),
+    backgroundColor: "#FF3B30",
+    borderRadius: scale(10),
+    minWidth: scale(18),
+    height: scale(18),
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+  },
+  badgeText: {
+    color: "#FFFFFF",
+    fontSize: scale(10),
+    fontWeight: "bold",
   },
 });
 
