@@ -52,6 +52,7 @@ interface WellData {
     status: "normal" | "critical" | "warning" | "good";
     totalStations: number;
     monitoredStations: number;
+    rechargeTrend?: number[]; // Add this
   }[];
 }
 
@@ -87,10 +88,23 @@ const sampleWellData: WellData = {
     ],
   },
   rechargeData: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
-        data: [30, 35, 40, 45, 42, 45],
+        data: [30, 35, 40, 45, 42, 45, 50, 48, 46, 44, 42, 40],
       },
     ],
   },
@@ -145,6 +159,40 @@ const sampleWellData: WellData = {
       totalStations: 1450,
       monitoredStations: 546,
     },
+    {
+      id: "6",
+      name: "Karnataka",
+      lat: 15.3173,
+      lng: 75.7139,
+      level: 6.8,
+      status: "normal",
+      totalStations: 1200,
+      monitoredStations: 950,
+      rechargeTrend: [2, 3, 4, 6, 8, 12, 10, 9, 7, 5, 4, 3],
+    },
+    {
+      id: "7",
+      name: "Gujarat",
+      lat: 22.2587,
+      lng: 71.1924,
+      level: 5.5,
+      status: "warning",
+      totalStations: 800,
+      monitoredStations: 600,
+      rechargeTrend: [1, 2, 3, 5, 7, 9, 8, 7, 6, 4, 3, 2],
+    },
+    {
+      id: "8",
+      name: "Uttar Pradesh",
+      lat: 26.8467,
+      lng: 80.9462,
+      level: 7.1,
+      status: "good",
+      totalStations: 1500,
+      monitoredStations: 1200,
+      rechargeTrend: [3, 4, 6, 8, 10, 14, 12, 10, 8, 6, 5, 4],
+    },
+    // Add more as needed
   ],
 };
 
@@ -351,28 +399,7 @@ export default function Dashboard() {
             Groundwater Monitoring Dashboard
           </Text>
         </View>
-        <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={styles.regionSelector}
-            onPress={() => {
-              Alert.alert(
-                "Select Region",
-                "Choose a region to view data",
-                wellData.regions.map((region) => ({
-                  text: region.name,
-                  onPress: () => handleRegionChange(region.name),
-                }))
-              );
-            }}
-          >
-            <Text style={styles.regionText}>{selectedRegion}</Text>
-            <Text style={styles.dropdownIcon}>▼</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.notificationButton}>
-            <Text style={styles.notificationIcon}>🔔</Text>
-            <View style={styles.notificationBadge} />
-          </TouchableOpacity>
-        </View>
+        {/* Removed headerActions */}
       </View>
 
       {/* Role Switcher */}
@@ -450,43 +477,43 @@ export default function Dashboard() {
             <Text style={styles.regionStatsTitle}>
               State Wise Station Count
             </Text>
-            <BarChart
-              data={{
-                labels: wellData.regions.map((r) => r.name.substring(0, 3)), // Shorten labels for chart
-                datasets: [
-                  {
-                    data: wellData.regions.map((r) => r.totalStations),
-                    color: () => "#48cae4", // Lighter blue for total
+            {/* Wrap the BarChart in a ScrollView for horizontal scrolling */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <BarChart
+                data={{
+                  labels: wellData.regions.map((r) => r.name.substring(0, 3)),
+                  datasets: [
+                    {
+                      data: wellData.regions.map((r) => r.totalStations),
+                      color: () => "#48cae4",
+                    },
+                    {
+                      data: wellData.regions.map((r) => r.monitoredStations),
+                      color: () => "#007ea7",
+                    },
+                  ],
+                }}
+                width={Dimensions.get("window").width * 2} // Wider for scrolling
+                height={verticalScale(220)}
+                yAxisLabel=""
+                yAxisSuffix=""
+                fromZero
+                chartConfig={{
+                  ...(chartConfig as any),
+                  barPercentage: 0.6,
+                  propsForLabels: { fontSize: scale(9) },
+                  propsForBackgroundLines: {
+                    strokeDasharray: "",
+                    stroke: "#f0f0f0",
                   },
-                  {
-                    data: wellData.regions.map((r) => r.monitoredStations),
-                    color: () => "#007ea7", // Deeper blue for monitored
-                  },
-                ],
-                // removed unsupported 'legend' property
-              }}
-              width={Dimensions.get("window").width * 0.48 - scale(16)} // Adjust for padding
-              height={verticalScale(220)}
-              yAxisLabel=""
-              yAxisSuffix=""
-              fromZero
-              chartConfig={{
-                ...(chartConfig as any), // cast to any to avoid strict type complaints
-                barPercentage: 0.6, // keep valid prop if needed
-                // removed unsupported 'categoryPercentage'
-                propsForLabels: {
-                  fontSize: scale(9),
-                },
-                propsForBackgroundLines: {
-                  strokeDasharray: "", // Solid background lines
-                  stroke: "#f0f0f0",
-                },
-              }}
-              style={styles.chart}
-              verticalLabelRotation={scale(30)}
-              showBarTops={false}
-              withInnerLines={true}
-            />
+                }}
+                style={styles.chart}
+                verticalLabelRotation={scale(30)}
+                showBarTops={false}
+                withInnerLines={true}
+              />
+            </ScrollView>
+
             <View style={styles.regionList}>
               {wellData.regions.map((region) => {
                 const status = renderRegionStatus(region.status);
@@ -511,10 +538,11 @@ export default function Dashboard() {
                 );
               })}
             </View>
-          </View>
-          <View style={styles.regionMapCol}>
-            <Text style={styles.regionStatsTitle}>Map Overview</Text>
-            <View style={styles.mapContainer}>
+
+            {/* Map moved here under State Wise Station Count */}
+            <View
+              style={[styles.mapContainer, { marginTop: verticalScale(12) }]}
+            >
               <WebView
                 source={{
                   uri: "https://www.openstreetmap.org/export/embed.html?bbox=67.0,7.5,97.0,37.0&layer=mapnik",
@@ -531,15 +559,17 @@ export default function Dashboard() {
         {/* Trend Graph */}
         <View style={styles.trendSection}>
           <Text style={styles.regionStatsTitle}>Recharge Trend</Text>
-          <BarChart
-            data={wellData.rechargeData}
-            width={Dimensions.get("window").width - scale(48)}
-            height={verticalScale(180)}
-            yAxisLabel=""
-            yAxisSuffix="%"
-            chartConfig={chartConfig}
-            style={styles.chart}
-          />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <BarChart
+              data={wellData.rechargeData}
+              width={Dimensions.get("window").width * 2} // Wider for scrolling
+              height={verticalScale(180)}
+              yAxisLabel=""
+              yAxisSuffix="%"
+              chartConfig={chartConfig}
+              style={styles.chart}
+            />
+          </ScrollView>
         </View>
 
         {/* Role-specific content */}
@@ -557,15 +587,18 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f8fafd" }, // Lighter background
+  container: { flex: 1, backgroundColor: "#f0f4f8" }, // Softer background
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: scale(20),
     paddingVertical: verticalScale(12),
     backgroundColor: "#ffffff",
-    borderBottomWidth: StyleSheet.hairlineWidth, // Thinner border
-    borderBottomColor: "#e0e0e0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
     justifyContent: "space-between",
     gap: scale(10),
   },
@@ -602,49 +635,6 @@ const styles = StyleSheet.create({
     color: "#424242",
     fontWeight: "500",
     marginTop: verticalScale(2),
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: scale(12),
-  },
-  regionSelector: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#e3f2fd",
-    paddingHorizontal: scale(12),
-    paddingVertical: verticalScale(7),
-    borderRadius: scale(8),
-    borderWidth: scale(1),
-    borderColor: "#bbdefb",
-    marginRight: scale(6),
-  },
-  regionText: {
-    fontSize: scale(14),
-    fontWeight: "600",
-    color: "#1976d2",
-    marginRight: scale(4),
-  },
-  dropdownIcon: {
-    fontSize: scale(10),
-    color: "#1976d2",
-  },
-  notificationButton: {
-    position: "relative",
-    padding: scale(8),
-  },
-  notificationIcon: {
-    fontSize: scale(20),
-    color: "#1976d2",
-  },
-  notificationBadge: {
-    position: "absolute",
-    top: verticalScale(5),
-    right: scale(5),
-    width: scale(7),
-    height: scale(7),
-    borderRadius: scale(3.5),
-    backgroundColor: "#ef476f", // Vibrant red
   },
   roleSwitcher: {
     flexDirection: "row",
