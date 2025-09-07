@@ -8,7 +8,6 @@ import {
   SafeAreaView,
   Dimensions,
   Alert,
-  Image,
 } from "react-native";
 import { LineChart, BarChart } from "react-native-chart-kit";
 import * as Location from "expo-location";
@@ -559,17 +558,19 @@ export default function Dashboard() {
         {/* Trend Graph */}
         <View style={styles.trendSection}>
           <Text style={styles.regionStatsTitle}>Recharge Trend</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <BarChart
-              data={wellData.rechargeData}
-              width={Dimensions.get("window").width * 2} // Wider for scrolling
-              height={verticalScale(180)}
-              yAxisLabel=""
-              yAxisSuffix="%"
-              chartConfig={chartConfig}
-              style={styles.chart}
-            />
-          </ScrollView>
+          <View style={styles.chartWrapper}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <BarChart
+                data={wellData.rechargeData}
+                width={Dimensions.get("window").width * 2} // Wider for scrolling
+                height={verticalScale(180)}
+                yAxisLabel=""
+                yAxisSuffix="%"
+                chartConfig={chartConfig}
+                style={styles.chart}
+              />
+            </ScrollView>
+          </View>
         </View>
 
         {/* Role-specific content */}
@@ -852,6 +853,10 @@ const styles = StyleSheet.create({
   chart: {
     borderRadius: scale(10),
     marginVertical: verticalScale(8),
+  },
+  chartWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   roleSection: {
     backgroundColor: "#ffffff",
