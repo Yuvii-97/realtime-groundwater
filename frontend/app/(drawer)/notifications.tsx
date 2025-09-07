@@ -13,7 +13,6 @@ import { useNotifications, NotificationCategory, Notification } from '../../cont
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../hooks/useTheme';
 import { scale, verticalScale } from '../../utils/styling';
-import AppHeader from '../../components/AppHeader';
 
 const { width } = Dimensions.get('window');
 
@@ -75,9 +74,7 @@ const NotificationInsights = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <AppHeader title="Notification Analytics" showLogo={false} />
-      
+    <SafeAreaView style={styles.container}>      
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Overview Stats */}
         <View style={styles.section}>
