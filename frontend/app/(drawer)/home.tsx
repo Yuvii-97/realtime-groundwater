@@ -59,13 +59,12 @@ export default function Home() {
     <ScrollView style={dynamicStyles.container} showsVerticalScrollIndicator={false}>
       {/* Hero Section */}
       <View style={styles.heroSection}>
-        <Text style={styles.heroEmoji}>🌊</Text>
         <Text style={styles.heroTitle}>{t('heroTitle')}</Text>
         <Text style={styles.heroSubtitle}>
           {t('heroSubtitle')}
         </Text>
         <TouchableOpacity style={styles.getStartedButton}>
-          <Text style={styles.getStartedText}>👉 {t('getStarted')}</Text>
+          <Text style={styles.getStartedText}>{t('getStarted')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -222,7 +221,6 @@ const styles = StyleSheet.create({
   heroSection: {
     backgroundColor: "#075a7dff",
     padding: 30,
-    paddingTop: 60,
     alignItems: "center",
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
