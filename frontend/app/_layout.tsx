@@ -1,10 +1,16 @@
 import { Stack } from "expo-router";
 import { SettingsProvider } from "../contexts/SettingsContext";
+import { LanguageProvider } from "../contexts/LanguageContext";
+import { NotificationProvider } from "../contexts/NotificationContext";
 
 const StackLayout = () => {
   return (
     <SettingsProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <LanguageProvider>
+        <NotificationProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </NotificationProvider>
+      </LanguageProvider>
     </SettingsProvider>
   );
 };
