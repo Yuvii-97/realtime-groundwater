@@ -12,14 +12,7 @@ import {
 import { LineChart, BarChart } from "react-native-chart-kit";
 import * as Location from "expo-location";
 import { WebView } from "react-native-webview";
-
-// Assuming scale and verticalScale are correctly implemented in '@/utils/styling'
-// These are placeholders for illustration purposes.
-const scale = (size: number) => size; // Replace with actual scale implementation
-const verticalScale = (size: number) => size; // Replace with actual verticalScale implementation
-
-// Replace with your actual logo path if available
-// import JalShaktiLogo from '../../../assets/jalshakti-logo.png';
+import { scale,verticalScale } from "@/utils/styling";
 
 interface WellData {
   currentLevel: number;
