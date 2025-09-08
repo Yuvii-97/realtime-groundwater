@@ -1,24 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  StyleSheet
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LineChart, PieChart } from 'react-native-chart-kit';
-import { useNotifications, NotificationCategory, Notification } from '../../contexts/NotificationContext';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useTheme } from '../../hooks/useTheme';
-import { scale, verticalScale } from '../../utils/styling';
+  StyleSheet,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LineChart, PieChart } from "react-native-chart-kit";
+import {
+  useNotifications,
+  NotificationCategory,
+  Notification,
+} from "../../contexts/NotificationContext";
+import { useTranslation } from "react-i18next"; // Changed from useLanguage
+import { useTheme } from "../../hooks/useTheme";
+import { scale, verticalScale } from "../../utils/styling";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const NotificationInsights = () => {
   const { notifications } = useNotifications();
-  const { t } = useLanguage();
+  const { t } = useTranslation(); // Changed from useLanguage
   const theme = useTheme();
 
   // Analytics Data
@@ -32,29 +36,67 @@ const NotificationInsights = () => {
       return notifDate.toDateString() === date.toDateString();
     });
     last7Days.push({
-      day: date.toLocaleDateString('en', { weekday: 'short' }),
-      count: dayNotifications.length
+      day: date.toLocaleDateString("en", { weekday: "short" }),
+      count: dayNotifications.length,
     });
   }
 
   const categoryData = [
-    { name: 'Water Levels', population: notifications.filter((n: Notification) => n.category === 'water_level').length, color: '#007AFF', legendFontColor: '#333', legendFontSize: 12 },
-    { name: 'Predictions', population: notifications.filter((n: Notification) => n.category === 'prediction').length, color: '#FF9500', legendFontColor: '#333', legendFontSize: 12 },
-    { name: 'System', population: notifications.filter((n: Notification) => n.category === 'system').length, color: '#34C759', legendFontColor: '#333', legendFontSize: 12 },
-    { name: 'Tips', population: notifications.filter((n: Notification) => n.category === 'tip').length, color: '#AF52DE', legendFontColor: '#333', legendFontSize: 12 },
-  ].filter(item => item.population > 0);
+    {
+      name: t("notifications.waterLevels"),
+      population: notifications.filter(
+        (n: Notification) => n.category === "water_level"
+      ).length,
+      color: "#007AFF",
+      legendFontColor: "#333",
+      legendFontSize: 12,
+    },
+    {
+      name: t("notifications.predictions"),
+      population: notifications.filter(
+        (n: Notification) => n.category === "prediction"
+      ).length,
+      color: "#FF9500",
+      legendFontColor: "#333",
+      legendFontSize: 12,
+    },
+    {
+      name: t("notifications.system"),
+      population: notifications.filter(
+        (n: Notification) => n.category === "system"
+      ).length,
+      color: "#34C759",
+      legendFontColor: "#333",
+      legendFontSize: 12,
+    },
+    {
+      name: t("notifications.tips"),
+      population: notifications.filter(
+        (n: Notification) => n.category === "tip"
+      ).length,
+      color: "#AF52DE",
+      legendFontColor: "#333",
+      legendFontSize: 12,
+    },
+  ].filter((item) => item.population > 0);
 
   const chartConfig = {
-    backgroundColor: '#ffffff',
-    backgroundGradientFrom: '#ffffff',
-    backgroundGradientTo: '#ffffff',
+    backgroundColor: "#ffffff",
+    backgroundGradientFrom: "#ffffff",
+    backgroundGradientTo: "#ffffff",
     color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
     strokeWidth: 2,
     barPercentage: 0.5,
     useShadowColorFromDataset: false,
   };
 
-  const StatCard = ({ title, value, icon, color, subtitle }: {
+  const StatCard = ({
+    title,
+    value,
+    icon,
+    color,
+    subtitle,
+  }: {
     title: string;
     value: string | number;
     icon: string;
@@ -74,54 +116,64 @@ const NotificationInsights = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>      
+    <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Overview Stats */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📊 Overview</Text>
+          <Text style={styles.sectionTitle}>{t("notifications.overview")}</Text>
           <View style={styles.statsGrid}>
             <StatCard
-              title="Total Notifications"
+              title={t("notifications.totalNotifications")}
               value={notifications.length}
               icon="📧"
               color="#007AFF"
-              subtitle="All time"
+              subtitle={t("notifications.allTime")}
             />
             <StatCard
-              title="Unread"
+              title={t("notifications.unread")}
               value={notifications.filter((n: Notification) => !n.read).length}
               icon="🔔"
               color="#FF3B30"
-              subtitle="Needs attention"
+              subtitle={t("notifications.needsAttention")}
             />
             <StatCard
-              title="Critical Alerts"
-              value={notifications.filter((n: Notification) => n.type === 'critical').length}
+              title={t("notifications.criticalAlerts")}
+              value={
+                notifications.filter((n: Notification) => n.type === "critical")
+                  .length
+              }
               icon="🚨"
               color="#FF3B30"
-              subtitle="High priority"
+              subtitle={t("notifications.highPriority")}
             />
             <StatCard
-              title="Success Updates"
-              value={notifications.filter((n: Notification) => n.type === 'success').length}
+              title={t("notifications.successUpdates")}
+              value={
+                notifications.filter((n: Notification) => n.type === "success")
+                  .length
+              }
               icon="✅"
               color="#34C759"
-              subtitle="Positive news"
+              subtitle={t("notifications.positiveNews")}
             />
           </View>
         </View>
 
         {/* Activity Chart */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📈 Weekly Activity</Text>
+          <Text style={styles.sectionTitle}>
+            {t("notifications.weeklyActivity")}
+          </Text>
           <View style={styles.chartContainer}>
             <LineChart
               data={{
-                labels: last7Days.map(d => d.day),
-                datasets: [{
-                  data: last7Days.map(d => d.count),
-                  strokeWidth: 3
-                }]
+                labels: last7Days.map((d) => d.day),
+                datasets: [
+                  {
+                    data: last7Days.map((d) => d.count),
+                    strokeWidth: 3,
+                  },
+                ],
               }}
               width={width - scale(40)}
               height={scale(200)}
@@ -142,7 +194,9 @@ const NotificationInsights = () => {
         {/* Category Distribution */}
         {categoryData.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🎯 Category Breakdown</Text>
+            <Text style={styles.sectionTitle}>
+              {t("notifications.categoryBreakdown")}
+            </Text>
             <View style={styles.chartContainer}>
               <PieChart
                 data={categoryData}
@@ -160,61 +214,116 @@ const NotificationInsights = () => {
 
         {/* Recent Trends */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🔍 Insights</Text>
+          <Text style={styles.sectionTitle}>{t("notifications.insights")}</Text>
           <View style={styles.insightCard}>
-            <Text style={styles.insightTitle}>💧 Water Level Monitoring</Text>
+            <Text style={styles.insightTitle}>
+              {t("notifications.waterLevelMonitoring")}
+            </Text>
             <Text style={styles.insightText}>
-              {notifications.filter((n: Notification) => n.category === 'water_level').length} water level alerts in the last week. 
-              {notifications.filter((n: Notification) => n.type === 'critical' && n.category === 'water_level').length > 0 
-                ? ` ${notifications.filter((n: Notification) => n.type === 'critical' && n.category === 'water_level').length} are critical and require immediate attention.`
-                : ' All levels are within normal range.'
-              }
+              {
+                notifications.filter(
+                  (n: Notification) => n.category === "water_level"
+                ).length
+              }{" "}
+              {t("notifications.waterLevelAlertsInWeek")}.
+              {notifications.filter(
+                (n: Notification) =>
+                  n.type === "critical" && n.category === "water_level"
+              ).length > 0
+                ? ` ${
+                    notifications.filter(
+                      (n: Notification) =>
+                        n.type === "critical" && n.category === "water_level"
+                    ).length
+                  } ${t("notifications.areCritical")}.`
+                : ` ${t("notifications.allLevelsNormal")}.`}
             </Text>
           </View>
 
           <View style={styles.insightCard}>
-            <Text style={styles.insightTitle}>🤖 AI Predictions</Text>
+            <Text style={styles.insightTitle}>
+              {t("notifications.aiPredictions")}
+            </Text>
             <Text style={styles.insightText}>
-              AI system generated {notifications.filter((n: Notification) => n.category === 'prediction').length} predictive alerts. 
-              These help you prepare for upcoming water level changes with 85%+ accuracy.
+              {t("notifications.aiGenerated")}{" "}
+              {
+                notifications.filter(
+                  (n: Notification) => n.category === "prediction"
+                ).length
+              }{" "}
+              {t("notifications.predictiveAlerts")}.
+              {t("notifications.helpPrepare")}.
             </Text>
           </View>
 
           <View style={styles.insightCard}>
-            <Text style={styles.insightTitle}>📊 Performance</Text>
+            <Text style={styles.insightTitle}>
+              {t("notifications.performance")}
+            </Text>
             <Text style={styles.insightText}>
-              Your notification system is working optimally. Average response time: &lt;2 minutes. 
-              Latest data from {notifications.length > 0 ? new Date(notifications[0].timestamp).toLocaleString() : 'N/A'}.
+              {t("notifications.systemOptimal")}.{" "}
+              {t("notifications.averageResponseTime")}.
+              {t("notifications.latestData")}{" "}
+              {notifications.length > 0
+                ? new Date(notifications[0].timestamp).toLocaleString()
+                : "N/A"}
+              .
             </Text>
           </View>
         </View>
 
         {/* Quick Actions */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>⚡ Quick Actions</Text>
+          <Text style={styles.sectionTitle}>
+            {t("notifications.quickActions")}
+          </Text>
           <View style={styles.actionGrid}>
-            <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#E5F3FF' }]}>
+            <TouchableOpacity
+              style={[styles.actionCard, { backgroundColor: "#E5F3FF" }]}
+            >
               <Text style={styles.actionIcon}>🔧</Text>
-              <Text style={styles.actionTitle}>Settings</Text>
-              <Text style={styles.actionSubtitle}>Configure alerts</Text>
+              <Text style={styles.actionTitle}>
+                {t("notifications.settings")}
+              </Text>
+              <Text style={styles.actionSubtitle}>
+                {t("notifications.configureAlerts")}
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#E5F7E5' }]}>
+            <TouchableOpacity
+              style={[styles.actionCard, { backgroundColor: "#E5F7E5" }]}
+            >
               <Text style={styles.actionIcon}>📊</Text>
-              <Text style={styles.actionTitle}>Reports</Text>
-              <Text style={styles.actionSubtitle}>Generate analysis</Text>
+              <Text style={styles.actionTitle}>
+                {t("notifications.reports")}
+              </Text>
+              <Text style={styles.actionSubtitle}>
+                {t("notifications.generateAnalysis")}
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#FFF2E5' }]}>
+            <TouchableOpacity
+              style={[styles.actionCard, { backgroundColor: "#FFF2E5" }]}
+            >
               <Text style={styles.actionIcon}>🎯</Text>
-              <Text style={styles.actionTitle}>Filters</Text>
-              <Text style={styles.actionSubtitle}>Customize view</Text>
+              <Text style={styles.actionTitle}>
+                {t("notifications.filters")}
+              </Text>
+              <Text style={styles.actionSubtitle}>
+                {t("notifications.customizeView")}
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#FFE5E5' }]}>
+            <TouchableOpacity
+              style={[styles.actionCard, { backgroundColor: "#FFE5E5" }]}
+            >
               <Text style={styles.actionIcon}>📤</Text>
-              <Text style={styles.actionTitle}>Export</Text>
-              <Text style={styles.actionSubtitle}>Share data</Text>
+              <Text style={styles.actionTitle}>
+                {t("notifications.export")}
+              </Text>
+              <Text style={styles.actionSubtitle}>
+                {t("notifications.shareData")}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -228,7 +337,7 @@ const NotificationInsights = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   content: {
     flex: 1,
@@ -238,18 +347,18 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: scale(20),
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
     marginHorizontal: scale(20),
     marginBottom: scale(15),
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     paddingHorizontal: scale(10),
   },
   statCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     width: (width - scale(60)) / 2,
     margin: scale(10),
     padding: scale(15),
@@ -261,8 +370,8 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   statHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   statIcon: {
     fontSize: scale(24),
@@ -270,21 +379,21 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: scale(24),
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
   },
   statTitle: {
     fontSize: scale(12),
-    color: '#666666',
+    color: "#666666",
     marginTop: scale(2),
   },
   statSubtitle: {
     fontSize: scale(10),
-    color: '#999999',
+    color: "#999999",
     marginTop: scale(1),
   },
   chartContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginHorizontal: scale(20),
     borderRadius: scale(12),
     padding: scale(10),
@@ -297,7 +406,7 @@ const styles = StyleSheet.create({
     borderRadius: scale(12),
   },
   insightCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginHorizontal: scale(20),
     marginBottom: scale(12),
     padding: scale(16),
@@ -309,18 +418,18 @@ const styles = StyleSheet.create({
   },
   insightTitle: {
     fontSize: scale(16),
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
     marginBottom: scale(8),
   },
   insightText: {
     fontSize: scale(14),
-    color: '#666666',
+    color: "#666666",
     lineHeight: scale(20),
   },
   actionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     paddingHorizontal: scale(10),
   },
   actionCard: {
@@ -328,7 +437,7 @@ const styles = StyleSheet.create({
     margin: scale(10),
     padding: scale(20),
     borderRadius: scale(12),
-    alignItems: 'center',
+    alignItems: "center",
     elevation: 2,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -340,14 +449,14 @@ const styles = StyleSheet.create({
   },
   actionTitle: {
     fontSize: scale(16),
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
     marginBottom: scale(4),
   },
   actionSubtitle: {
     fontSize: scale(12),
-    color: '#666666',
-    textAlign: 'center',
+    color: "#666666",
+    textAlign: "center",
   },
 });
 

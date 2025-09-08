@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
@@ -6,10 +6,11 @@ import { colors } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
 import { useTheme } from "../hooks/useTheme";
 import { useSettings } from "../contexts/SettingsContext";
-import { useLanguage } from "../contexts/LanguageContext";
+import { useTranslation } from "react-i18next"; // Use react-i18next directly
 import { useNotifications } from "../contexts/NotificationContext";
 import LanguageSelector from "./LanguageSelector";
 import { NotificationPanel } from "./NotificationPanel";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // For saving language
 
 interface AppHeaderProps {
   title?: string;
@@ -27,9 +28,26 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const navigation = useNavigation();
   const theme = useTheme();
   const { notificationsEnabled } = useSettings();
-  const { t } = useLanguage();
+  const { t, i18n } = useTranslation(); // Use i18next's translation hook
   const { unreadCount = 0 } = useNotifications() || {};
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+
+  // Language change handler
+  const handleLanguageChange = useCallback(
+    async (languageCode: string) => {
+      // Change language
+      await i18n.changeLanguage(languageCode);
+
+      // Save to AsyncStorage
+      await AsyncStorage.setItem("language", languageCode);
+
+      // Call any additional callback if provided
+      if (onLanguageSwitch) {
+        onLanguageSwitch();
+      }
+    },
+    [i18n, onLanguageSwitch]
+  );
 
   const handleNotificationPress = () => {
     setShowNotificationPanel(true);
@@ -71,12 +89,18 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           />
         )}
         <View style={styles.titleContainer}>
-          <Text style={dynamicStyles.title}>{title === "Ground Water" ? t('groundWater') : title}</Text>
-          <Text style={dynamicStyles.subtitle}>{t('analytics')}</Text>
+          <Text style={dynamicStyles.title}>
+            {title === "Ground Water" ? `${t("groundWater")}` : title}
+          </Text>
+          <Text style={dynamicStyles.subtitle}>{`${t("analytics")}`}</Text>
         </View>
       </View>
       <View style={styles.right}>
-        <LanguageSelector showAsButton={true} onLanguageSelected={onLanguageSwitch} />
+        <LanguageSelector
+          showAsButton={true}
+          onLanguageSelected={handleLanguageChange}
+          currentLanguage={i18n.language}
+        />
         <TouchableOpacity
           onPress={handleNotificationPress}
           style={styles.iconButton}
@@ -89,13 +113,13 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           {unreadCount > 0 && (
             <View style={styles.notificationBadge}>
               <Text style={styles.badgeText}>
-                {unreadCount > 99 ? '99+' : String(unreadCount)}
+                {unreadCount > 99 ? "99+" : String(unreadCount)}
               </Text>
             </View>
           )}
         </TouchableOpacity>
       </View>
-      
+
       <NotificationPanel
         visible={showNotificationPanel}
         onClose={() => setShowNotificationPanel(false)}
@@ -122,7 +146,7 @@ const styles = StyleSheet.create({
   logo: {
     width: scale(45),
     height: verticalScale(38),
-    marginLeft: scale(-4)
+    marginLeft: scale(-4),
   },
   titleContainer: {
     justifyContent: "center",

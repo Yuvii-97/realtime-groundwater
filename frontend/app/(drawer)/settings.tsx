@@ -10,9 +10,9 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 import { useSettings } from "../../contexts/SettingsContext";
-import { useLanguage } from "../../contexts/LanguageContext";
+import { useTranslation } from "react-i18next"; // Changed from useLanguage
 import LanguageSelector from "../../components/LanguageSelector";
 
 interface LanguageOption {
@@ -22,63 +22,59 @@ interface LanguageOption {
 }
 
 const languageOptions: LanguageOption[] = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-  { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-  { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-  { code: 'kn', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
-  { code: 'ml', name: 'മലയാളം', flag: '🇮🇳' },
-  { code: 'bn', name: 'বাংলা', flag: '🇮🇳' },
-  { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
-  { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
-  { code: 'pa', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "hi", name: "हिंदी", flag: "🇮🇳" },
+  { code: "te", name: "తెలుగు", flag: "🇮🇳" },
+  { code: "ta", name: "தமிழ்", flag: "🇮🇳" },
+  { code: "kn", name: "ಕನ್ನಡ", flag: "🇮🇳" },
+  { code: "ml", name: "മലയാളം", flag: "🇮🇳" },
+  { code: "bn", name: "বাংলা", flag: "🇮🇳" },
+  { code: "gu", name: "ગુજરાતી", flag: "🇮🇳" },
+  { code: "mr", name: "मराठी", flag: "🇮🇳" },
+  { code: "pa", name: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
 ];
 
 const refreshIntervalOptions = [
-  { value: 15, label: '15 minutes' },
-  { value: 30, label: '30 minutes' },
-  { value: 60, label: '1 hour' },
-  { value: 120, label: '2 hours' },
-  { value: 240, label: '4 hours' },
+  { value: 15, label: "15 minutes" },
+  { value: 30, label: "30 minutes" },
+  { value: 60, label: "1 hour" },
+  { value: 120, label: "2 hours" },
+  { value: 240, label: "4 hours" },
 ];
 
 export default function Settings() {
   const settings = useSettings();
-  const { t } = useLanguage();
+  const { t } = useTranslation(); // Changed from useLanguage
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [intervalModalVisible, setIntervalModalVisible] = useState(false);
 
   const handleClearCache = () => {
-    Alert.alert(
-      "Clear Cache",
-      "Are you sure you want to clear all cached data? This will remove downloaded maps and station data.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { 
-          text: "Clear", 
-          style: "destructive",
-          onPress: () => {
-            // Implement cache clearing logic here
-            Alert.alert("Success", "Cache cleared successfully!");
-          }
-        }
-      ]
-    );
+    Alert.alert(t("settings.clearCache"), t("settings.clearCacheConfirm"), [
+      { text: t("settings.cancel"), style: "cancel" },
+      {
+        text: t("settings.clear"),
+        style: "destructive",
+        onPress: () => {
+          // Implement cache clearing logic here
+          Alert.alert(t("settings.success"), t("settings.cacheCleared"));
+        },
+      },
+    ]);
   };
 
   const handleResetSettings = () => {
     Alert.alert(
-      "Reset Settings",
-      "Are you sure you want to reset all settings to default values?",
+      t("settings.resetSettings"),
+      t("settings.resetSettingsConfirm"),
       [
-        { text: "Cancel", style: "cancel" },
-        { 
-          text: "Reset", 
+        { text: t("settings.cancel"), style: "cancel" },
+        {
+          text: t("settings.reset"),
           style: "destructive",
           onPress: () => {
             // Reset all settings to default
             settings.setIsDarkMode(false);
-            settings.setLanguage('en');
+            settings.setLanguage("en");
             settings.setNotificationsEnabled(true);
             settings.setAlertsEnabled(true);
             settings.setEmailNotifications(false);
@@ -86,41 +82,52 @@ export default function Settings() {
             settings.setRefreshInterval(30);
             settings.setDataCollection(true);
             settings.setLocationAccess(true);
-            settings.setTemperatureUnit('celsius');
-            settings.setWaterLevelUnit('meters');
-            Alert.alert("Success", "Settings reset to default values!");
-          }
-        }
+            settings.setTemperatureUnit("celsius");
+            settings.setWaterLevelUnit("meters");
+            Alert.alert(t("settings.success"), t("settings.settingsReset"));
+          },
+        },
       ]
     );
   };
 
   const getLanguageName = (code: string) => {
-    return languageOptions.find(lang => lang.code === code)?.name || 'English';
+    return (
+      languageOptions.find((lang) => lang.code === code)?.name || "English"
+    );
   };
 
   const getLanguageFlag = (code: string) => {
-    return languageOptions.find(lang => lang.code === code)?.flag || '🇺🇸';
+    return languageOptions.find((lang) => lang.code === code)?.flag || "🇺🇸";
   };
 
   const getRefreshIntervalLabel = (value: number) => {
-    return refreshIntervalOptions.find(option => option.value === value)?.label || `${value} minutes`;
+    return (
+      refreshIntervalOptions.find((option) => option.value === value)?.label ||
+      `${value} minutes`
+    );
   };
 
-  const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  const SettingSection = ({
+    title,
+    children,
+  }: {
+    title: string;
+    children: React.ReactNode;
+  }) => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {children}
     </View>
   );
 
-  const SettingItem = ({ 
-    icon, 
-    title, 
-    subtitle, 
-    rightElement, 
+  const SettingItem = ({
+    icon,
+    title,
+    subtitle,
+    rightElement,
     onPress,
-    showArrow = false 
+    showArrow = false,
   }: {
     icon: string;
     title: string;
@@ -129,8 +136,8 @@ export default function Settings() {
     onPress?: () => void;
     showArrow?: boolean;
   }) => (
-    <TouchableOpacity 
-      style={styles.settingItem} 
+    <TouchableOpacity
+      style={styles.settingItem}
       onPress={onPress}
       disabled={!onPress}
     >
@@ -143,7 +150,9 @@ export default function Settings() {
       </View>
       <View style={styles.settingRight}>
         {rightElement}
-        {showArrow && <Ionicons name="chevron-forward" size={20} color="#999" />}
+        {showArrow && (
+          <Ionicons name="chevron-forward" size={20} color="#999" />
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -152,16 +161,18 @@ export default function Settings() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('settings')}</Text>
-        <Text style={styles.headerSubtitle}>Customize your groundwater monitoring experience</Text>
+        <Text style={styles.headerTitle}>{t("settings.settings")}</Text>
+        <Text style={styles.headerSubtitle}>
+          {t("settings.customizeExperience")}
+        </Text>
       </View>
 
       {/* Appearance */}
-      <SettingSection title={t('appearance')}>
+      <SettingSection title={t("settings.appearance")}>
         <SettingItem
           icon="moon"
-          title={t('darkMode')}
-          subtitle="Switch between light and dark theme"
+          title={t("settings.darkMode")}
+          subtitle={t("settings.darkModeSubtitle")}
           rightElement={
             <Switch
               value={settings.isDarkMode}
@@ -177,11 +188,11 @@ export default function Settings() {
       <LanguageSelector />
 
       {/* Notifications */}
-      <SettingSection title={t('notifications')}>
+      <SettingSection title={t("settings.notifications")}>
         <SettingItem
           icon="notifications"
-          title="Push Notifications"
-          subtitle="Receive app notifications"
+          title={t("settings.pushNotifications")}
+          subtitle={t("settings.pushNotificationsSubtitle")}
           rightElement={
             <Switch
               value={settings.notificationsEnabled}
@@ -193,8 +204,8 @@ export default function Settings() {
         />
         <SettingItem
           icon="warning"
-          title="Water Level Alerts"
-          subtitle="Get alerts for critical water levels"
+          title={t("settings.waterLevelAlerts")}
+          subtitle={t("settings.waterLevelAlertsSubtitle")}
           rightElement={
             <Switch
               value={settings.alertsEnabled}
@@ -207,8 +218,8 @@ export default function Settings() {
         />
         <SettingItem
           icon="mail"
-          title="Email Notifications"
-          subtitle="Receive reports via email"
+          title={t("settings.emailNotifications")}
+          subtitle={t("settings.emailNotificationsSubtitle")}
           rightElement={
             <Switch
               value={settings.emailNotifications}
@@ -221,11 +232,11 @@ export default function Settings() {
       </SettingSection>
 
       {/* Data & Sync */}
-      <SettingSection title="Data & Sync">
+      <SettingSection title={t("settings.dataSync")}>
         <SettingItem
           icon="refresh"
-          title="Auto Refresh"
-          subtitle="Automatically update data"
+          title={t("settings.autoRefresh")}
+          subtitle={t("settings.autoRefreshSubtitle")}
           rightElement={
             <Switch
               value={settings.autoRefresh}
@@ -237,7 +248,7 @@ export default function Settings() {
         />
         <SettingItem
           icon="time"
-          title="Refresh Interval"
+          title={t("settings.refreshInterval")}
           subtitle={getRefreshIntervalLabel(settings.refreshInterval)}
           onPress={() => setIntervalModalVisible(true)}
           showArrow
@@ -245,41 +256,59 @@ export default function Settings() {
       </SettingSection>
 
       {/* Units */}
-      <SettingSection title="Units">
+      <SettingSection title={t("settings.units")}>
         <SettingItem
           icon="thermometer"
-          title="Temperature Unit"
-          subtitle={settings.temperatureUnit === 'celsius' ? 'Celsius (°C)' : 'Fahrenheit (°F)'}
+          title={t("settings.temperatureUnit")}
+          subtitle={
+            settings.temperatureUnit === "celsius"
+              ? t("settings.celsius")
+              : t("settings.fahrenheit")
+          }
           rightElement={
             <Switch
-              value={settings.temperatureUnit === 'fahrenheit'}
-              onValueChange={(value) => settings.setTemperatureUnit(value ? 'fahrenheit' : 'celsius')}
+              value={settings.temperatureUnit === "fahrenheit"}
+              onValueChange={(value) =>
+                settings.setTemperatureUnit(value ? "fahrenheit" : "celsius")
+              }
               trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.temperatureUnit === 'fahrenheit' ? "#ffffff" : "#f4f3f4"}
+              thumbColor={
+                settings.temperatureUnit === "fahrenheit"
+                  ? "#ffffff"
+                  : "#f4f3f4"
+              }
             />
           }
         />
         <SettingItem
           icon="water"
-          title="Water Level Unit"
-          subtitle={settings.waterLevelUnit === 'meters' ? 'Meters (m)' : 'Feet (ft)'}
+          title={t("settings.waterLevelUnit")}
+          subtitle={
+            settings.waterLevelUnit === "meters"
+              ? t("settings.meters")
+              : t("settings.feet")
+          }
           rightElement={
             <Switch
-              value={settings.waterLevelUnit === 'feet'}
-              onValueChange={(value) => settings.setWaterLevelUnit(value ? 'feet' : 'meters')}
+              value={settings.waterLevelUnit === "feet"}
+              onValueChange={(value) =>
+                settings.setWaterLevelUnit(value ? "feet" : "meters")
+              }
               trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.waterLevelUnit === 'feet' ? "#ffffff" : "#f4f3f4"}
+              thumbColor={
+                settings.waterLevelUnit === "feet" ? "#ffffff" : "#f4f3f4"
+              }
             />
           }
         />
       </SettingSection>
 
       {/* Privacy */}
-      <SettingSection title="Privacy & Security">
+      <SettingSection title={t("settings.privacySecurity")}>
         <SettingItem
           icon="analytics"
-          title="Data Collection"
-          subtitle="Help improve the app with usage data"
+          title={t("settings.dataCollection")}
+          subtitle={t("settings.dataCollectionSubtitle")}
           rightElement={
             <Switch
               value={settings.dataCollection}
@@ -291,8 +320,8 @@ export default function Settings() {
         />
         <SettingItem
           icon="location"
-          title="Location Access"
-          subtitle="Allow location-based features"
+          title={t("settings.locationAccess")}
+          subtitle={t("settings.locationAccessSubtitle")}
           rightElement={
             <Switch
               value={settings.locationAccess}
@@ -305,42 +334,57 @@ export default function Settings() {
       </SettingSection>
 
       {/* Storage */}
-      <SettingSection title="Storage">
+      <SettingSection title={t("settings.storage")}>
         <SettingItem
           icon="trash"
-          title="Clear Cache"
-          subtitle="Free up storage space"
+          title={t("settings.clearCache")}
+          subtitle={t("settings.clearCacheSubtitle")}
           onPress={handleClearCache}
           showArrow
         />
       </SettingSection>
 
       {/* About */}
-      <SettingSection title="About">
+      <SettingSection title={t("settings.about")}>
         <SettingItem
           icon="information-circle"
-          title="App Version"
+          title={t("settings.appVersion")}
           subtitle="1.0.0"
         />
         <SettingItem
           icon="document-text"
-          title="Privacy Policy"
-          onPress={() => Alert.alert("Privacy Policy", "Privacy policy content would go here.")}
+          title={t("settings.privacyPolicy")}
+          onPress={() =>
+            Alert.alert(
+              t("settings.privacyPolicy"),
+              t("settings.privacyPolicyContent")
+            )
+          }
           showArrow
         />
         <SettingItem
           icon="document-text"
-          title="Terms of Service"
-          onPress={() => Alert.alert("Terms of Service", "Terms of service content would go here.")}
+          title={t("settings.termsOfService")}
+          onPress={() =>
+            Alert.alert(
+              t("settings.termsOfService"),
+              t("settings.termsOfServiceContent")
+            )
+          }
           showArrow
         />
       </SettingSection>
 
       {/* Reset */}
       <View style={styles.section}>
-        <TouchableOpacity style={styles.resetButton} onPress={handleResetSettings}>
+        <TouchableOpacity
+          style={styles.resetButton}
+          onPress={handleResetSettings}
+        >
           <Ionicons name="refresh-outline" size={20} color="#ef4444" />
-          <Text style={styles.resetButtonText}>Reset All Settings</Text>
+          <Text style={styles.resetButtonText}>
+            {t("settings.resetAllSettings")}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -354,7 +398,9 @@ export default function Settings() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Language</Text>
+              <Text style={styles.modalTitle}>
+                {t("settings.selectLanguage")}
+              </Text>
               <TouchableOpacity onPress={() => setLanguageModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
@@ -366,7 +412,8 @@ export default function Settings() {
                 <TouchableOpacity
                   style={[
                     styles.languageOption,
-                    settings.language === item.code && styles.languageOptionSelected
+                    settings.language === item.code &&
+                      styles.languageOptionSelected,
                   ]}
                   onPress={() => {
                     settings.setLanguage(item.code);
@@ -374,10 +421,13 @@ export default function Settings() {
                   }}
                 >
                   <Text style={styles.languageFlag}>{item.flag}</Text>
-                  <Text style={[
-                    styles.languageName,
-                    settings.language === item.code && styles.languageNameSelected
-                  ]}>
+                  <Text
+                    style={[
+                      styles.languageName,
+                      settings.language === item.code &&
+                        styles.languageNameSelected,
+                    ]}
+                  >
                     {item.name}
                   </Text>
                   {settings.language === item.code && (
@@ -400,7 +450,9 @@ export default function Settings() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Refresh Interval</Text>
+              <Text style={styles.modalTitle}>
+                {t("settings.refreshInterval")}
+              </Text>
               <TouchableOpacity onPress={() => setIntervalModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>
@@ -412,17 +464,21 @@ export default function Settings() {
                 <TouchableOpacity
                   style={[
                     styles.intervalOption,
-                    settings.refreshInterval === item.value && styles.intervalOptionSelected
+                    settings.refreshInterval === item.value &&
+                      styles.intervalOptionSelected,
                   ]}
                   onPress={() => {
                     settings.setRefreshInterval(item.value);
                     setIntervalModalVisible(false);
                   }}
                 >
-                  <Text style={[
-                    styles.intervalLabel,
-                    settings.refreshInterval === item.value && styles.intervalLabelSelected
-                  ]}>
+                  <Text
+                    style={[
+                      styles.intervalLabel,
+                      settings.refreshInterval === item.value &&
+                        styles.intervalLabelSelected,
+                    ]}
+                  >
                     {item.label}
                   </Text>
                   {settings.refreshInterval === item.value && (

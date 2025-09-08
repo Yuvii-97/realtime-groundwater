@@ -13,11 +13,11 @@ import {
 import { scale, verticalScale } from "@/utils/styling";
 import AppHeader from "@/components/AppHeader";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next"; // Changed from useLanguage
 
 export default function Layout() {
-  const { t } = useLanguage();
-  
+  const { t } = useTranslation(); // Changed from useLanguage
+
   return (
     <Drawer
       drawerContent={(props) => (
@@ -32,8 +32,8 @@ export default function Layout() {
               resizeMode="contain"
             />
             <View>
-              <Text style={styles.title}>{t('groundWater')}</Text>
-              <Text style={styles.subtitle}>{t('analytics')}</Text>
+              <Text style={styles.title}>{t("groundWater")}</Text>
+              <Text style={styles.subtitle}>{t("analytics")}</Text>
             </View>
           </View>
           <View style={styles.divider} />
@@ -64,7 +64,7 @@ export default function Layout() {
       <Drawer.Screen
         name="home"
         options={{
-          title: t('home'),
+          title: t("drawer.home"),
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -73,7 +73,7 @@ export default function Layout() {
       <Drawer.Screen
         name="dashboard"
         options={{
-          title: t('dashboard'),
+          title: t("drawer.dashboard"),
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="view-dashboard-outline"
@@ -86,7 +86,7 @@ export default function Layout() {
       <Drawer.Screen
         name="groundwaterMonitoring"
         options={{
-          title: t('groundwaterMonitoring'),
+          title: t("drawer.groundwaterMonitoring"),
           drawerIcon: ({ color, size }) => (
             <FontAwesome5 name="water" size={size} color={color} />
           ),
@@ -95,7 +95,7 @@ export default function Layout() {
       <Drawer.Screen
         name="livedata"
         options={{
-          title: t('liveData'),
+          title: t("drawer.liveData"),
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="chart-line"
@@ -108,7 +108,7 @@ export default function Layout() {
       <Drawer.Screen
         name="analytics"
         options={{
-          title: t('analytics'),
+          title: t("drawer.analytics"),
           drawerIcon: ({ color, size }) => (
             <Ionicons name="analytics-outline" size={size} color={color} />
           ),
@@ -117,7 +117,7 @@ export default function Layout() {
       <Drawer.Screen
         name="maps"
         options={{
-          title: t('maps'),
+          title: t("drawer.maps"),
           drawerIcon: ({ color, size }) => (
             <Ionicons name="map-outline" size={size} color={color} />
           ),
@@ -126,7 +126,7 @@ export default function Layout() {
       <Drawer.Screen
         name="reports"
         options={{
-          title: t('reports'),
+          title: t("drawer.reports"),
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="file-document-outline"
@@ -139,7 +139,7 @@ export default function Layout() {
       <Drawer.Screen
         name="settings"
         options={{
-          title: t('settings'),
+          title: t("drawer.settings"),
           drawerIcon: ({ color, size }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
           ),

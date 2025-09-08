@@ -1,0 +1,21 @@
+{
+  "groundWater": "ഭൂമിജലം",
+  "analytics": "വിശകലനം",
+  "language": "ഭാഷ",
+  "close": "അടയ്ക്കുക",
+  "notifications": "അറിയിപ്പുകൾ",
+  "markAllAsRead": "എല്ലാം വായിച്ചതായി അടയാളപ്പെടുത്തുക",
+  "clearAll": "എല്ലാം മായ്ക്കുക",
+  "noNotifications": "അറിയിപ്പുകൾ ഇല്ല",
+  "all": "എല്ലാം",
+  "waterLevelAlerts": "ജലനില അലേർട്ടുകൾ",
+  "predictions": "പ്രവചനങ്ങൾ",
+  "system": "സിസ്റ്റം",
+  "tips": "സൂചനകൾ",
+  "selectLanguage": "ഭാഷ തിരഞ്ഞെടുക്കുക",
+  "welcome": "സ്വാഗതം",
+  "home": {
+    "title": "ഭൂമിജല നിരീക്ഷണം",
+    "subtitle": "റിയൽ-ടൈം ഡാറ്റയും വിശകലനവും"
+  }
+}
