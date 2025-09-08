@@ -5,7 +5,6 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   Alert,
   RefreshControl,
 } from "react-native";
@@ -14,10 +13,8 @@ import {
   Notification,
   NotificationCategory,
 } from "../contexts/NotificationContext";
-import { useLanguage } from "../contexts/LanguageContext";
+import { useTranslation } from "react-i18next"; // Changed from useLanguage
 import { scale } from "../utils/styling";
-
-const { width, height } = Dimensions.get("window");
 
 interface NotificationPanelProps {
   visible: boolean;
@@ -33,7 +30,7 @@ const CategoryFilter = ({
   onSelectCategory: (category: NotificationCategory | "all") => void;
   notifications: Notification[];
 }) => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   // Safety check for notifications
   const safeNotifications = Array.isArray(notifications) ? notifications : [];
@@ -41,34 +38,34 @@ const CategoryFilter = ({
   const categories = [
     {
       key: "all",
-      label: t("all"),
+      label: t("notifications.all"),
       icon: "📋",
       count: safeNotifications.length,
     },
     {
       key: "water_level",
-      label: t("waterLevelAlerts"),
+      label: t("notifications.waterLevelAlerts"),
       icon: "💧",
       count: safeNotifications.filter((n) => n && n.category === "water_level")
         .length,
     },
     {
       key: "prediction",
-      label: t("predictions"),
+      label: t("notifications.predictions"),
       icon: "🔮",
       count: safeNotifications.filter((n) => n && n.category === "prediction")
         .length,
     },
     {
       key: "system",
-      label: t("system"),
+      label: t("notifications.system"),
       icon: "⚙️",
       count: safeNotifications.filter((n) => n && n.category === "system")
         .length,
     },
     {
       key: "tip",
-      label: t("tips"),
+      label: t("notifications.tips"),
       icon: "💡",
       count: safeNotifications.filter((n) => n && n.category === "tip").length,
     },
@@ -78,7 +75,7 @@ const CategoryFilter = ({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      style={{ marginBottom: scale(15), maxHeight: scale(50) }} // Limit height to prevent vertical bar look
+      style={{ marginBottom: scale(15), maxHeight: scale(50) }}
       contentContainerStyle={{
         paddingHorizontal: scale(20),
         alignItems: "center",
@@ -94,7 +91,7 @@ const CategoryFilter = ({
             backgroundColor:
               selectedCategory === category.key ? "#007AFF" : "#F5F5F5",
             paddingHorizontal: scale(12),
-            paddingVertical: scale(6), // Reduced vertical padding for compactness
+            paddingVertical: scale(6),
             borderRadius: scale(20),
             marginRight: scale(8),
             flexDirection: "row",
@@ -103,7 +100,7 @@ const CategoryFilter = ({
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.2,
             shadowRadius: 2,
-            minHeight: scale(32), // Ensure consistent height
+            minHeight: scale(32),
           }}
         >
           <Text style={{ fontSize: scale(14), marginRight: scale(4) }}>
@@ -363,7 +360,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
   visible,
   onClose,
 }) => {
-  const { t } = useLanguage();
+  const { t } = useTranslation(); // Changed from useLanguage
   const {
     notifications = [],
     unreadCount = 0,
@@ -428,12 +425,12 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
 
   const handleClearAll = () => {
     Alert.alert(
-      t("clearAll"),
+      t("notifications.clearAll"),
       "Are you sure you want to clear all notifications? This action cannot be undone.",
       [
-        { text: t("cancel"), style: "cancel" },
+        { text: t("notifications.cancel"), style: "cancel" },
         {
-          text: t("clearAll"),
+          text: t("notifications.clearAll"),
           style: "destructive",
           onPress: clearAllNotifications,
         },
@@ -481,7 +478,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                   marginRight: scale(8),
                 }}
               >
-                🔔 {t("notifications")}
+                🔔 {t("notifications.notifications")}
               </Text>
               {unreadCount > 0 && (
                 <View
@@ -543,7 +540,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                   marginRight: scale(4),
                 }}
               >
-                ✓ {t("markAllAsRead")}
+                ✓ {t("notifications.markAllAsRead")}
               </Text>
             </TouchableOpacity>
 
@@ -566,7 +563,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                   marginRight: scale(4),
                 }}
               >
-                🗑️ {t("clearAll")}
+                🗑️ {t("notifications.clearAll")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -611,7 +608,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                   marginBottom: scale(8),
                 }}
               >
-                {t("noNotifications")}
+                {t("notifications.noNotifications")}
               </Text>
               <Text
                 style={{
@@ -632,7 +629,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
           ) : (
             <>
               {filteredNotifications
-                .filter((notification) => notification && notification.id) // Safety filter
+                .filter((notification) => notification && notification.id)
                 .map((notification) => (
                   <NotificationItem
                     key={notification.id}

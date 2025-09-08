@@ -1,0 +1,21 @@
+{
+  "groundWater": "જમીન પાણી",
+  "analytics": "વિશ્લેષણ",
+  "language": "ભાષા",
+  "close": "બંધ કરો",
+  "notifications": "સૂચનાઓ",
+  "markAllAsRead": "બધાને વાંચેલા તરીકે ચિહ્નિત કરો",
+  "clearAll": "બધું સાફ કરો",
+  "noNotifications": "કોઈ સૂચનાઓ નથી",
+  "all": "બધા",
+  "waterLevelAlerts": "પાણી સ્તર ચેતવણીઓ",
+  "predictions": "અનુમાનો",
+  "system": "સિસ્ટમ",
+  "tips": "સલાહો",
+  "selectLanguage": "ભાષા પસંદ કરો",
+  "welcome": "સ્વાગત છે",
+  "home": {
+    "title": "જમીન પાણી નિરીક્ષણ",
+    "subtitle": "રીઅલ-ટાઇમ ડેટા અને વિશ્લેષણ"
+  }
+}

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLanguage } from './LanguageContext';
+import { useTranslation } from 'react-i18next'; // Changed from useLanguage
 
 export type NotificationType = 'critical' | 'warning' | 'info' | 'success';
 export type NotificationCategory = 'water_level' | 'prediction' | 'system' | 'tip';
@@ -127,7 +127,7 @@ const generateSampleNotifications = (): Notification[] => {
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const { t } = useLanguage();
+  const { t } = useTranslation(); // Changed from useLanguage
   
   // Add a counter for unique IDs
   const notificationCounter = React.useRef(0);
@@ -175,23 +175,23 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const generateWaterLevelNotification = (): { title: string; message: string; type: NotificationType; icon: string } => {
     const locations = ['Pune DWLR-23', 'Mumbai DWLR-15', 'Nashik DWLR-08', 'Aurangabad DWLR-31', 'Solapur DWLR-12'];
     const levels = ['2.1m', '2.8m', '3.5m', '4.2m', '5.1m', '6.3m'];
-    const statuses = [t('dropped'), t('increased'), t('stabilized')];
+    const statuses = [t('notifications.dropped'), t('notifications.increased'), t('notifications.stabilized')];
     const notifications = [
       {
-        title: t('waterLevelAlerts'),
-        message: `${locations[Math.floor(Math.random() * locations.length)]} ${t('waterLevel')} ${statuses[Math.floor(Math.random() * statuses.length)]} to ${levels[Math.floor(Math.random() * levels.length)]}`,
+        title: t('notifications.waterLevelAlerts'),
+        message: `${locations[Math.floor(Math.random() * locations.length)]} ${t('notifications.waterLevel')} ${statuses[Math.floor(Math.random() * statuses.length)]} to ${levels[Math.floor(Math.random() * levels.length)]}`,
         type: Math.random() > 0.7 ? 'critical' as NotificationType : (Math.random() > 0.5 ? 'warning' as NotificationType : 'success' as NotificationType),
         icon: Math.random() > 0.5 ? '💧' : '📊'
       },
       {
-        title: t('realTimeReading'),
-        message: `${t('livedata')} ${t('from')} ${locations[Math.floor(Math.random() * locations.length)]}: ${t('currentLevel')} ${levels[Math.floor(Math.random() * levels.length)]}, ${t('trending')} ${Math.random() > 0.5 ? t('upward') : t('stable')}`,
+        title: t('notifications.realTimeReading'),
+        message: `${t('notifications.livedata')} ${t('notifications.from')} ${locations[Math.floor(Math.random() * locations.length)]}: ${t('notifications.currentLevel')} ${levels[Math.floor(Math.random() * levels.length)]}, ${t('notifications.trending')} ${Math.random() > 0.5 ? t('notifications.upward') : t('notifications.stable')}`,
         type: 'info' as NotificationType,
         icon: '📈'
       },
       {
-        title: t('waterQualityUpdate'),
-        message: `${t('waterQuality')} ${t('at')} ${locations[Math.floor(Math.random() * locations.length)]}: pH ${(6.5 + Math.random() * 2).toFixed(1)}, TDS ${Math.floor(200 + Math.random() * 300)}ppm - ${Math.random() > 0.8 ? t('excellent') : t('good')} ${t('quality')}`,
+        title: t('notifications.waterQualityUpdate'),
+        message: `${t('notifications.waterQuality')} ${t('notifications.at')} ${locations[Math.floor(Math.random() * locations.length)]}: pH ${(6.5 + Math.random() * 2).toFixed(1)}, TDS ${Math.floor(200 + Math.random() * 300)}ppm - ${Math.random() > 0.8 ? t('notifications.excellent') : t('notifications.good')} ${t('notifications.quality')}`,
         type: 'success' as NotificationType,
         icon: '✅'
       }
@@ -202,26 +202,26 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const generatePredictionNotification = (): { title: string; message: string; type: NotificationType; icon: string } => {
     const predictions = [
       {
-        title: t('aiForecastAlert'),
+        title: t('notifications.aiForecastAlert'),
         message: `Machine learning model predicts ${Math.floor(15 + Math.random() * 30)}% water level change in next ${Math.floor(7 + Math.random() * 30)} days. Confidence: ${Math.floor(75 + Math.random() * 20)}%`,
         type: Math.random() > 0.6 ? 'warning' as NotificationType : 'info' as NotificationType,
         icon: '🤖'
       },
       {
-        title: t('weatherImpactPrediction'),
+        title: t('notifications.weatherImpactPrediction'),
         message: `Expected rainfall: ${Math.floor(10 + Math.random() * 50)}mm. Predicted groundwater recharge: ${Math.floor(5 + Math.random() * 25)}%. Best recharge areas identified.`,
         type: 'success' as NotificationType,
         icon: '🌧️'
       },
       {
-        title: t('seasonalTrendAnalysis'),
+        title: t('notifications.seasonalTrendAnalysis'),
         message: `Historical data shows ${Math.random() > 0.5 ? 'declining' : 'improving'} trend for this period. Current levels are ${Math.floor(80 + Math.random() * 40)}% of seasonal average.`,
         type: Math.random() > 0.5 ? 'warning' as NotificationType : 'info' as NotificationType,
         icon: '📊'
       },
       {
-        title: t('demandPrediction'),
-        message: `AI forecasts ${Math.floor(10 + Math.random() * 30)}% ${Math.random() > 0.5 ? t('increased') : 'decrease'} in water demand next week. Prepare conservation measures accordingly.`,
+        title: t('notifications.demandPrediction'),
+        message: `AI forecasts ${Math.floor(10 + Math.random() * 30)}% ${Math.random() > 0.5 ? t('notifications.increased') : 'decrease'} in water demand next week. Prepare conservation measures accordingly.`,
         type: 'warning' as NotificationType,
         icon: '🔮'
       }
@@ -232,26 +232,26 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const generateSystemNotification = (): { title: string; message: string; type: NotificationType; icon: string } => {
     const systems = [
       {
-        title: t('systemStatusUpdate'),
-        message: `${Math.floor(15 + Math.random() * 10)} DWLR ${t('stations')} online. Network uptime: ${(95 + Math.random() * 5).toFixed(1)}%. All sensors functioning optimally.`,
+        title: t('notifications.systemStatusUpdate'),
+        message: `${Math.floor(15 + Math.random() * 10)} DWLR ${t('notifications.stations')} online. Network uptime: ${(95 + Math.random() * 5).toFixed(1)}%. All sensors functioning optimally.`,
         type: 'success' as NotificationType,
         icon: '📡'
       },
       {
-        title: t('dataSync'),
-        message: `Latest readings synchronized ${t('from')} ${Math.floor(20 + Math.random() * 30)} monitoring points. Data accuracy: ${(98 + Math.random() * 2).toFixed(1)}%. No transmission errors.`,
+        title: t('notifications.dataSync'),
+        message: `Latest readings synchronized ${t('notifications.from')} ${Math.floor(20 + Math.random() * 30)} monitoring points. Data accuracy: ${(98 + Math.random() * 2).toFixed(1)}%. No transmission errors.`,
         type: 'info' as NotificationType,
         icon: '🔄'
       },
       {
-        title: t('maintenanceAlert'),
-        message: `Scheduled maintenance for DWLR ${t('station')} ${Math.floor(1 + Math.random() * 50)} completed successfully. All systems restored to full operation.`,
+        title: t('notifications.maintenanceAlert'),
+        message: `Scheduled maintenance for DWLR ${t('notifications.station')} ${Math.floor(1 + Math.random() * 50)} completed successfully. All systems restored to full operation.`,
         type: 'success' as NotificationType,
         icon: '🔧'
       },
       {
-        title: t('networkExpansion'),
-        message: `New monitoring ${t('station')} DWLR-${Math.floor(51 + Math.random() * 49)} added to network. Enhanced coverage for your ${t('region')} now available.`,
+        title: t('notifications.networkExpansion'),
+        message: `New monitoring ${t('notifications.station')} DWLR-${Math.floor(51 + Math.random() * 49)} added to network. Enhanced coverage for your ${t('notifications.region')} now available.`,
         type: 'success' as NotificationType,
         icon: '📍'
       }
@@ -262,50 +262,50 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const generateTipNotification = (): { title: string; message: string; type: NotificationType; icon: string } => {
     const tips = [
       {
-        title: t('smartIrrigationTip'),
-        message: `💡 ${t('tip')}: Use drip irrigation during early morning (5-7 AM) to reduce water loss by up to 40%. Current weather is perfect for efficient watering.`,
+        title: t('notifications.smartIrrigationTip'),
+        message: `💡 ${t('notifications.tip')}: Use drip irrigation during early morning (5-7 AM) to reduce water loss by up to 40%. Current weather is perfect for efficient watering.`,
         type: 'info' as NotificationType,
         icon: '💡'
       },
       {
-        title: t('rainwaterHarvesting'),
-        message: `🌧️ Pro ${t('tip')}: With monsoon approaching, set up rainwater harvesting systems. Every 1mm rainfall on 100m² can collect 100 liters of water!`,
+        title: t('notifications.rainwaterHarvesting'),
+        message: `🌧️ Pro ${t('notifications.tip')}: With monsoon approaching, set up rainwater harvesting systems. Every 1mm rainfall on 100m² can collect 100 liters of water!`,
         type: 'info' as NotificationType,
         icon: '☔'
       },
       {
-        title: t('waterConservation'),
-        message: `🚿 Daily ${t('tip')}: Fix that leaky tap! A single drop per second wastes 5 liters daily. Check your fixtures for potential water savings.`,
+        title: t('notifications.waterConservation'),
+        message: `🚿 Daily ${t('notifications.tip')}: Fix that leaky tap! A single drop per second wastes 5 liters daily. Check your fixtures for potential water savings.`,
         type: 'info' as NotificationType,
         icon: '🔧'
       },
       {
-        title: t('optimalUsage'),
-        message: `⏰ Best Practice: Use washing machines and dishwashers during off-peak ${t('hours')} (10 PM - 6 AM) to reduce strain on water supply systems.`,
+        title: t('notifications.optimalUsage'),
+        message: `⏰ Best Practice: Use washing machines and dishwashers during off-peak ${t('notifications.hours')} (10 PM - 6 AM) to reduce strain on water supply systems.`,
         type: 'info' as NotificationType,
         icon: '⏰'
       },
       {
-        title: t('gardenWaterWisdom'),
-        message: `🌱 Green ${t('tip')}: Water your plants with rice water or pasta water (after cooling). These provide nutrients while conserving fresh water.`,
+        title: t('notifications.gardenWaterWisdom'),
+        message: `🌱 Green ${t('notifications.tip')}: Water your plants with rice water or pasta water (after cooling). These provide nutrients while conserving fresh water.`,
         type: 'info' as NotificationType,
         icon: '🌱'
       },
       {
-        title: t('monsoonPreparation'),
-        message: `🏠 Seasonal ${t('tip')}: Clean your roof gutters before monsoon. Proper drainage prevents water logging and maximizes groundwater recharge.`,
+        title: t('notifications.monsoonPreparation'),
+        message: `🏠 Seasonal ${t('notifications.tip')}: Clean your roof gutters before monsoon. Proper drainage prevents water logging and maximizes groundwater recharge.`,
         type: 'info' as NotificationType,
         icon: '🏠'
       },
       {
-        title: t('smartMonitoring'),
-        message: `📱 Tech ${t('tip')}: Check your water meter monthly. Unusual spikes might indicate hidden leaks. Early detection saves water and money!`,
+        title: t('notifications.smartMonitoring'),
+        message: `📱 Tech ${t('notifications.tip')}: Check your water meter monthly. Unusual spikes might indicate hidden leaks. Early detection saves water and money!`,
         type: 'info' as NotificationType,
         icon: '📱'
       },
       {
-        title: t('soilHealth'),
-        message: `🌾 Agriculture ${t('tip')}: Mulching reduces soil water evaporation by 50%. Use organic matter around plants to retain moisture longer.`,
+        title: t('notifications.soilHealth'),
+        message: `🌾 Agriculture ${t('notifications.tip')}: Mulching reduces soil water evaporation by 50%. Use organic matter around plants to retain moisture longer.`,
         type: 'info' as NotificationType,
         icon: '🌾'
       }
@@ -369,7 +369,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       clearInterval(systemInterval);
       clearInterval(tipsInterval);
     };
-  }, []);
+  }, [t]); // Added t as dependency
 
   // Simulate new notifications periodically (for demo purposes)
   useEffect(() => {
@@ -413,7 +413,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, 2 * 60 * 1000); // Every 2 minutes
 
     return () => clearInterval(interval);
-  }, []);
+  }, [t]); // Added t as dependency
 
   const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     // Safety check for notification data

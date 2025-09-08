@@ -1,16 +1,14 @@
 import { Stack } from "expo-router";
 import { SettingsProvider } from "../contexts/SettingsContext";
-import { LanguageProvider } from "../contexts/LanguageContext";
 import { NotificationProvider } from "../contexts/NotificationContext";
+import "../src/i18n"; // Keep this for i18n initialization
 
 const StackLayout = () => {
   return (
     <SettingsProvider>
-      <LanguageProvider>
-        <NotificationProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-        </NotificationProvider>
-      </LanguageProvider>
+      <NotificationProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </NotificationProvider>
     </SettingsProvider>
   );
 };
