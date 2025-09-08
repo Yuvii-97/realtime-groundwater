@@ -379,21 +379,6 @@ export default function Dashboard() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.logoCircle}>
-          {/* <Image source={JalShaktiLogo} style={styles.logoImg} resizeMode="contain" /> */}
-          <Text style={styles.logoText}>JS</Text> {/* Placeholder */}
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>JAL SHAKTI</Text>
-          <Text style={styles.headerSubTitle}>
-            Groundwater Monitoring Dashboard
-          </Text>
-        </View>
-        {/* Removed headerActions */}
-      </View>
-
       {/* Role Switcher */}
       <View style={styles.roleSwitcher}>
         {roles.map((role) => (
