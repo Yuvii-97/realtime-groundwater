@@ -2,7 +2,6 @@ import { Image, StyleSheet, View } from "react-native";
 import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { scale, verticalScale } from "@/utils/styling";
-
 export default function Splash() {
   const router = useRouter();
 

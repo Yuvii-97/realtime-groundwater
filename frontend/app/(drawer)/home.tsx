@@ -5,17 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
 } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
-import { useLanguage } from "../../contexts/LanguageContext";
-
-const { width } = Dimensions.get("window");
+import { useTranslation } from "react-i18next"; // Changed from useLanguage
 
 export default function Home() {
   const theme = useTheme();
-  const { t } = useLanguage();
-  
+  const { t } = useTranslation(); // Changed from useLanguage
+
   const dynamicStyles = StyleSheet.create({
     container: {
       ...styles.container,
@@ -67,36 +64,39 @@ export default function Home() {
   });
 
   return (
-    <ScrollView style={dynamicStyles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={dynamicStyles.container}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Hero Section */}
       <View style={dynamicStyles.heroSection}>
-        <Text style={styles.heroTitle}>{t('heroTitle')}</Text>
+        <Text style={styles.heroTitle}>{t('home.heroTitle')}</Text>
         <Text style={styles.heroSubtitle}>
-          {t('heroSubtitle')}
+          {t('home.heroSubtitle')}
         </Text>
         <TouchableOpacity style={styles.getStartedButton}>
-          <Text style={styles.getStartedText}>{t('getStarted')}</Text>
+          <Text style={styles.getStartedText}>{t("home.getStarted")}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Why This App Section */}
       <View style={dynamicStyles.section}>
-        <Text style={styles.sectionTitle}>{t('whyThisApp')}</Text>
+        <Text style={styles.sectionTitle}>{t("home.whyThisApp")}</Text>
         <Text style={dynamicStyles.sectionText}>
-          {t('whyThisAppDesc')}
+          {t("home.whyThisAppDesc")}
         </Text>
       </View>
 
       {/* Key Features Section */}
       <View style={dynamicStyles.section}>
-        <Text style={styles.sectionTitle}>{t('keyFeatures')}</Text>
+        <Text style={styles.sectionTitle}>{t("home.keyFeatures")}</Text>
 
         <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>📊</Text>
           <View style={styles.featureContent}>
-            <Text style={styles.featureTitle}>{t('realTimeData')}</Text>
+            <Text style={styles.featureTitle}>{t("home.realTimeData")}</Text>
             <Text style={dynamicStyles.featureDescription}>
-              {t('realTimeDataDesc')}
+              {t("home.realTimeDataDesc")}
             </Text>
           </View>
         </View>
@@ -104,9 +104,9 @@ export default function Home() {
         <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>🤖</Text>
           <View style={styles.featureContent}>
-            <Text style={styles.featureTitle}>{t('aiPredictions')}</Text>
+            <Text style={styles.featureTitle}>{t("home.aiPredictions")}</Text>
             <Text style={dynamicStyles.featureDescription}>
-              {t('aiPredictionsDesc')}
+              {t("home.aiPredictionsDesc")}
             </Text>
           </View>
         </View>
@@ -114,9 +114,9 @@ export default function Home() {
         <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>⚠️</Text>
           <View style={styles.featureContent}>
-            <Text style={styles.featureTitle}>{t('statusAlerts')}</Text>
+            <Text style={styles.featureTitle}>{t("home.statusAlerts")}</Text>
             <Text style={dynamicStyles.featureDescription}>
-              {t('statusAlertsDesc')}
+              {t("home.statusAlertsDesc")}
             </Text>
           </View>
         </View>
@@ -124,9 +124,9 @@ export default function Home() {
         <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>🗺️</Text>
           <View style={styles.featureContent}>
-            <Text style={styles.featureTitle}>{t('interactiveMap')}</Text>
+            <Text style={styles.featureTitle}>{t("home.interactiveMap")}</Text>
             <Text style={dynamicStyles.featureDescription}>
-              {t('interactiveMapDesc')}
+              {t("home.interactiveMapDesc")}
             </Text>
           </View>
         </View>
@@ -134,9 +134,11 @@ export default function Home() {
         <View style={dynamicStyles.featureItem}>
           <Text style={styles.featureIcon}>🌐</Text>
           <View style={styles.featureContent}>
-            <Text style={styles.featureTitle}>{t('multilingualSupport')}</Text>
+            <Text style={styles.featureTitle}>
+              {t("home.multilingualSupport")}
+            </Text>
             <Text style={dynamicStyles.featureDescription}>
-              {t('multilingualSupportDesc')}
+              {t("home.multilingualSupportDesc")}
             </Text>
           </View>
         </View>
@@ -144,38 +146,34 @@ export default function Home() {
 
       {/* How It Works Section */}
       <View style={dynamicStyles.section}>
-        <Text style={styles.sectionTitle}>{t('howItWorks')}</Text>
+        <Text style={styles.sectionTitle}>{t("home.howItWorks")}</Text>
 
         <View style={dynamicStyles.stepItem}>
           <Text style={styles.stepNumber}>1️⃣</Text>
-          <Text style={dynamicStyles.stepText}>{t('step1')}</Text>
+          <Text style={dynamicStyles.stepText}>{t("home.step1")}</Text>
         </View>
 
         <View style={dynamicStyles.stepItem}>
           <Text style={styles.stepNumber}>2️⃣</Text>
-          <Text style={dynamicStyles.stepText}>
-            {t('step2')}
-          </Text>
+          <Text style={dynamicStyles.stepText}>{t("home.step2")}</Text>
         </View>
 
         <View style={dynamicStyles.stepItem}>
           <Text style={styles.stepNumber}>3️⃣</Text>
-          <Text style={dynamicStyles.stepText}>
-            {t('step3')}
-          </Text>
+          <Text style={dynamicStyles.stepText}>{t("home.step3")}</Text>
         </View>
       </View>
 
       {/* Why Use It Section */}
       <View style={dynamicStyles.section}>
-        <Text style={styles.sectionTitle}>{t('whyUseIt')}</Text>
+        <Text style={styles.sectionTitle}>{t("home.whyUseIt")}</Text>
 
         <View style={dynamicStyles.benefitItem}>
           <Text style={styles.benefitCheck}>✅</Text>
           <View style={styles.benefitContent}>
-            <Text style={styles.benefitTitle}>{t('forCitizens')}</Text>
+            <Text style={styles.benefitTitle}>{t("home.forCitizens")}</Text>
             <Text style={dynamicStyles.benefitDescription}>
-              {t('forCitizensDesc')}
+              {t("home.forCitizensDesc")}
             </Text>
           </View>
         </View>
@@ -183,9 +181,9 @@ export default function Home() {
         <View style={dynamicStyles.benefitItem}>
           <Text style={styles.benefitCheck}>✅</Text>
           <View style={styles.benefitContent}>
-            <Text style={styles.benefitTitle}>{t('forFarmers')}</Text>
+            <Text style={styles.benefitTitle}>{t("home.forFarmers")}</Text>
             <Text style={dynamicStyles.benefitDescription}>
-              {t('forFarmersDesc')}
+              {t("home.forFarmersDesc")}
             </Text>
           </View>
         </View>
@@ -193,9 +191,9 @@ export default function Home() {
         <View style={dynamicStyles.benefitItem}>
           <Text style={styles.benefitCheck}>✅</Text>
           <View style={styles.benefitContent}>
-            <Text style={styles.benefitTitle}>{t('forPolicymakers')}</Text>
+            <Text style={styles.benefitTitle}>{t("home.forPolicymakers")}</Text>
             <Text style={dynamicStyles.benefitDescription}>
-              {t('forPolicymakersDesc')}
+              {t("home.forPolicymakersDesc")}
             </Text>
           </View>
         </View>
@@ -205,18 +203,16 @@ export default function Home() {
       <View style={dynamicStyles.footer}>
         <View style={styles.footerLinks}>
           <TouchableOpacity style={styles.footerLink}>
-            <Text style={styles.footerLinkText}>📖 {t('about')}</Text>
+            <Text style={styles.footerLinkText}>📖 {t("home.about")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerLink}>
-            <Text style={styles.footerLinkText}>{t('contact')}</Text>
+            <Text style={styles.footerLinkText}>{t("home.contact")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.footerLink}>
-            <Text style={styles.footerLinkText}>{t('credits')}</Text>
+            <Text style={styles.footerLinkText}>{t("home.credits")}</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.footerCredit}>
-          {t('footerCredit')}
-        </Text>
+        <Text style={styles.footerCredit}>{t("home.footerCredit")}</Text>
       </View>
     </ScrollView>
   );

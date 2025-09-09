@@ -1,0 +1,21 @@
+{
+  "groundWater": "భూగర్భ జలం",
+  "analytics": "విశ్లేషణ",
+  "language": "భాష",
+  "close": "మూసివేయి",
+  "notifications": "నోటిఫికేషన్లు",
+  "markAllAsRead": "అన్నింటినీ చదివినట్టు గుర్తించు",
+  "clearAll": "అన్నింటినీ తీసివేయి",
+  "noNotifications": "నోటిఫికేషన్లు లేవు",
+  "all": "అన్నీ",
+  "waterLevelAlerts": "జల స్థాయి హెచ్చరికలు",
+  "predictions": "అంచనాలు",
+  "system": "సిస్టమ్",
+  "tips": "సూచనలు",
+  "selectLanguage": "భాషను ఎంచుకోండి",
+  "welcome": "స్వాగతం",
+  "home": {
+    "title": "భూగర్భ జల పర్యవేక్షణ",
+    "subtitle": "రీయల్-టైమ్ డేటా మరియు విశ్లేషణ"
+  }
+}
