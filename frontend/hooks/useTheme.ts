@@ -1,20 +1,12 @@
 import { useSettings } from '../contexts/SettingsContext';
-import { colors } from '../constants/theme';
+import { lightColors, darkColors } from '../constants/theme';
 
 export const useTheme = () => {
   const { isDarkMode } = useSettings();
 
   const theme = {
-    colors: {
-      background: isDarkMode ? '#1f2937' : '#F0FFFE',
-      surface: isDarkMode ? '#374151' : '#FFFFFF',
-      primary: '#077A7D',
-      primaryLight: '#A8E6E6',
-      text: isDarkMode ? '#FFFFFF' : '#333333',
-      textSecondary: isDarkMode ? '#D1D5DB' : '#666666',
-      border: isDarkMode ? '#4B5563' : '#E5E7EB',
-      hero: '#075a7dff',
-    },
+    colors: isDarkMode ? darkColors : lightColors,
+    isDark: isDarkMode,
     spacing: {
       xs: 4,
       sm: 8,
@@ -27,6 +19,61 @@ export const useTheme = () => {
       md: 12,
       lg: 16,
       xl: 20,
+    },
+    fonts: {
+      regular: {
+        fontWeight: '400' as const,
+      },
+      medium: {
+        fontWeight: '500' as const,
+      },
+      semibold: {
+        fontWeight: '600' as const,
+      },
+      bold: {
+        fontWeight: '700' as const,
+      },
+    },
+    shadows: {
+      small: isDarkMode ? {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        elevation: 2,
+      } : {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+      },
+      medium: isDarkMode ? {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 4,
+        elevation: 4,
+      } : {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 4,
+      },
+      large: isDarkMode ? {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+        elevation: 8,
+      } : {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 8,
+      },
     },
   };
 

@@ -18,6 +18,7 @@ import { LineChart } from "react-native-chart-kit";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTheme } from "@/hooks/useTheme";
 
 const COLOR_PRIMARY = "#0A84FF";
 const COLOR_BG = "#ffffff";
@@ -32,6 +33,7 @@ type RangeKey = "week" | "month" | "year" | "custom";
 
 const GroundwaterMonitoring = () => {
   const router = useRouter();
+  const theme = useTheme();
 
   const [states, setStates] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
@@ -384,11 +386,11 @@ const GroundwaterMonitoring = () => {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: COLOR_BG }}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{ paddingBottom: 24 }}
     >
       {/* Controls Card */}
-      <View style={styles.controlsCard}>
+      <View style={[styles.controlsCard, { backgroundColor: theme.colors.surface }]}>
         <View
           style={{
             flexDirection: "row",
@@ -396,16 +398,16 @@ const GroundwaterMonitoring = () => {
             justifyContent: "space-between",
           }}
         >
-          <Text style={styles.sectionTitle}>Select Range</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Select Range</Text>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <TouchableOpacity
-              style={styles.rangeSelect}
+              style={[styles.rangeSelect, { borderColor: theme.colors.border }]}
               onPress={() => setRangeMenuVisible(true)}
             >
               <Ionicons
                 name="calendar-outline"
                 size={18}
-                color={COLOR_PRIMARY}
+                color={theme.colors.primary}
               />
               <Text style={styles.rangeSelectText}>
                 {range === "week" && "Last 7 days"}
@@ -472,9 +474,9 @@ const GroundwaterMonitoring = () => {
       </View>
 
       {/* Chart Card - Always visible at top */}
-      <View style={styles.chartCard}>
+      <View style={[styles.chartCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
         <View style={styles.chartHeader}>
-          <Text style={styles.sectionTitle}>Groundwater Depth</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Groundwater Depth</Text>
         </View>
 
         {loading && (
@@ -492,18 +494,18 @@ const GroundwaterMonitoring = () => {
                 width={Dimensions.get("window").width - 40}
                 height={260}
                 chartConfig={{
-                  backgroundColor: COLOR_BG,
-                  backgroundGradientFrom: WATER_GRADIENT_FROM,
-                  backgroundGradientTo: WATER_GRADIENT_TO,
+                  backgroundColor: theme.colors.surface,
+                  backgroundGradientFrom: theme.colors.surface,
+                  backgroundGradientTo: theme.colors.surface,
                   decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(10,132,255,${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(15,23,42,${opacity})`,
+                  color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
+                  labelColor: (opacity = 1) => theme.isDark ? `rgba(248, 250, 252, ${opacity})` : `rgba(15, 23, 42, ${opacity})`,
                   propsForDots: {
                     r: "3.5",
                     strokeWidth: "2",
-                    stroke: "#60a5fa",
+                    stroke: "#0A84FF",
                   },
-                  propsForBackgroundLines: { stroke: "#e5e7eb" },
+                  propsForBackgroundLines: { stroke: theme.isDark ? "#374151" : "#e5e7eb" },
                 }}
                 bezier
                 yAxisSuffix=" m"
@@ -557,7 +559,7 @@ const GroundwaterMonitoring = () => {
       </View>
 
       {/* Location Selectors (State/District/Station) */}
-      <View style={styles.selectorsCard}>
+      <View style={[styles.selectorsCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
         <View
           style={{
             flexDirection: "row",
@@ -565,8 +567,8 @@ const GroundwaterMonitoring = () => {
             marginBottom: 12,
           }}
         >
-          <Ionicons name="location-outline" size={18} color={COLOR_PRIMARY} />
-          <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>
+          <Ionicons name="location-outline" size={18} color={theme.colors.primary} />
+          <Text style={[styles.sectionTitle, { marginLeft: 8, color: theme.colors.text }]}>
             Filter Location
           </Text>
         </View>
@@ -637,51 +639,51 @@ const GroundwaterMonitoring = () => {
 
       {/* KPI Cards */}
       <View style={styles.kpiGrid}>
-        <View style={styles.kpiCard}>
+        <View style={[styles.kpiCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
           <View style={styles.kpiIcon}>
-            <Ionicons name="water-outline" size={18} color={COLOR_PRIMARY} />
+            <Ionicons name="water-outline" size={18} color={theme.colors.primary} />
           </View>
-          <Text style={styles.kpiLabel}>Average</Text>
-          <Text style={styles.kpiValue}>
+          <Text style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}>Average</Text>
+          <Text style={[styles.kpiValue, { color: theme.colors.text }]}>
             {kpis ? `${kpis.avg.toFixed(2)} m` : "--"}
           </Text>
         </View>
-        <View style={styles.kpiCard}>
+        <View style={[styles.kpiCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
           <View style={styles.kpiIcon}>
             <Ionicons
               name="trending-down-outline"
               size={18}
-              color={COLOR_PRIMARY}
+              color={theme.colors.primary}
             />
           </View>
-          <Text style={styles.kpiLabel}>Lowest</Text>
-          <Text style={styles.kpiValue}>
+          <Text style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}>Lowest</Text>
+          <Text style={[styles.kpiValue, { color: theme.colors.text }]}>
             {kpis ? `${kpis.min.toFixed(2)} m` : "--"}
           </Text>
         </View>
-        <View style={styles.kpiCard}>
+        <View style={[styles.kpiCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
           <View style={styles.kpiIcon}>
             <Ionicons
               name="trending-up-outline"
               size={18}
-              color={COLOR_PRIMARY}
+              color={theme.colors.primary}
             />
           </View>
-          <Text style={styles.kpiLabel}>Highest</Text>
-          <Text style={styles.kpiValue}>
+          <Text style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}>Highest</Text>
+          <Text style={[styles.kpiValue, { color: theme.colors.text }]}>
             {kpis ? `${kpis.max.toFixed(2)} m` : "--"}
           </Text>
         </View>
-        <View style={styles.kpiCard}>
+        <View style={[styles.kpiCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
           <View style={styles.kpiIcon}>
             <MaterialCommunityIcons
               name="chart-line"
               size={18}
-              color={COLOR_PRIMARY}
+              color={theme.colors.primary}
             />
           </View>
-          <Text style={styles.kpiLabel}>Trend</Text>
-          <Text style={styles.kpiValue}>
+          <Text style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}>Trend</Text>
+          <Text style={[styles.kpiValue, { color: theme.colors.text }]}>
             {kpis
               ? kpis.trend > 0
                 ? "Increasing"

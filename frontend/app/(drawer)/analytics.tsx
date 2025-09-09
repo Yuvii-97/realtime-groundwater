@@ -10,6 +10,7 @@ import {
 } from "react-native";
 // import * as Location from "expo-location"; // Commented out as we're hardcoding location
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
+import { useTheme } from "@/hooks/useTheme";
 
 const API_KEY="ABC";
 // const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe"; 
@@ -17,6 +18,8 @@ const API_KEY="ABC";
 const screenWidth = Dimensions.get("window").width;
 
 export default function Analytics() {
+  const theme = useTheme();
+  const { colors } = theme;
   const [weatherData, setWeatherData] = useState<any>(null);
   // Hardcoding Chennai location for the demo
   const [location, setLocation] = useState<{ lat: number; lon: number }>({
@@ -56,17 +59,19 @@ export default function Analytics() {
 
   // Chart configuration for consistent styling
   const chartConfig = {
-    backgroundColor: "#ffffff",
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#f5f5f5",
+    backgroundColor: colors.surface,
+    backgroundGradientFrom: colors.surface,
+    backgroundGradientTo: colors.background,
     decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`, // Default blue
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`, // Use hex primary
+    labelColor: (opacity = 1) => colors.text.includes('rgb') 
+      ? colors.text.replace('rgb', 'rgba').replace(')', `, ${opacity})`)
+      : `rgba(55, 65, 81, ${opacity})`, // Fallback for hex colors
     style: { borderRadius: 16 },
     propsForDots: {
       r: "6",
       strokeWidth: "2",
-      stroke: "#ffa726",
+      stroke: colors.primary,
     },
   };
 
@@ -148,7 +153,7 @@ export default function Analytics() {
       name: key,
       population: conditions[key],
       color: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"][index % 4],
-      legendFontColor: "#7F7F7F",
+      legendFontColor: colors.text,
       legendFontSize: 15,
     }));
   }, [weatherData]);
@@ -192,25 +197,25 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading weather data...</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.loadingText, { color: colors.text }]}>Loading weather data...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container}>
-        <Text style={styles.title}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.title, { color: colors.text }]}>
           Weather Analytics for Groundwater Monitoring
         </Text>
         {locationName && (
-          <Text style={styles.locationText}>Location: {locationName}</Text>
+          <Text style={[styles.locationText, { color: colors.textSecondary }]}>Location: {locationName}</Text>
         )}
 
         {/* Temperature Chart */}
-        <View style={styles.chartCard}>
-          <Text style={styles.sectionTitle}>Temperature Forecast</Text>
+        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Temperature Forecast</Text>
           {tempChartData && (
             <ScrollView horizontal showsHorizontalScrollIndicator={true}>
               <LineChart
@@ -233,8 +238,8 @@ export default function Analytics() {
         </View>
 
         {/* Precipitation Chart */}
-        <View style={styles.chartCard}>
-          <Text style={styles.sectionTitle}>Precipitation Forecast</Text>
+        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Precipitation Forecast</Text>
           {rainChartData && (
             <ScrollView horizontal showsHorizontalScrollIndicator={true}>
               <BarChart
@@ -258,8 +263,8 @@ export default function Analytics() {
         </View>
 
         {/* Humidity Chart */}
-        <View style={styles.chartCard}>
-          <Text style={styles.sectionTitle}>Humidity Forecast</Text>
+        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Humidity Forecast</Text>
           {humidityChartData && (
             <ScrollView horizontal showsHorizontalScrollIndicator={true}>
               <BarChart
@@ -283,8 +288,8 @@ export default function Analytics() {
         </View>
 
         {/* Weather Conditions Pie Chart */}
-        <View style={styles.chartCard}>
-          <Text style={styles.sectionTitle}>
+        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>
             Weather Conditions Distribution
           </Text>
           {weatherPieData.length > 0 && (
@@ -302,11 +307,11 @@ export default function Analytics() {
         </View>
 
         {/* Groundwater Insights */}
-        <View style={styles.insightsCard}>
-          <Text style={styles.sectionTitle}>Groundwater Insights</Text>
+        <View style={[styles.insightsCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Groundwater Insights</Text>
           {weatherInsights.map((ins, idx) => (
-            <View key={idx} style={styles.insightItem}>
-              <Text style={styles.insightText}>{ins}</Text>
+            <View key={idx} style={[styles.insightItem, { backgroundColor: colors.background, borderLeftColor: colors.primary }]}>
+              <Text style={[styles.insightText, { color: colors.textSecondary }]}>{ins}</Text>
             </View>
           ))}
         </View>
@@ -318,88 +323,77 @@ export default function Analytics() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f9fafb", // Match container background
   },
   container: {
     flex: 1,
-    backgroundColor: "#f9fafb",
     padding: 16,
   },
   title: {
-    fontSize: 26, // Slightly larger title
+    fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: "#0A84FF",
   },
   loadingText: {
     fontSize: 18,
     textAlign: "center",
     marginTop: 50,
-    color: "#475569",
   },
   chartCard: {
-    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
-    shadowColor: "#000", // Add subtle shadow for depth
+    borderColor: '#e2e8f0',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 1.41,
     elevation: 2,
   },
   sectionTitle: {
-    fontSize: 20, // Slightly larger section titles
-    fontWeight: "700", // Bolder
-    marginBottom: 14, // More space
-    color: "#1e293b",
-    borderBottomWidth: 1, // Underline for section titles
-    borderBottomColor: "#e2e8f0",
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
     paddingBottom: 8,
   },
   chart: {
     borderRadius: 12,
   },
   insightsCard: {
-    backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 18, // Slightly more padding
+    padding: 18,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: '#e2e8f0',
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 1.41,
     elevation: 2,
-    marginBottom: 40, // Added spacing at the bottom
+    marginBottom: 40,
   },
   insightItem: {
     marginBottom: 12,
     padding: 8,
-    backgroundColor: "#f8fafc",
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#0A84FF",
   },
   insightText: {
     fontSize: 14,
-    color: "#475569",
     lineHeight: 20,
   },
   locationText: {
-    fontSize: 16, // Larger for better visibility
+    fontSize: 16,
     fontWeight: "500",
-    color: "#475569",
     textAlign: "center",
-    marginBottom: 20, // More spacing
+    marginBottom: 20,
   },
 });

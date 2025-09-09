@@ -13,6 +13,7 @@ import { LineChart, BarChart } from "react-native-chart-kit";
 import * as Location from "expo-location";
 import { WebView } from "react-native-webview";
 import { scale,verticalScale } from "@/utils/styling";
+import { useTheme } from "@/hooks/useTheme";
 
 interface WellData {
   currentLevel: number;
@@ -210,6 +211,7 @@ const farmerGuidance: FarmerGuidance = {
 };
 
 export default function Dashboard() {
+  const theme = useTheme();
   const [selectedRegion, setSelectedRegion] = useState<string>("National");
   const [selectedRole, setSelectedRole] = useState<string>("Policymaker");
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -260,19 +262,19 @@ export default function Dashboard() {
   };
 
   const chartConfig = {
-    backgroundColor: "#ffffff",
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
+    backgroundColor: theme.colors.surface,
+    backgroundGradientFrom: theme.colors.surface,
+    backgroundGradientTo: theme.colors.surface,
     decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(17, 138, 178, ${opacity})`, // Using a slightly darker blue
-    labelColor: (opacity = 1) => `rgba(30, 42, 61, ${opacity})`,
+    color: (opacity = 1) => `rgba(${theme.isDark ? '59, 130, 246' : '17, 138, 178'}, ${opacity})`,
+    labelColor: (opacity = 1) => theme.colors.text.replace('rgb', 'rgba').replace(')', `, ${opacity})`),
     style: {
       borderRadius: scale(12),
     },
     propsForDots: {
       r: scale(4),
       strokeWidth: scale(2),
-      stroke: "#007ea7", // Deeper blue for dots
+      stroke: theme.colors.primary,
     },
     propsForLabels: {
       fontSize: scale(10),
@@ -378,16 +380,16 @@ export default function Dashboard() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.logoCircle}>
           {/* <Image source={JalShaktiLogo} style={styles.logoImg} resizeMode="contain" /> */}
           <Text style={styles.logoText}>JS</Text> {/* Placeholder */}
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>JAL SHAKTI</Text>
-          <Text style={styles.headerSubTitle}>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>JAL SHAKTI</Text>
+          <Text style={[styles.headerSubTitle, { color: theme.colors.textSecondary }]}>
             Groundwater Monitoring Dashboard
           </Text>
         </View>
@@ -395,20 +397,22 @@ export default function Dashboard() {
       </View>
 
       {/* Role Switcher */}
-      <View style={styles.roleSwitcher}>
+      <View style={[styles.roleSwitcher, { backgroundColor: theme.colors.surface }]}>
         {roles.map((role) => (
           <TouchableOpacity
             key={role}
             style={[
               styles.roleBtn,
-              selectedRole === role && styles.roleBtnActive,
+              { borderColor: theme.colors.border },
+              selectedRole === role && { backgroundColor: theme.colors.primary },
             ]}
             onPress={() => setSelectedRole(role)}
           >
             <Text
               style={[
                 styles.roleBtnText,
-                selectedRole === role && styles.roleBtnTextActive,
+                { color: theme.colors.text },
+                selectedRole === role && { color: theme.colors.surface },
               ]}
             >
               {role}
@@ -418,14 +422,14 @@ export default function Dashboard() {
       </View>
 
       <ScrollView
-        style={styles.scrollArea}
+        style={[styles.scrollArea, { backgroundColor: theme.colors.background }]}
         contentContainerStyle={{ paddingBottom: verticalScale(32) }}
       >
         {/* Top Stats */}
         <View style={styles.topStatsRow}>
-          <View style={styles.topStatBox}>
-            <Text style={styles.topStatLabel}>Current Level</Text>
-            <Text style={styles.topStatValue}>{wellData.currentLevel} m</Text>
+          <View style={[styles.topStatBox, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.topStatLabel, { color: theme.colors.textSecondary }]}>Current Level</Text>
+            <Text style={[styles.topStatValue, { color: theme.colors.text }]}>{wellData.currentLevel} m</Text>
             <Text
               style={[
                 styles.topStatTrend,
@@ -438,35 +442,35 @@ export default function Dashboard() {
               week
             </Text>
           </View>
-          <View style={styles.topStatBox}>
-            <Text style={styles.topStatLabel}>Recharge Status</Text>
-            <Text style={styles.topStatValue}>{wellData.rechargeStatus}</Text>
-            <Text style={styles.topStatSub}>
+          <View style={[styles.topStatBox, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.topStatLabel, { color: theme.colors.textSecondary }]}>Recharge Status</Text>
+            <Text style={[styles.topStatValue, { color: theme.colors.text }]}>{wellData.rechargeStatus}</Text>
+            <Text style={[styles.topStatSub, { color: theme.colors.textSecondary }]}>
               {wellData.rechargeValue}% capacity
             </Text>
           </View>
-          <View style={styles.topStatBox}>
-            <Text style={styles.topStatLabel}>Rainfall Forecast</Text>
-            <Text style={styles.topStatValue}>
+          <View style={[styles.topStatBox, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.topStatLabel, { color: theme.colors.textSecondary }]}>Rainfall Forecast</Text>
+            <Text style={[styles.topStatValue, { color: theme.colors.text }]}>
               {wellData.rainfallForecast} mm
             </Text>
-            <Text style={styles.topStatSub}>Next 48 hours</Text>
+            <Text style={[styles.topStatSub, { color: theme.colors.textSecondary }]}>Next 48 hours</Text>
           </View>
         </View>
 
         {/* Alert */}
-        <View style={styles.alertSection}>
+        <View style={[styles.alertSection, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
           <Text style={styles.alertIcon}>🚨</Text>
-          <Text style={styles.alertText}>{wellData.alert}</Text>
-          <TouchableOpacity style={styles.alertBtn}>
-            <Text style={styles.alertBtnText}>View Details</Text>
+          <Text style={[styles.alertText, { color: theme.colors.text }]}>{wellData.alert}</Text>
+          <TouchableOpacity style={[styles.alertBtn, { backgroundColor: theme.colors.primary }]}>
+            <Text style={[styles.alertBtnText, { color: theme.colors.surface }]}>View Details</Text>
           </TouchableOpacity>
         </View>
 
         {/* Region Status Overview */}
         <View style={styles.regionOverviewRow}>
-          <View style={styles.regionStatsCol}>
-            <Text style={styles.regionStatsTitle}>
+          <View style={[styles.regionStatsCol, { backgroundColor: theme.colors.surface }]}>
+            <Text style={[styles.regionStatsTitle, { color: theme.colors.text }]}>
               State Wise Station Count
             </Text>
             {/* Wrap the BarChart in a ScrollView for horizontal scrolling */}

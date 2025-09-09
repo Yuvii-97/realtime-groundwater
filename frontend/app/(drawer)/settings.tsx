@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSettings } from "../../contexts/SettingsContext";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useTheme } from "../../hooks/useTheme";
 import LanguageSelector from "../../components/LanguageSelector";
 
 interface LanguageOption {
@@ -45,6 +46,7 @@ const refreshIntervalOptions = [
 export default function Settings() {
   const settings = useSettings();
   const { t } = useLanguage();
+  const theme = useTheme();
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [intervalModalVisible, setIntervalModalVisible] = useState(false);
 
@@ -108,8 +110,8 @@ export default function Settings() {
   };
 
   const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+    <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{title}</Text>
       {children}
     </View>
   );
@@ -130,30 +132,30 @@ export default function Settings() {
     showArrow?: boolean;
   }) => (
     <TouchableOpacity 
-      style={styles.settingItem} 
+      style={[styles.settingItem, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border }]} 
       onPress={onPress}
       disabled={!onPress}
     >
       <View style={styles.settingLeft}>
-        <Ionicons name={icon as any} size={24} color="#077A7D" />
+        <Ionicons name={icon as any} size={24} color={theme.colors.primary} />
         <View style={styles.settingTextContainer}>
-          <Text style={styles.settingTitle}>{title}</Text>
-          {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+          <Text style={[styles.settingTitle, { color: theme.colors.text }]}>{title}</Text>
+          {subtitle && <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>{subtitle}</Text>}
         </View>
       </View>
       <View style={styles.settingRight}>
         {rightElement}
-        {showArrow && <Ionicons name="chevron-forward" size={20} color="#999" />}
+        {showArrow && <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />}
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]} showsVerticalScrollIndicator={false}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('settings')}</Text>
-        <Text style={styles.headerSubtitle}>Customize your groundwater monitoring experience</Text>
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>{t('settings')}</Text>
+        <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>Customize your groundwater monitoring experience</Text>
       </View>
 
       {/* Appearance */}
@@ -166,8 +168,8 @@ export default function Settings() {
             <Switch
               value={settings.isDarkMode}
               onValueChange={settings.setIsDarkMode}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.isDarkMode ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.isDarkMode ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />
@@ -186,8 +188,8 @@ export default function Settings() {
             <Switch
               value={settings.notificationsEnabled}
               onValueChange={settings.setNotificationsEnabled}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.notificationsEnabled ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.notificationsEnabled ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />
@@ -199,8 +201,8 @@ export default function Settings() {
             <Switch
               value={settings.alertsEnabled}
               onValueChange={settings.setAlertsEnabled}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.alertsEnabled ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.alertsEnabled ? theme.colors.surface : "#f4f3f4"}
               disabled={!settings.notificationsEnabled}
             />
           }
@@ -213,8 +215,8 @@ export default function Settings() {
             <Switch
               value={settings.emailNotifications}
               onValueChange={settings.setEmailNotifications}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.emailNotifications ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.emailNotifications ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />
@@ -230,8 +232,8 @@ export default function Settings() {
             <Switch
               value={settings.autoRefresh}
               onValueChange={settings.setAutoRefresh}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.autoRefresh ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.autoRefresh ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />
@@ -254,8 +256,8 @@ export default function Settings() {
             <Switch
               value={settings.temperatureUnit === 'fahrenheit'}
               onValueChange={(value) => settings.setTemperatureUnit(value ? 'fahrenheit' : 'celsius')}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.temperatureUnit === 'fahrenheit' ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.temperatureUnit === 'fahrenheit' ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />
@@ -267,8 +269,8 @@ export default function Settings() {
             <Switch
               value={settings.waterLevelUnit === 'feet'}
               onValueChange={(value) => settings.setWaterLevelUnit(value ? 'feet' : 'meters')}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.waterLevelUnit === 'feet' ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.waterLevelUnit === 'feet' ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />
@@ -284,8 +286,8 @@ export default function Settings() {
             <Switch
               value={settings.dataCollection}
               onValueChange={settings.setDataCollection}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.dataCollection ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.dataCollection ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />
@@ -297,8 +299,8 @@ export default function Settings() {
             <Switch
               value={settings.locationAccess}
               onValueChange={settings.setLocationAccess}
-              trackColor={{ false: "#E5E7EB", true: "#077A7D" }}
-              thumbColor={settings.locationAccess ? "#ffffff" : "#f4f3f4"}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={settings.locationAccess ? theme.colors.surface : "#f4f3f4"}
             />
           }
         />

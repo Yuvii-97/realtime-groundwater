@@ -1,29 +1,57 @@
 import { scale, verticalScale } from "@/utils/styling";
 
-export const colors = {
+// Light Theme Colors
+export const lightColors = {
   primary: "#0ea5e9",       // bright blue
   primaryLight: "#7dd3fc",  // lighter blue
   primaryDark: "#0369a1",   // deep blue
   secondary: "#16a34a",     // green
   secondaryLight: "#bbf7d0", // light green
   secondaryDark: "#15803d", // deep green
-  text: "#ffffff",
-  textLight: "#e5e5e5",
-  textLighter: "#d4d4d4",
+  background: "#F0FFFE",    // light background
+  surface: "#FFFFFF",       // card/surface background
+  surfaceSecondary: "#f8fafc", // secondary surface
+  text: "#1f2937",          // primary text
+  textSecondary: "#6b7280", // secondary text
+  textLight: "#9ca3af",     // light text
+  border: "#e5e7eb",        // borders
+  borderLight: "#f3f4f6",   // light borders
   white: "#ffffff",
   black: "#000000",
-  neutral50: "#f9fafb",
-  neutral100: "#f3f4f6",
-  neutral200: "#e5e7eb",
-  neutral300: "#d1d5db",
-  neutral400: "#9ca3af",
-  neutral500: "#6b7280",
-  neutral600: "#4b5563",
-  neutral700: "#374151",
-  neutral800: "#1f2937",
-  neutral900: "#111827",
+  hero: "#075a7dff",        // hero section
   danger: "#ef4444",        // for alerts
+  warning: "#f59e0b",       // warnings
+  success: "#10b981",       // success
+  info: "#3b82f6",          // info
 };
+
+// Dark Theme Colors
+export const darkColors = {
+  primary: "#3b82f6",       // bright blue for dark
+  primaryLight: "#60a5fa",  // lighter blue for dark
+  primaryDark: "#1d4ed8",   // deep blue for dark
+  secondary: "#10b981",     // green for dark
+  secondaryLight: "#34d399", // light green for dark
+  secondaryDark: "#059669", // deep green for dark
+  background: "#0f172a",    // dark background
+  surface: "#1e293b",       // card/surface background dark
+  surfaceSecondary: "#334155", // secondary surface dark
+  text: "#f8fafc",          // primary text dark
+  textSecondary: "#cbd5e1", // secondary text dark
+  textLight: "#94a3b8",     // light text dark
+  border: "#475569",        // borders dark
+  borderLight: "#64748b",   // light borders dark
+  white: "#ffffff",
+  black: "#000000",
+  hero: "#1e40af",          // hero section dark
+  danger: "#f87171",        // for alerts dark
+  warning: "#fbbf24",       // warnings dark
+  success: "#34d399",       // success dark
+  info: "#60a5fa",          // info dark
+};
+
+// Legacy colors for backward compatibility
+export const colors = lightColors;
 
 
 export const spacingX = {
