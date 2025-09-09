@@ -11,7 +11,8 @@ import {
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
 import { useTheme } from "@/hooks/useTheme";
 
-const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe";
+const API_KEY = "ABC";
+// const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -53,9 +54,10 @@ export default function Analytics() {
     backgroundGradientTo: colors.background,
     decimalPlaces: 1,
     color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`, // Use hex primary
-    labelColor: (opacity = 1) => colors.text.includes('rgb') 
-      ? colors.text.replace('rgb', 'rgba').replace(')', `, ${opacity})`)
-      : `rgba(55, 65, 81, ${opacity})`, // Fallback for hex colors
+    labelColor: (opacity = 1) =>
+      colors.text.includes("rgb")
+        ? colors.text.replace("rgb", "rgba").replace(")", `, ${opacity})`)
+        : `rgba(55, 65, 81, ${opacity})`, // Fallback for hex colors
     style: { borderRadius: 16 },
     propsForDots: {
       r: "6",
@@ -128,7 +130,14 @@ export default function Analytics() {
       },
       {}
     );
-    const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"]; // More colors for more conditions
+    const colors = [
+      "#FF6384",
+      "#36A2EB",
+      "#FFCE56",
+      "#4BC0C0",
+      "#9966FF",
+      "#FF9F40",
+    ]; // More colors for more conditions
     return Object.keys(conditions).map((key, index) => ({
       name: key,
       population: conditions[key],
@@ -181,7 +190,9 @@ export default function Analytics() {
   if (loading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.loadingText, { color: colors.text }]}>Loading weather data...</Text>
+        <Text style={[styles.loadingText, { color: colors.text }]}>
+          Loading weather data...
+        </Text>
       </View>
     );
   }
@@ -191,18 +202,36 @@ export default function Analytics() {
     Math.max(screenWidth, labelsLength * 90); // Increased factor for better spacing
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: colors.background }]}
+    >
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <Text style={[styles.title, { color: colors.text }]}>
           Weather Analytics for Groundwater Monitoring
         </Text>
         {locationName && (
-          <Text style={[styles.locationText, { color: colors.textSecondary }]}>Location: {locationName}</Text>
+          <Text style={[styles.locationText, { color: colors.textSecondary }]}>
+            Location: {locationName}
+          </Text>
         )}
 
         {/* Temperature Chart */}
-        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Temperature Forecast</Text>
+        <View
+          style={[
+            styles.chartCard,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: colors.text, borderBottomColor: colors.border },
+            ]}
+          >
+            Temperature Forecast
+          </Text>
           {tempChartData && (
             <ScrollView
               horizontal
@@ -226,8 +255,20 @@ export default function Analytics() {
         </View>
 
         {/* Precipitation Chart */}
-        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Precipitation Forecast</Text>
+        <View
+          style={[
+            styles.chartCard,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: colors.text, borderBottomColor: colors.border },
+            ]}
+          >
+            Precipitation Forecast
+          </Text>
           {rainChartData && (
             <ScrollView
               horizontal
@@ -252,8 +293,20 @@ export default function Analytics() {
         </View>
 
         {/* Humidity Chart */}
-        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Humidity Forecast</Text>
+        <View
+          style={[
+            styles.chartCard,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: colors.text, borderBottomColor: colors.border },
+            ]}
+          >
+            Humidity Forecast
+          </Text>
           {humidityChartData && (
             <ScrollView
               horizontal
@@ -278,8 +331,18 @@ export default function Analytics() {
         </View>
 
         {/* Weather Conditions Pie Chart */}
-        <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+        <View
+          style={[
+            styles.chartCard,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: colors.text, borderBottomColor: colors.border },
+            ]}
+          >
             Weather Conditions Distribution
           </Text>
           {weatherPieData.length > 0 && (
@@ -297,11 +360,36 @@ export default function Analytics() {
         </View>
 
         {/* Groundwater Insights */}
-        <View style={[styles.insightsCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text, borderBottomColor: colors.border }]}>Groundwater Insights</Text>
+        <View
+          style={[
+            styles.insightsCard,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: colors.text, borderBottomColor: colors.border },
+            ]}
+          >
+            Groundwater Insights
+          </Text>
           {weatherInsights.map((ins, idx) => (
-            <View key={idx} style={[styles.insightItem, { backgroundColor: colors.background, borderLeftColor: colors.primary }]}>
-              <Text style={[styles.insightText, { color: colors.textSecondary }]}>{ins}</Text>
+            <View
+              key={idx}
+              style={[
+                styles.insightItem,
+                {
+                  backgroundColor: colors.background,
+                  borderLeftColor: colors.primary,
+                },
+              ]}
+            >
+              <Text
+                style={[styles.insightText, { color: colors.textSecondary }]}
+              >
+                {ins}
+              </Text>
             </View>
           ))}
         </View>
@@ -334,7 +422,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: "#e2e8f0",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -349,7 +437,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: "#e2e8f0",
     paddingBottom: 8,
   },
   chart: {
@@ -359,7 +447,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: "#e2e8f0",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
