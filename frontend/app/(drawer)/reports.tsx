@@ -16,6 +16,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import ViewShot, { captureRef } from "react-native-view-shot";  // ✅ add captureRef
+import { useTheme } from "@/hooks/useTheme";
 
 import * as Print from "expo-print"; 
 const { PDFDocument, PDFPage } = require("react-native-pdf-lib");
@@ -23,6 +24,8 @@ const { PDFDocument, PDFPage } = require("react-native-pdf-lib");
 const screenWidth = Dimensions.get("window").width;
 
 const Reports: React.FC = () => {
+  const theme = useTheme();
+  const { colors } = theme;
   const [location, setLocation] = useState("Station 1");
   const [timePeriod, setTimePeriod] = useState("7days");
   const [modalVisible, setModalVisible] = useState(false);
@@ -37,11 +40,22 @@ const Reports: React.FC = () => {
   const predictedData = [12, 13, 14, 15, 16, 17, 18];
   const labels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"];
 
-  
   const groundwaterRef = useRef<ViewShot | null>(null);
   const rainfallRef = useRef<ViewShot | null>(null);
   const tempRef = useRef<ViewShot | null>(null);
   const predictionRef = useRef<ViewShot | null>(null);
+
+  // Chart configuration - will be moved inside component
+  const chartConfig = {
+    backgroundColor: colors.surface,
+    backgroundGradientFrom: colors.surface,
+    backgroundGradientTo: colors.background,
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`, // Use hex primary
+    labelColor: (opacity = 1) => colors.text.includes('rgb') 
+      ? colors.text.replace('rgb', 'rgba').replace(')', `, ${opacity})`)
+      : `rgba(55, 65, 81, ${opacity})`, // Fallback for hex colors
+  };
 
   const exportCSV = async () => {
     const csv =
@@ -158,21 +172,21 @@ const exportPDF = async () => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingBottom: 40 }}>
      
-      <Text style={styles.title}>📊 Reports & Analysis</Text>
-      <Text style={styles.subtitle}>
+      <Text style={[styles.title, { color: colors.text }]}>📊 Reports & Analysis</Text>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
         Download detailed groundwater and weather insights for selected time periods.
       </Text>
 
-      <View style={styles.filterCard}>
-        <Text style={styles.sectionLabel}>Select Location:</Text>
-        <View style={styles.pickerWrapper}>
+      <View style={[styles.filterCard, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: colors.text }]}>Select Location:</Text>
+        <View style={[styles.pickerWrapper, { backgroundColor: colors.background }]}>
           <Picker
             selectedValue={location}
             onValueChange={setLocation}
-            style={styles.picker}
-            dropdownIconColor="#000"
+            style={[styles.picker, { color: colors.text }]}
+            dropdownIconColor="#666"
           >
             <Picker.Item label="Station 1" value="Station 1" />
             <Picker.Item label="Station 2" value="Station 2" />
@@ -180,28 +194,28 @@ const exportPDF = async () => {
           </Picker>
         </View>
 
-        <Text style={styles.sectionLabel}>Select Time Period:</Text>
-        <View style={styles.pickerWrapper}>
+        <Text style={[styles.sectionLabel, { color: colors.text }]}>Select Time Period:</Text>
+        <View style={[styles.pickerWrapper, { backgroundColor: colors.background }]}>
           <Picker
             selectedValue={timePeriod}
             onValueChange={setTimePeriod}
-            style={styles.picker}
-            dropdownIconColor="#000"
+            style={[styles.picker, { color: colors.text }]}
+            dropdownIconColor="#666"
           >
             <Picker.Item label="Last 7 days" value="7days" />
             <Picker.Item label="Last 30 days" value="30days" />
           </Picker>
         </View>
 
-        <TouchableOpacity style={styles.downloadMain} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity style={[styles.downloadMain, { backgroundColor: colors.primary }]} onPress={() => setModalVisible(true)}>
           <MaterialCommunityIcons name="download" size={22} color="white" />
           <Text style={styles.buttonText}> Download Report</Text>
         </TouchableOpacity>
       </View>
 
      
-      <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Groundwater Level Trend</Text>
+      <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>Groundwater Level Trend</Text>
         <ViewShot ref={groundwaterRef} options={{ format: "png", quality: 1 }}>
           <LineChart
             data={{ labels, datasets: [{ data: groundwaterData }] }}
@@ -214,8 +228,8 @@ const exportPDF = async () => {
         </ViewShot>
       </View>
 
-      <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Rainfall vs Groundwater Recharge</Text>
+      <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>Rainfall vs Groundwater Recharge</Text>
         <ViewShot ref={rainfallRef} options={{ format: "png", quality: 1 }}>
           <BarChart
             data={{ labels, datasets: [{ data: rainfallData }] }}
@@ -229,8 +243,8 @@ const exportPDF = async () => {
         </ViewShot>
       </View>
 
-      <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Temperature & Humidity Trends</Text>
+      <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>Temperature & Humidity Trends</Text>
         <ViewShot ref={tempRef} options={{ format: "png", quality: 1 }}>
           <LineChart
             data={{
@@ -249,8 +263,8 @@ const exportPDF = async () => {
         </ViewShot>
       </View>
 
-      <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Prediction vs Actual</Text>
+      <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>Prediction vs Actual</Text>
         <ViewShot ref={predictionRef} options={{ format: "png", quality: 1 }}>
           <LineChart
             data={{
@@ -270,15 +284,15 @@ const exportPDF = async () => {
       </View>
 
       
-      <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Insights & Recommendations</Text>
-        <Text style={styles.insight}>📉 Groundwater dropped by 8% compared to last week</Text>
-        <Text style={styles.insight}>🌧 High rainfall expected in next 2 days (Recharge opportunity)</Text>
-        <Text style={styles.insight}>⚠ Rising temperature may cause water stress</Text>
+      <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>Insights & Recommendations</Text>
+        <Text style={[styles.insight, { color: colors.textSecondary }]}>📉 Groundwater dropped by 8% compared to last week</Text>
+        <Text style={[styles.insight, { color: colors.textSecondary }]}>🌧 High rainfall expected in next 2 days (Recharge opportunity)</Text>
+        <Text style={[styles.insight, { color: colors.textSecondary }]}>⚠ Rising temperature may cause water stress</Text>
       </View>
 
      
-      <Text style={styles.footer}>
+      <Text style={[styles.footer, { color: colors.textSecondary }]}>
         Reports are auto-generated from DWLR station data & AI models.
       </Text>
 
@@ -290,19 +304,19 @@ const exportPDF = async () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Download As</Text>
-            <TouchableOpacity style={styles.modalButton} onPress={() => handleDownload("CSV")}>
-              <Text>📑 CSV </Text>
+          <View style={[styles.modalBox, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Download As</Text>
+            <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.background }]} onPress={() => handleDownload("CSV")}>
+              <Text style={{ color: colors.text }}>📑 CSV </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => handleDownload("JSON")}>
-              <Text>🗂 JSON </Text>
+            <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.background }]} onPress={() => handleDownload("JSON")}>
+              <Text style={{ color: colors.text }}>🗂 JSON </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => handleDownload("PDF")}>
-              <Text>📊 PDF </Text>
+            <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.background }]} onPress={() => handleDownload("PDF")}>
+              <Text style={{ color: colors.text }}>📊 PDF </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={[styles.cancelText, { color: colors.primary }]}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -311,22 +325,12 @@ const exportPDF = async () => {
   );
 };
 
-const chartConfig = {
-  backgroundColor: "#ffffff",
-  backgroundGradientFrom: "#f9fafb",
-  backgroundGradientTo: "#f3f4f6",
-  decimalPlaces: 0,
-  color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
-  labelColor: (opacity = 1) => `rgba(55, 65, 81, ${opacity})`,
-};
-
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#f9fafb" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 6, color: "#111827" },
-  subtitle: { fontSize: 14, color: "#6b7280", marginBottom: 16 },
+  container: { flex: 1, padding: 16 },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 6 },
+  subtitle: { fontSize: 14, marginBottom: 16 },
   sectionLabel: { fontSize: 14, fontWeight: "600", marginTop: 8, marginBottom: 4 },
   filterCard: {
-    backgroundColor: "white",
     padding: 16,
     borderRadius: 12,
     marginBottom: 20,
@@ -349,7 +353,6 @@ const styles = StyleSheet.create({
   downloadMain: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2563eb",
     paddingVertical: 12,
     borderRadius: 8,
     marginTop: 12,
@@ -362,7 +365,6 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: "white", fontWeight: "600", fontSize: 16 },
   chartCard: {
-    backgroundColor: "white",
     padding: 16,
     borderRadius: 12,
     marginBottom: 20,
@@ -372,10 +374,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  chartTitle: { fontWeight: "700", fontSize: 16, marginBottom: 10, color: "#1f2937" },
+  chartTitle: { fontWeight: "700", fontSize: 16, marginBottom: 10 },
   chart: { borderRadius: 8 },
-  insight: { fontSize: 14, color: "#374151", marginVertical: 4 },
-  footer: { textAlign: "center", fontSize: 12, color: "#6b7280", marginVertical: 20 },
+  insight: { fontSize: 14, marginVertical: 4 },
+  footer: { textAlign: "center", fontSize: 12, marginVertical: 20 },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -384,7 +386,6 @@ const styles = StyleSheet.create({
   },
   modalBox: {
     width: "85%",
-    backgroundColor: "white",
     padding: 20,
     borderRadius: 12,
     shadowColor: "#000",
@@ -399,7 +400,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
   },
-  cancelText: { color: "red", marginTop: 12, textAlign: "center", fontWeight: "600" },
+  cancelText: { marginTop: 12, textAlign: "center", fontWeight: "600" },
 });
 
 export default Reports;

@@ -5,54 +5,89 @@ import {
   FontAwesome5,
 } from "@expo/vector-icons";
 import { Image, View, StyleSheet, Text } from "react-native";
-import { colors } from "@/constants/theme";
 import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import { scale, verticalScale } from "@/utils/styling";
 import AppHeader from "@/components/AppHeader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next"; // Changed from useLanguage
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Layout() {
   const { t } = useTranslation(); // Changed from useLanguage
+  const theme = useTheme();
+  
+  const dynamicStyles = StyleSheet.create({
+    drawerBackground: {
+      flex: 1,
+      backgroundColor: theme.colors.surface,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      paddingBottom: 24,
+    },
+    logo: {
+      width: 90,
+      height: 90,
+      marginRight: 8,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "bold",
+      color: theme.colors.text,
+    },
+    subtitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: theme.colors.text,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: theme.colors.border,
+      marginHorizontal: 16,
+      marginBottom: 18,
+      opacity: 0.3,
+    },
+  });
 
   return (
     <Drawer
       drawerContent={(props) => (
         <DrawerContentScrollView
           {...props}
-          contentContainerStyle={styles.drawerBackground}
+          contentContainerStyle={dynamicStyles.drawerBackground}
         >
-          <View style={styles.headerRow}>
+          <View style={dynamicStyles.headerRow}>
             <Image
               source={require("@/assets/images/cgwblogo.png")}
-              style={styles.logo}
+              style={dynamicStyles.logo}
               resizeMode="contain"
             />
             <View>
-              <Text style={styles.title}>{t("groundWater")}</Text>
-              <Text style={styles.subtitle}>{t("analytics")}</Text>
+              <Text style={dynamicStyles.title}>{t('groundWater')}</Text>
+              <Text style={dynamicStyles.subtitle}>{t('analytics')}</Text>
             </View>
           </View>
-          <View style={styles.divider} />
+          <View style={dynamicStyles.divider} />
           {/* Drawer items */}
           <DrawerItemList {...props} />
         </DrawerContentScrollView>
       )}
       screenOptions={{
-        drawerActiveTintColor: colors.black,
-        drawerInactiveTintColor: colors.black,
+        drawerActiveTintColor: theme.colors.primary,
+        drawerInactiveTintColor: theme.colors.textSecondary,
         drawerLabelStyle: {
           fontSize: 18,
           fontWeight: "bold",
         },
         drawerStyle: {
-          backgroundColor: colors.white,
+          backgroundColor: theme.colors.surface,
         },
         header: () => (
-          <SafeAreaView edges={["top"]} style={{ backgroundColor: "#fff" }}>
+          <SafeAreaView edges={["top"]} style={{ backgroundColor: theme.colors.surface }}>
             <AppHeader
               onLanguageSwitch={() => console.log("Switch Language")}
               onNotificationsPress={() => console.log("Notifications")}
@@ -148,38 +183,3 @@ export default function Layout() {
     </Drawer>
   );
 }
-
-const styles = StyleSheet.create({
-  drawerBackground: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    paddingBottom: 24,
-  },
-  logo: {
-    width: 90,
-    height: 90,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: colors.black,
-  },
-  subtitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: colors.black,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.black,
-    marginHorizontal: 16,
-    marginBottom: 18,
-    opacity: 0.2,
-  },
-});

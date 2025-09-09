@@ -5,12 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
 } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { useTranslation } from "react-i18next"; // Changed from useLanguage
-
-const { width } = Dimensions.get("window");
 
 export default function Home() {
   const theme = useTheme();
@@ -32,6 +29,7 @@ export default function Home() {
     featureItem: {
       ...styles.featureItem,
       backgroundColor: theme.colors.surface,
+      ...theme.shadows.small,
     },
     featureDescription: {
       ...styles.featureDescription,
@@ -40,6 +38,7 @@ export default function Home() {
     stepItem: {
       ...styles.stepItem,
       backgroundColor: theme.colors.surface,
+      ...theme.shadows.small,
     },
     stepText: {
       ...styles.stepText,
@@ -48,10 +47,19 @@ export default function Home() {
     benefitItem: {
       ...styles.benefitItem,
       backgroundColor: theme.colors.surface,
+      ...theme.shadows.small,
     },
     benefitDescription: {
       ...styles.benefitDescription,
       color: theme.colors.textSecondary,
+    },
+    heroSection: {
+      ...styles.heroSection,
+      backgroundColor: theme.colors.hero,
+    },
+    footer: {
+      ...styles.footer,
+      backgroundColor: theme.colors.hero,
     },
   });
 
@@ -61,9 +69,11 @@ export default function Home() {
       showsVerticalScrollIndicator={false}
     >
       {/* Hero Section */}
-      <View style={styles.heroSection}>
-        <Text style={styles.heroTitle}>{t("home.heroTitle")}</Text>
-        <Text style={styles.heroSubtitle}>{t("home.heroSubtitle")}</Text>
+      <View style={dynamicStyles.heroSection}>
+        <Text style={styles.heroTitle}>{t('home.heroTitle')}</Text>
+        <Text style={styles.heroSubtitle}>
+          {t('home.heroSubtitle')}
+        </Text>
         <TouchableOpacity style={styles.getStartedButton}>
           <Text style={styles.getStartedText}>{t("home.getStarted")}</Text>
         </TouchableOpacity>
@@ -190,7 +200,7 @@ export default function Home() {
       </View>
 
       {/* Footer Section */}
-      <View style={styles.footer}>
+      <View style={dynamicStyles.footer}>
         <View style={styles.footerLinks}>
           <TouchableOpacity style={styles.footerLink}>
             <Text style={styles.footerLinkText}>📖 {t("home.about")}</Text>
