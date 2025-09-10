@@ -7,12 +7,38 @@ import {
   Alert,
   ScrollView,
   SafeAreaView,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
 import { useTheme } from "@/hooks/useTheme";
+import * as Location from "expo-location";
+import { GoogleGenerativeAI } from "@google/generative-ai"; // Added for Gemini AI
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
-const API_KEY = "ABC";
-// const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe";
+// Define a structured type for insights (no TS errors)
+interface InsightItem {
+  title: string;
+  bullets: string[];
+  action: string;
+  category: "recharge" | "monitoring" | "conservation" | "risk";
+}
+
+// const API_KEY = "ABC";
+const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe";
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+
+if (!GEMINI_API_KEY) {
+  console.error(
+    "Gemini API key not set. Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file."
+  );
+}
+
+// If you have typing issues with the SDK, keep model as any to avoid TS errors
+const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
+const model: any = genAI
+  ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+  : null;
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -20,12 +46,51 @@ export default function Analytics() {
   const theme = useTheme();
   const { colors } = theme;
   const [weatherData, setWeatherData] = useState<any>(null);
-  const [location, setLocation] = useState<{ lat: number; lon: number }>({
-    lat: 13.0827,
-    lon: 80.2707,
-  });
+  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
-  const [locationName, setLocationName] = useState<string>("Chennai, India");
+  const [locationName, setLocationName] = useState<string>(
+    "Fetching location..."
+  );
+  const [insights, setInsights] = useState<InsightItem[]>([]);
+  const [generatingInsights, setGeneratingInsights] = useState(false);
+
+  const fetchCurrentLocation = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission denied",
+          "Location permission is required to fetch weather data for your area."
+        );
+        setLocation({ lat: 13.0827, lon: 80.2707 }); // Fallback to Chennai
+        setLocationName("Chennai, India (Default)");
+        return;
+      }
+
+      let locationResult = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = locationResult.coords;
+      setLocation({ lat: latitude, lon: longitude });
+
+      // Reverse geocode to get location name
+      let address = await Location.reverseGeocodeAsync({ latitude, longitude });
+      if (address.length > 0) {
+        const { city, region, country } = address[0];
+        setLocationName(`${city || region || "Unknown"}, ${country || ""}`);
+      } else {
+        setLocationName(`${latitude.toFixed(2)}, ${longitude.toFixed(2)}`);
+      }
+    } catch (error) {
+      console.error("Error fetching location:", error);
+      Alert.alert(
+        "Error",
+        "Failed to fetch your location. Using default location."
+      );
+      setLocation({ lat: 13.0827, lon: 80.2707 }); // Fallback
+      setLocationName("Chennai, India (Default)");
+    }
+  };
 
   const fetchWeatherForecast = async () => {
     if (!location) return;
@@ -42,22 +107,182 @@ export default function Analytics() {
     }
   };
 
+  // Helper: parse JSON returned by Gemini (handles ```json fences)
+  const parseInsightsJSON = (text: string): InsightItem[] => {
+    const cleaned = text
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+    const parsed = JSON.parse(cleaned);
+    if (!Array.isArray(parsed)) throw new Error("JSON is not an array");
+    // Coerce and validate minimally
+    return parsed
+      .map((it: any) => ({
+        title: String(it.title ?? "Insight"),
+        bullets: Array.isArray(it.bullets)
+          ? it.bullets.map((b: any) => String(b))
+          : [String(it.detail ?? it.description ?? "").trim()].filter(Boolean),
+        action: String(it.action ?? "Review data for further analysis"),
+        category: (
+          ["recharge", "monitoring", "conservation", "risk"] as const
+        ).includes(it.category)
+          ? it.category
+          : "monitoring",
+      }))
+      .slice(0, 4);
+  };
+
+  // Build a compact forecast to reduce tokens (keeps it readable for Gemini)
+  const compactForecast = (list: any[]) => {
+    return list.map((it: any) => ({
+      dt: String(it.dt_txt),
+      t: Number(((it.main?.temp ?? 0) - 273.15).toFixed(1)), // °C
+      h: Number(it.main?.humidity ?? 0), // %
+      r: Number((it.rain?.["3h"] ?? 0).toFixed(2)), // mm
+      w: Number((it.wind?.speed ?? 0).toFixed(1)), // m/s
+      c: String(it.weather?.[0]?.main ?? "NA"), // condition
+    }));
+  };
+
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  async function generateWithRetry(
+    prompt: string,
+    maxRetries = 3
+  ): Promise<string> {
+    if (!model) return "";
+    let attempt = 0;
+    while (attempt <= maxRetries) {
+      try {
+        const result = await model.generateContent(prompt);
+        const resp = await result.response;
+        return resp.text();
+      } catch (err: any) {
+        const msg = String(err?.message ?? "");
+        const shouldRetry =
+          msg.includes("503") ||
+          /overloaded/i.test(msg) ||
+          /quota|exhausted|rate|429/i.test(msg);
+        if (attempt < maxRetries && shouldRetry) {
+          const wait = Math.min(
+            2000 * Math.pow(2, attempt) + Math.random() * 400,
+            12000
+          );
+          await sleep(wait);
+          attempt++;
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw new Error("Retries exhausted");
+  }
+
+  // Send the full 5-day forecast (compact) and improve resilience + parsing
+  const generateGroundwaterInsights = async () => {
+    if (!weatherData?.list || !model) return;
+    setGeneratingInsights(true);
+    try {
+      const payload = {
+        location: {
+          name: locationName,
+          lat: location?.lat,
+          lon: location?.lon,
+        },
+        city: weatherData.city
+          ? {
+              name: weatherData.city.name,
+              country: weatherData.city.country,
+              timezone: weatherData.city.timezone,
+            }
+          : null,
+        list: compactForecast(weatherData.list), // full 5-day list, compacted
+      };
+      const payloadJson = JSON.stringify(payload);
+
+      const prompt = `
+You are a groundwater domain expert. Analyze the 5-day forecast payload and produce concise, actionable insights for stakeholders.
+
+Return ONLY valid JSON array with exactly 4 items, each:
+{
+  "title": "Short, specific title",
+  "bullets": ["point 1", "point 2", "point 3"],
+  "action": "One recommended action",
+  "category": "recharge" | "monitoring" | "conservation" | "risk"
+}
+
+Data:
+${payloadJson}
+`;
+
+      const text: string = await generateWithRetry(prompt, 3);
+
+      try {
+        const structured = parseInsightsJSON(text);
+        setInsights(structured);
+      } catch {
+        // Fallback: turn paragraphs into readable bullets
+        const fallbackBullets: string[] = text
+          .split(/\r?\n+/)
+          .map((line: string) => line.trim())
+          .filter((line: string) => line.length > 0)
+          .slice(0, 12); // 3 bullets x 4 items
+
+        const grouped: InsightItem[] = Array.from({ length: 4 }).map(
+          (_, i) => ({
+            title: `Insight ${i + 1}`,
+            bullets: fallbackBullets.slice(i * 3, i * 3 + 3),
+            action:
+              "Prioritize targeted groundwater monitoring in the next 7 days.",
+            category: "monitoring",
+          })
+        );
+        setInsights(grouped);
+      }
+    } catch (error) {
+      console.error("Error generating insights:", error);
+      setInsights([
+        {
+          title: "Service temporarily unavailable",
+          bullets: [
+            "The insight service is currently overloaded (503).",
+            "Your data was processed locally; try again shortly for AI insights.",
+          ],
+          action: "Tap refresh in a few minutes.",
+          category: "monitoring",
+        },
+      ]);
+    } finally {
+      setGeneratingInsights(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentLocation();
+  }, []);
+
   useEffect(() => {
     if (location) {
       fetchWeatherForecast();
     }
   }, [location]);
 
+  useEffect(() => {
+    if (weatherData) {
+      generateGroundwaterInsights();
+    }
+  }, [weatherData]);
+
   const chartConfig = {
     backgroundColor: colors.surface,
     backgroundGradientFrom: colors.surface,
     backgroundGradientTo: colors.background,
     decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`, // Use hex primary
+    color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
     labelColor: (opacity = 1) =>
       colors.text.includes("rgb")
         ? colors.text.replace("rgb", "rgba").replace(")", `, ${opacity})`)
-        : `rgba(55, 65, 81, ${opacity})`, // Fallback for hex colors
+        : `rgba(55, 65, 81, ${opacity})`,
     style: { borderRadius: 16 },
     propsForDots: {
       r: "6",
@@ -66,11 +291,9 @@ export default function Analytics() {
     },
   };
 
-  // MODIFIED: Helper to create chart labels for dates with time, using all data
   const generateChartLabels = (dataList: any[]) => {
     return dataList.map((item: any) => {
-      const date = new Date(item.dt_txt); // Parse dt_txt directly
-      // Example: "08 Sep 12:00"
+      const date = new Date(item.dt_txt);
       return date.toLocaleString("en-GB", {
         day: "2-digit",
         month: "short",
@@ -80,13 +303,12 @@ export default function Analytics() {
     });
   };
 
-  // Prepare chart data for temperature with all data points
   const tempChartData = useMemo(() => {
     if (!weatherData?.list) return null;
     const labels = generateChartLabels(weatherData.list);
     const data = weatherData.list.map((item: any) =>
       (item.main.temp - 273.15).toFixed(1)
-    ); // Convert Kelvin to Celsius
+    );
     return {
       labels,
       datasets: [
@@ -95,7 +317,6 @@ export default function Analytics() {
     };
   }, [weatherData]);
 
-  // Prepare bar chart data for precipitation with all data points
   const rainChartData = useMemo(() => {
     if (!weatherData?.list) return null;
     const labels = generateChartLabels(weatherData.list);
@@ -108,7 +329,6 @@ export default function Analytics() {
     };
   }, [weatherData]);
 
-  // Prepare bar chart data for humidity with all data points
   const humidityChartData = useMemo(() => {
     if (!weatherData?.list) return null;
     const labels = generateChartLabels(weatherData.list);
@@ -119,7 +339,6 @@ export default function Analytics() {
     };
   }, [weatherData]);
 
-  // MODIFIED: Prepare pie chart data for weather conditions using all data
   const weatherPieData = useMemo(() => {
     if (!weatherData?.list) return [];
     const conditions = weatherData.list.reduce(
@@ -137,69 +356,33 @@ export default function Analytics() {
       "#4BC0C0",
       "#9966FF",
       "#FF9F40",
-    ]; // More colors for more conditions
+    ];
     return Object.keys(conditions).map((key, index) => ({
       name: key,
       population: conditions[key],
-      color: colors[index % colors.length], // Cycle through colors
+      color: colors[index % colors.length],
       legendFontColor: "#7F7F7F",
       legendFontSize: 15,
     }));
   }, [weatherData]);
 
-  // Enhanced insights for groundwater (using all data for averages)
-  const weatherInsights = useMemo(() => {
-    if (!weatherData?.list) return [];
-    const rainEvents = weatherData.list.filter(
-      (item: any) => item.weather[0].main === "Rain"
-    );
-    const totalDataPoints = weatherData.list.length;
-    const avgTemp =
-      weatherData.list.reduce(
-        (sum: number, item: any) => sum + (item.main.temp - 273.15),
-        0
-      ) / totalDataPoints; // Avg temp in Celsius
-    const avgHumidity =
-      weatherData.list.reduce(
-        (sum: number, item: any) => sum + item.main.humidity,
-        0
-      ) / totalDataPoints;
-    const insights = [];
-    if (rainEvents.length > 0) {
-      insights.push(
-        `Rain expected over ${rainEvents.length} forecast periods. Groundwater recharge likely, monitor for level increases.`
-      );
-    } else {
-      insights.push(
-        "No significant rain expected in the forecast. Groundwater levels may decline; consider conservation strategies."
-      );
-    }
-    insights.push(
-      `Average temperature: ${avgTemp.toFixed(
-        1
-      )}°C. Consistently high temperatures can increase evaporation from surface water and soil, potentially affecting groundwater recharge.`
-    );
-    insights.push(
-      `Average humidity: ${avgHumidity.toFixed(
-        1
-      )}%. Lower humidity can lead to drier soil conditions and increased plant transpiration, both of which can impact the rate of groundwater infiltration.`
-    );
-    return insights;
-  }, [weatherData]);
-
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.loadingText, { color: colors.text }]}>
-          Loading weather data...
-        </Text>
-      </View>
+      <SafeAreaView
+        style={[styles.safeArea, { backgroundColor: colors.background }]}
+      >
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            Loading weather data for {locationName}...
+          </Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
-  // Calculate dynamic width for scrollable charts
   const dynamicChartWidth = (labelsLength: number) =>
-    Math.max(screenWidth, labelsLength * 90); // Increased factor for better spacing
+    Math.max(screenWidth, labelsLength * 90);
 
   return (
     <SafeAreaView
@@ -208,14 +391,23 @@ export default function Analytics() {
       <ScrollView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <Text style={[styles.title, { color: colors.text }]}>
-          Weather Analytics for Groundwater Monitoring
-        </Text>
-        {locationName && (
-          <Text style={[styles.locationText, { color: colors.textSecondary }]}>
-            Location: {locationName}
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]}>
+            Weather Forecast and Analysis of Your Location
           </Text>
-        )}
+          <TouchableOpacity
+            style={[styles.refreshButton, { backgroundColor: colors.primary }]}
+            onPress={() => {
+              setLoading(true);
+              fetchCurrentLocation();
+            }}
+          >
+            <Text style={styles.refreshButtonText}>Refresh Location</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.locationText, { color: colors.textSecondary }]}>
+          📍 Location: {locationName}
+        </Text>
 
         {/* Temperature Chart */}
         <View
@@ -230,12 +422,17 @@ export default function Analytics() {
               { color: colors.text, borderBottomColor: colors.border },
             ]}
           >
+            <Ionicons
+              name="thermometer-outline"
+              size={18}
+              color={colors.text}
+            />{" "}
             Temperature Forecast
           </Text>
           {tempChartData && (
             <ScrollView
               horizontal
-              showsHorizontalScrollIndicator={true}
+              showsHorizontalScrollIndicator={false}
               style={{ marginBottom: 8 }}
             >
               <LineChart
@@ -267,12 +464,17 @@ export default function Analytics() {
               { color: colors.text, borderBottomColor: colors.border },
             ]}
           >
+            <MaterialCommunityIcons
+              name="weather-rainy"
+              size={18}
+              color={colors.text}
+            />{" "}
             Precipitation Forecast
           </Text>
           {rainChartData && (
             <ScrollView
               horizontal
-              showsHorizontalScrollIndicator={true}
+              showsHorizontalScrollIndicator={false}
               style={{ marginBottom: 8 }}
             >
               <BarChart
@@ -305,12 +507,17 @@ export default function Analytics() {
               { color: colors.text, borderBottomColor: colors.border },
             ]}
           >
+            <MaterialCommunityIcons
+              name="water-percent"
+              size={18}
+              color={colors.text}
+            />{" "}
             Humidity Forecast
           </Text>
           {humidityChartData && (
             <ScrollView
               horizontal
-              showsHorizontalScrollIndicator={true}
+              showsHorizontalScrollIndicator={false}
               style={{ marginBottom: 8 }}
             >
               <BarChart
@@ -343,6 +550,11 @@ export default function Analytics() {
               { color: colors.text, borderBottomColor: colors.border },
             ]}
           >
+            <MaterialCommunityIcons
+              name="weather-partly-cloudy"
+              size={18}
+              color={colors.text}
+            />{" "}
             Weather Conditions Distribution
           </Text>
           {weatherPieData.length > 0 && (
@@ -359,7 +571,7 @@ export default function Analytics() {
           )}
         </View>
 
-        {/* Groundwater Insights */}
+        {/* AI-Generated Groundwater Insights */}
         <View
           style={[
             styles.insightsCard,
@@ -372,26 +584,101 @@ export default function Analytics() {
               { color: colors.text, borderBottomColor: colors.border },
             ]}
           >
-            Groundwater Insights
+            <MaterialCommunityIcons
+              name="brain"
+              size={18}
+              color={colors.text}
+            />{" "}
+            Smart Groundwater Insights
           </Text>
-          {weatherInsights.map((ins, idx) => (
-            <View
-              key={idx}
-              style={[
-                styles.insightItem,
-                {
-                  backgroundColor: colors.background,
-                  borderLeftColor: colors.primary,
-                },
-              ]}
-            >
+
+          {generatingInsights ? (
+            <View style={styles.insightLoading}>
+              <ActivityIndicator size="small" color={colors.primary} />
               <Text
                 style={[styles.insightText, { color: colors.textSecondary }]}
               >
-                {ins}
+                Analyzing forecast for groundwater implications...
               </Text>
             </View>
-          ))}
+          ) : (
+            insights.map((ins, idx) => {
+              const cat =
+                ins.category === "risk"
+                  ? { color: "#E53E3E", icon: "alert" }
+                  : ins.category === "recharge"
+                  ? { color: "#3182CE", icon: "water-plus" }
+                  : ins.category === "conservation"
+                  ? { color: "#2F855A", icon: "leaf" }
+                  : { color: colors.primary, icon: "chart-line" }; // monitoring
+
+              return (
+                <View
+                  key={idx}
+                  style={[
+                    styles.insightItem,
+                    {
+                      backgroundColor: colors.background,
+                      borderLeftColor: cat.color,
+                    },
+                  ]}
+                >
+                  <View style={styles.insightHeader}>
+                    <MaterialCommunityIcons
+                      name={cat.icon as any}
+                      size={20}
+                      color={cat.color}
+                      style={styles.insightIcon}
+                    />
+                    <Text style={[styles.insightTitle, { color: colors.text }]}>
+                      {ins.title}
+                    </Text>
+                    <View style={[styles.badge, { borderColor: cat.color }]}>
+                      <Text style={[styles.badgeText, { color: cat.color }]}>
+                        {ins.category.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {ins.bullets.map((b, bi) => (
+                    <View key={bi} style={styles.bulletRow}>
+                      <View
+                        style={[
+                          styles.bulletDot,
+                          { backgroundColor: cat.color },
+                        ]}
+                      />
+                      <Text
+                        style={[
+                          styles.bulletText,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        {b}
+                      </Text>
+                    </View>
+                  ))}
+
+                  <View style={styles.insightAction}>
+                    <MaterialCommunityIcons
+                      name="lightbulb-on-outline"
+                      size={16}
+                      color={cat.color}
+                      style={styles.actionIcon}
+                    />
+                    <Text
+                      style={[
+                        styles.actionText,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
+                      {ins.action}
+                    </Text>
+                  </View>
+                </View>
+              );
+            })
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -406,38 +693,52 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    textAlign: "center",
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  refreshButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  refreshButtonText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   loadingText: {
-    fontSize: 18,
-    textAlign: "center",
-    marginTop: 50,
+    fontSize: 16,
+    marginTop: 10,
   },
   chartCard: {
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 1.41,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
     marginBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
     paddingBottom: 8,
   },
   chart: {
@@ -447,20 +748,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 18,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 1.41,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
     marginBottom: 40,
   },
   insightItem: {
     marginBottom: 12,
-    padding: 8,
+    padding: 12,
     borderRadius: 8,
     borderLeftWidth: 4,
   },
@@ -468,10 +765,67 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+  insightLoading: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
   locationText: {
     fontSize: 16,
     fontWeight: "500",
     textAlign: "center",
     marginBottom: 20,
+  },
+  insightHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  insightIcon: {
+    marginRight: 8,
+  },
+  insightTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    flex: 1,
+  },
+  badge: {
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  bulletRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  bulletDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  bulletText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  insightAction: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  actionIcon: {
+    marginRight: 4,
+  },
+  actionText: {
+    fontSize: 14,
+    color: "#333",
   },
 });
