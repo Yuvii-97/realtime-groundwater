@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { LineChart, BarChart } from "react-native-chart-kit";
 import * as Location from "expo-location";
-import { WebView } from "react-native-webview";
-import { scale,verticalScale } from "@/utils/styling";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { scale, verticalScale } from "@/utils/styling";
 import { useTheme } from "@/hooks/useTheme";
 
 interface WellData {
@@ -214,6 +214,7 @@ export default function Dashboard() {
   const theme = useTheme();
   const [selectedRegion, setSelectedRegion] = useState<string>("National");
   const [selectedRole, setSelectedRole] = useState<string>("Policymaker");
+  const [selectedFilter, setSelectedFilter] = useState("all");
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
@@ -221,6 +222,92 @@ export default function Dashboard() {
   const [wellData, setWellData] = useState<WellData>(sampleWellData);
 
   const roles: string[] = ["Policymaker", "Researcher", "Farmer"];
+
+  // DWLR Stations data for the map
+  const dwlrStations = [
+    {
+      id: 1,
+      name: "DWLR Station Alpha",
+      status: "stable",
+      depth: "8.2m",
+      latitude: 28.6139,
+      longitude: 77.209,
+      lastUpdated: "2 min ago",
+    },
+    {
+      id: 2,
+      name: "DWLR Station Beta",
+      status: "stress",
+      depth: "15.7m",
+      latitude: 28.6219,
+      longitude: 77.2195,
+      lastUpdated: "5 min ago",
+    },
+    {
+      id: 3,
+      name: "DWLR Station Gamma",
+      status: "critical",
+      depth: "22.1m",
+      latitude: 28.6059,
+      longitude: 77.1985,
+      lastUpdated: "1 min ago",
+    },
+    {
+      id: 4,
+      name: "DWLR Station Delta",
+      status: "stable",
+      depth: "6.8m",
+      latitude: 28.6289,
+      longitude: 77.2065,
+      lastUpdated: "3 min ago",
+    },
+    {
+      id: 5,
+      name: "DWLR Station Echo",
+      status: "stress",
+      depth: "18.3m",
+      latitude: 28.5989,
+      longitude: 77.2125,
+      lastUpdated: "7 min ago",
+    },
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "stable":
+        return "#4CAF50";
+      case "stress":
+        return "#FF9800";
+      case "critical":
+        return "#F44336";
+      default:
+        return "#2196F3";
+    }
+  };
+
+  const filteredStations =
+    selectedFilter === "all"
+      ? dwlrStations
+      : dwlrStations.filter((station) => station.status === selectedFilter);
+
+  const filterOptions = [
+    { key: "all", label: "All Stations", count: dwlrStations.length },
+    {
+      key: "stable",
+      label: "Stable",
+      count: dwlrStations.filter((s) => s.status === "stable").length,
+    },
+    {
+      key: "stress",
+      label: "Stress",
+      count: dwlrStations.filter((s) => s.status === "stress").length,
+    },
+    {
+      key: "critical",
+      label: "Critical",
+      count: dwlrStations.filter((s) => s.status === "critical").length,
+    },
+  ];
 
   useEffect(() => {
     (async () => {
@@ -266,8 +353,10 @@ export default function Dashboard() {
     backgroundGradientFrom: theme.colors.surface,
     backgroundGradientTo: theme.colors.surface,
     decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(${theme.isDark ? '59, 130, 246' : '17, 138, 178'}, ${opacity})`,
-    labelColor: (opacity = 1) => theme.colors.text.replace('rgb', 'rgba').replace(')', `, ${opacity})`),
+    color: (opacity = 1) =>
+      `rgba(${theme.isDark ? "59, 130, 246" : "17, 138, 178"}, ${opacity})`,
+    labelColor: (opacity = 1) =>
+      theme.colors.text.replace("rgb", "rgba").replace(")", `, ${opacity})`),
     style: {
       borderRadius: scale(12),
     },
@@ -382,14 +471,18 @@ export default function Dashboard() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Role Switcher */}
-      <View style={[styles.roleSwitcher, { backgroundColor: theme.colors.surface }]}>
+      <View
+        style={[styles.roleSwitcher, { backgroundColor: theme.colors.surface }]}
+      >
         {roles.map((role) => (
           <TouchableOpacity
             key={role}
             style={[
               styles.roleBtn,
               { borderColor: theme.colors.border },
-              selectedRole === role && { backgroundColor: theme.colors.primary },
+              selectedRole === role && {
+                backgroundColor: theme.colors.primary,
+              },
             ]}
             onPress={() => setSelectedRole(role)}
           >
@@ -407,14 +500,31 @@ export default function Dashboard() {
       </View>
 
       <ScrollView
-        style={[styles.scrollArea, { backgroundColor: theme.colors.background }]}
+        style={[
+          styles.scrollArea,
+          { backgroundColor: theme.colors.background },
+        ]}
         contentContainerStyle={{ paddingBottom: verticalScale(32) }}
       >
         {/* Top Stats */}
         <View style={styles.topStatsRow}>
-          <View style={[styles.topStatBox, { backgroundColor: theme.colors.surface }]}>
-            <Text style={[styles.topStatLabel, { color: theme.colors.textSecondary }]}>Current Level</Text>
-            <Text style={[styles.topStatValue, { color: theme.colors.text }]}>{wellData.currentLevel} m</Text>
+          <View
+            style={[
+              styles.topStatBox,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <Text
+              style={[
+                styles.topStatLabel,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Current Level
+            </Text>
+            <Text style={[styles.topStatValue, { color: theme.colors.text }]}>
+              {wellData.currentLevel} m
+            </Text>
             <Text
               style={[
                 styles.topStatTrend,
@@ -427,35 +537,90 @@ export default function Dashboard() {
               week
             </Text>
           </View>
-          <View style={[styles.topStatBox, { backgroundColor: theme.colors.surface }]}>
-            <Text style={[styles.topStatLabel, { color: theme.colors.textSecondary }]}>Recharge Status</Text>
-            <Text style={[styles.topStatValue, { color: theme.colors.text }]}>{wellData.rechargeStatus}</Text>
-            <Text style={[styles.topStatSub, { color: theme.colors.textSecondary }]}>
+          <View
+            style={[
+              styles.topStatBox,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <Text
+              style={[
+                styles.topStatLabel,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Recharge Status
+            </Text>
+            <Text style={[styles.topStatValue, { color: theme.colors.text }]}>
+              {wellData.rechargeStatus}
+            </Text>
+            <Text
+              style={[styles.topStatSub, { color: theme.colors.textSecondary }]}
+            >
               {wellData.rechargeValue}% capacity
             </Text>
           </View>
-          <View style={[styles.topStatBox, { backgroundColor: theme.colors.surface }]}>
-            <Text style={[styles.topStatLabel, { color: theme.colors.textSecondary }]}>Rainfall Forecast</Text>
+          <View
+            style={[
+              styles.topStatBox,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <Text
+              style={[
+                styles.topStatLabel,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Rainfall Forecast
+            </Text>
             <Text style={[styles.topStatValue, { color: theme.colors.text }]}>
               {wellData.rainfallForecast} mm
             </Text>
-            <Text style={[styles.topStatSub, { color: theme.colors.textSecondary }]}>Next 48 hours</Text>
+            <Text
+              style={[styles.topStatSub, { color: theme.colors.textSecondary }]}
+            >
+              Next 48 hours
+            </Text>
           </View>
         </View>
 
         {/* Alert */}
-        <View style={[styles.alertSection, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        <View
+          style={[
+            styles.alertSection,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
           <Text style={styles.alertIcon}>🚨</Text>
-          <Text style={[styles.alertText, { color: theme.colors.text }]}>{wellData.alert}</Text>
-          <TouchableOpacity style={[styles.alertBtn, { backgroundColor: theme.colors.primary }]}>
-            <Text style={[styles.alertBtnText, { color: theme.colors.surface }]}>View Details</Text>
+          <Text style={[styles.alertText, { color: theme.colors.text }]}>
+            {wellData.alert}
+          </Text>
+          <TouchableOpacity
+            style={[styles.alertBtn, { backgroundColor: theme.colors.primary }]}
+          >
+            <Text
+              style={[styles.alertBtnText, { color: theme.colors.surface }]}
+            >
+              View Details
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Region Status Overview */}
         <View style={styles.regionOverviewRow}>
-          <View style={[styles.regionStatsCol, { backgroundColor: theme.colors.surface }]}>
-            <Text style={[styles.regionStatsTitle, { color: theme.colors.text }]}>
+          <View
+            style={[
+              styles.regionStatsCol,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <Text
+              style={[styles.regionStatsTitle, { color: theme.colors.text }]}
+            >
               State Wise Station Count
             </Text>
             {/* Wrap the BarChart in a ScrollView for horizontal scrolling */}
@@ -524,15 +689,136 @@ export default function Dashboard() {
             <View
               style={[styles.mapContainer, { marginTop: verticalScale(12) }]}
             >
-              <WebView
-                source={{
-                  uri: "https://www.openstreetmap.org/export/embed.html?bbox=67.0,7.5,97.0,37.0&layer=mapnik",
+              {/* Filter Controls for Map */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.mapFilterContainer}
+                contentContainerStyle={styles.mapFilterContent}
+              >
+                {filterOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option.key}
+                    style={[
+                      styles.mapFilterButton,
+                      selectedFilter === option.key &&
+                        styles.mapFilterButtonActive,
+                      {
+                        borderColor:
+                          option.key !== "all"
+                            ? getStatusColor(option.key)
+                            : theme.colors.primary,
+                      },
+                    ]}
+                    onPress={() => setSelectedFilter(option.key)}
+                  >
+                    <Text
+                      style={[
+                        styles.mapFilterText,
+                        { color: theme.colors.text },
+                        selectedFilter === option.key && {
+                          color: theme.colors.surface,
+                        },
+                      ]}
+                    >
+                      {option.label} ({option.count})
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              {/* MapView */}
+              <MapView
+                provider={PROVIDER_GOOGLE}
+                style={styles.mapView}
+                initialRegion={{
+                  latitude: 28.6139,
+                  longitude: 77.209,
+                  latitudeDelta: 0.08,
+                  longitudeDelta: 0.08,
                 }}
-                style={styles.mapWebview}
-                javaScriptEnabled
-                domStorageEnabled
-                scrollEnabled={false}
-              />
+                showsUserLocation={true}
+                showsMyLocationButton={true}
+                showsCompass={true}
+                showsScale={true}
+              >
+                {filteredStations.map((station) => (
+                  <Marker
+                    key={station.id}
+                    coordinate={{
+                      latitude: station.latitude,
+                      longitude: station.longitude,
+                    }}
+                    title={station.name}
+                    description={`Depth: ${station.depth} | Status: ${station.status} | Updated: ${station.lastUpdated}`}
+                    pinColor={getStatusColor(station.status)}
+                  />
+                ))}
+              </MapView>
+
+              {/* Legend */}
+              <View
+                style={[
+                  styles.mapLegend,
+                  { backgroundColor: theme.colors.surface },
+                ]}
+              >
+                <Text
+                  style={[styles.mapLegendTitle, { color: theme.colors.text }]}
+                >
+                  Station Status
+                </Text>
+                <View style={styles.mapLegendItems}>
+                  <View style={styles.mapLegendItem}>
+                    <View
+                      style={[
+                        styles.mapLegendDot,
+                        { backgroundColor: "#4CAF50" },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.mapLegendText,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      Stable
+                    </Text>
+                  </View>
+                  <View style={styles.mapLegendItem}>
+                    <View
+                      style={[
+                        styles.mapLegendDot,
+                        { backgroundColor: "#FF9800" },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.mapLegendText,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      Stress
+                    </Text>
+                  </View>
+                  <View style={styles.mapLegendItem}>
+                    <View
+                      style={[
+                        styles.mapLegendDot,
+                        { backgroundColor: "#F44336" },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.mapLegendText,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      Critical
+                    </Text>
+                  </View>
+                </View>
+              </View>
             </View>
           </View>
         </View>
@@ -808,17 +1094,69 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     width: "100%",
-    height: verticalScale(200),
+    height: verticalScale(300),
     borderRadius: scale(10),
     overflow: "hidden",
     borderWidth: scale(1),
     borderColor: "#e0e0e0",
     marginTop: verticalScale(8),
   },
-  mapWebview: {
+  mapFilterContainer: {
+    maxHeight: 50,
+    paddingVertical: 0,
+    marginVertical: 0,
+    marginHorizontal: 5,
+  },
+  mapFilterContent: {
+    paddingHorizontal: 8,
+    paddingVertical: 0,
+    gap: 8,
+    alignItems: "center",
+  },
+  mapFilterButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 15,
+    borderWidth: 1.5,
+    backgroundColor: "#FFFFFF",
+  },
+  mapFilterButtonActive: {
+    backgroundColor: "#077A7D",
+  },
+  mapFilterText: {
+    fontSize: scale(11),
+    fontWeight: "500",
+  },
+  mapView: {
     flex: 1,
     height: verticalScale(200),
-    borderRadius: scale(10),
+  },
+  mapLegend: {
+    padding: scale(8),
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+  },
+  mapLegendTitle: {
+    fontSize: scale(12),
+    fontWeight: "bold",
+    marginBottom: verticalScale(6),
+  },
+  mapLegendItems: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  mapLegendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  mapLegendDot: {
+    width: scale(8),
+    height: scale(8),
+    borderRadius: scale(4),
+    marginRight: scale(4),
+  },
+  mapLegendText: {
+    fontSize: scale(10),
   },
   trendSection: {
     backgroundColor: "#ffffff",
