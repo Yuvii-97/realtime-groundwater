@@ -219,56 +219,102 @@ export default function Dashboard() {
     null
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [locationLoading, setLocationLoading] = useState<boolean>(true);
   const [wellData, setWellData] = useState<WellData>(sampleWellData);
 
   const roles: string[] = ["Policymaker", "Researcher", "Farmer"];
 
-  // DWLR Stations data for the map
+  // DWLR Stations data for Tamil Nadu
   const dwlrStations = [
     {
       id: 1,
-      name: "DWLR Station Alpha",
+      name: "Chennai DWLR Station",
       status: "stable",
-      depth: "8.2m",
-      latitude: 28.6139,
-      longitude: 77.209,
+      depth: "12.5m",
+      latitude: 13.0827,
+      longitude: 80.2707,
       lastUpdated: "2 min ago",
     },
     {
       id: 2,
-      name: "DWLR Station Beta",
+      name: "Coimbatore DWLR Station",
       status: "stress",
-      depth: "15.7m",
-      latitude: 28.6219,
-      longitude: 77.2195,
+      depth: "18.7m",
+      latitude: 11.0168,
+      longitude: 76.9558,
       lastUpdated: "5 min ago",
     },
     {
       id: 3,
-      name: "DWLR Station Gamma",
+      name: "Madurai DWLR Station",
       status: "critical",
-      depth: "22.1m",
-      latitude: 28.6059,
-      longitude: 77.1985,
+      depth: "25.1m",
+      latitude: 9.9252,
+      longitude: 78.1198,
       lastUpdated: "1 min ago",
     },
     {
       id: 4,
-      name: "DWLR Station Delta",
+      name: "Trichy DWLR Station",
       status: "stable",
-      depth: "6.8m",
-      latitude: 28.6289,
-      longitude: 77.2065,
+      depth: "9.8m",
+      latitude: 10.7905,
+      longitude: 78.7047,
       lastUpdated: "3 min ago",
     },
     {
       id: 5,
-      name: "DWLR Station Echo",
+      name: "Salem DWLR Station",
       status: "stress",
-      depth: "18.3m",
-      latitude: 28.5989,
-      longitude: 77.2125,
+      depth: "16.3m",
+      latitude: 11.664,
+      longitude: 78.146,
       lastUpdated: "7 min ago",
+    },
+    {
+      id: 6,
+      name: "Tirunelveli DWLR Station",
+      status: "stable",
+      depth: "7.2m",
+      latitude: 8.7139,
+      longitude: 77.7567,
+      lastUpdated: "4 min ago",
+    },
+    {
+      id: 7,
+      name: "Vellore DWLR Station",
+      status: "stable",
+      depth: "11.4m",
+      latitude: 12.9165,
+      longitude: 79.1325,
+      lastUpdated: "6 min ago",
+    },
+    {
+      id: 8,
+      name: "Thanjavur DWLR Station",
+      status: "critical",
+      depth: "20.8m",
+      latitude: 10.787,
+      longitude: 79.1378,
+      lastUpdated: "8 min ago",
+    },
+    {
+      id: 9,
+      name: "Erode DWLR Station",
+      status: "stress",
+      depth: "14.6m",
+      latitude: 11.341,
+      longitude: 77.7172,
+      lastUpdated: "3 min ago",
+    },
+    {
+      id: 10,
+      name: "Kanchipuram DWLR Station",
+      status: "stable",
+      depth: "10.2m",
+      latitude: 12.8342,
+      longitude: 79.7036,
+      lastUpdated: "5 min ago",
     },
   ];
 
@@ -280,6 +326,10 @@ export default function Dashboard() {
         return "#FF9800";
       case "critical":
         return "#F44336";
+      case "good":
+        return "#06d6a0";
+      case "warning":
+        return "#ffd166";
       default:
         return "#2196F3";
     }
@@ -311,13 +361,24 @@ export default function Dashboard() {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
+      try {
+        setLocationLoading(true);
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          setLocationLoading(false);
+          return;
+        }
+        let currentLocation = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        setLocation(currentLocation);
+        setLocationLoading(false);
+      } catch (error) {
+        setErrorMsg("Error getting location");
+        setLocationLoading(false);
+        console.error("Location error:", error);
       }
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
     })();
   }, []);
 
@@ -732,16 +793,30 @@ export default function Dashboard() {
                 provider={PROVIDER_GOOGLE}
                 style={styles.mapView}
                 initialRegion={{
-                  latitude: 28.6139,
-                  longitude: 77.209,
-                  latitudeDelta: 0.08,
-                  longitudeDelta: 0.08,
+                  latitude: location?.coords?.latitude || 11.1271, // Tamil Nadu center or current location
+                  longitude: location?.coords?.longitude || 78.6569, // Tamil Nadu center or current location
+                  latitudeDelta: 2.5, // Wider view to show whole Tamil Nadu
+                  longitudeDelta: 2.5,
                 }}
                 showsUserLocation={true}
                 showsMyLocationButton={true}
                 showsCompass={true}
                 showsScale={true}
               >
+                {/* Current Location Marker */}
+                {location && (
+                  <Marker
+                    coordinate={{
+                      latitude: location.coords.latitude,
+                      longitude: location.coords.longitude,
+                    }}
+                    title="Your Current Location"
+                    description="This is your current location"
+                    pinColor="#2196F3"
+                  />
+                )}
+
+                {/* Tamil Nadu DWLR Stations */}
                 {filteredStations.map((station) => (
                   <Marker
                     key={station.id}
@@ -769,6 +844,22 @@ export default function Dashboard() {
                   Station Status
                 </Text>
                 <View style={styles.mapLegendItems}>
+                  <View style={styles.mapLegendItem}>
+                    <View
+                      style={[
+                        styles.mapLegendDot,
+                        { backgroundColor: "#2196F3" },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.mapLegendText,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      Current Location
+                    </Text>
+                  </View>
                   <View style={styles.mapLegendItem}>
                     <View
                       style={[
@@ -1276,5 +1367,18 @@ const styles = StyleSheet.create({
     color: "#1976d2",
     fontSize: scale(12),
     fontWeight: "600",
+  },
+  mapHeader: {
+    marginBottom: verticalScale(8),
+    paddingHorizontal: scale(8),
+  },
+  mapTitle: {
+    fontSize: scale(14),
+    fontWeight: "700",
+    marginBottom: verticalScale(4),
+  },
+  locationStatus: {
+    fontSize: scale(11),
+    fontStyle: "italic",
   },
 });
