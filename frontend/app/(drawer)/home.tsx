@@ -15,7 +15,6 @@ import { scale, verticalScale } from "@/utils/styling";
 import {
   Ionicons,
   MaterialCommunityIcons,
-  FontAwesome5,
 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -33,8 +32,8 @@ const HeroCarousel = () => {
   const heroSlides = [
     {
       id: 1,
-      image: require("@/assets/images/file_2025-09-10_15.53.45[1].png"),
-      gradient: ["#075a7dff", "#0891b2"],
+      image: require("@/assets/images/dwlr.jpeg"),
+      gradient: ["#06b6d4", "#075a7dff"],
     },
     {
       id: 2,
@@ -43,8 +42,8 @@ const HeroCarousel = () => {
     },
     {
       id: 3,
-      image: require("@/assets/images/dwlr.jpeg"),
-      gradient: ["#06b6d4", "#075a7dff"],
+      image: require("@/assets/images/file_2025-09-10_15.53.45[1].png"),
+      gradient: ["#075a7dff", "#0891b2"],
     },
   ];
 
