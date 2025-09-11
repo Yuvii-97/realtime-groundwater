@@ -69,7 +69,7 @@ const sampleWellData: WellData = {
   rechargeStatus: "Moderate",
   rechargeValue: 45,
   rainfallForecast: 25,
-  alert: "District XYZ showing critically low levels",
+  alert: "Some Districts showing critically low levels",
   trendData: {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [
