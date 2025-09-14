@@ -22,7 +22,7 @@ const { width } = Dimensions.get("window");
 
 // Hero Carousel Component
 const HeroCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(1); // Start at 1 instead of 0
   const scrollX = useRef(new Animated.Value(0)).current;
   const slideRef = useRef<ScrollView>(null);
   const { t } = useTranslation();
@@ -37,21 +37,54 @@ const HeroCarousel = () => {
     },
     {
       id: 2,
-      image: require("@/assets/images/download.jpg"),
-      gradient: ["#0891b2", "#06b6d4"],
-    },
-    {
-      id: 3,
       image: require("@/assets/images/file_2025-09-10_15.53.45[1].png"),
       gradient: ["#075a7dff", "#0891b2"],
     },
+    {
+      id: 3,
+      image: require("@/assets/images/india.jpeg"),
+      gradient: ["#0369a1", "#075985"],
+    },
+    {
+      id: 4,
+      image: require("@/assets/images/farmer.webp"), // Replace with your actual image name
+      gradient: ["#075985", "#0c4a6e"],
+    },
+    {
+      id: 5,
+      image: require("@/assets/images/realtime.webp"), // Replace with your actual image name
+      gradient: ["#0c4a6e", "#164e63"],
+    },
+    {
+      id: 6,
+      image: require("@/assets/images/security.webp"), // Replace with your actual image name
+      gradient: ["#164e63", "#155e75"],
+    },
   ];
+
+  // Create infinite slides by adding duplicate slides
+  const infiniteSlides = [
+    { ...heroSlides[heroSlides.length - 1], key: 'last-duplicate' }, // Last slide at the beginning
+    ...heroSlides.map((slide, index) => ({ ...slide, key: `original-${index}` })),
+    { ...heroSlides[0], key: 'first-duplicate' }, // First slide at the end
+  ];
+
+  useEffect(() => {
+    // Set initial position to first real slide
+    if (slideRef.current) {
+      slideRef.current.scrollTo({
+        x: currentIndex * width,
+        y: 0,
+        animated: false,
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % heroSlides.length;
-        // Auto-scroll to next slide with smooth animation
+        const nextIndex = prevIndex + 1;
+        
         if (slideRef.current) {
           slideRef.current.scrollTo({
             x: nextIndex * width,
@@ -59,12 +92,47 @@ const HeroCarousel = () => {
             animated: true,
           });
         }
+        
         return nextIndex;
       });
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [width, heroSlides.length]);
+  }, [width]);
+
+  const handleMomentumScrollEnd = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const currentSlide = Math.round(offsetX / width);
+    
+    // Handle infinite loop
+    if (currentSlide === 0) {
+      // If we're at the duplicate last slide (position 0), jump to real last slide
+      setCurrentIndex(heroSlides.length);
+      if (slideRef.current) {
+        setTimeout(() => {
+          slideRef.current?.scrollTo({
+            x: heroSlides.length * width,
+            y: 0,
+            animated: false,
+          });
+        }, 50);
+      }
+    } else if (currentSlide === heroSlides.length + 1) {
+      // If we're at the duplicate first slide (last position), jump to real first slide
+      setCurrentIndex(1);
+      if (slideRef.current) {
+        setTimeout(() => {
+          slideRef.current?.scrollTo({
+            x: 1 * width,
+            y: 0,
+            animated: false,
+          });
+        }, 50);
+      }
+    } else {
+      setCurrentIndex(currentSlide);
+    }
+  };
 
   return (
     <View style={styles.heroContainer}>
@@ -78,15 +146,14 @@ const HeroCarousel = () => {
           { useNativeDriver: false }
         )}
         scrollEventThrottle={16}
-        onMomentumScrollEnd={(event) => {
-          const offsetX = event.nativeEvent.contentOffset.x;
-          const currentSlide = Math.round(offsetX / width);
-          setCurrentIndex(currentSlide);
-        }}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
       >
-        {heroSlides.map((slide, index) => (
-          <View key={slide.id} style={[styles.heroSlide, { width }]}>
-            <Image source={slide.image} style={styles.heroBackgroundImage} />
+        {infiniteSlides.map((slide, index) => (
+          <View key={slide.key} style={[styles.heroSlide, { width }]}>
+            <Image 
+              source={slide.image} 
+              style={styles.heroBackgroundImage} 
+            />
             <View style={styles.heroButtonOverlay}>
               <TouchableOpacity
                 style={styles.getStartedButton}
@@ -102,6 +169,26 @@ const HeroCarousel = () => {
                   style={styles.buttonIcon}
                 />
               </TouchableOpacity>
+              
+              {/* Dot indicators */}
+              <View style={styles.dotContainer}>
+                {heroSlides.map((_, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.dot,
+                      {
+                        backgroundColor: 
+                          (currentIndex === index + 1 || 
+                           (currentIndex === 0 && index === heroSlides.length - 1) ||
+                           (currentIndex === heroSlides.length + 1 && index === 0))
+                            ? "#FFFFFF" // Solid white for active dot
+                            : "#888888" // Solid grey for inactive dots
+                      }
+                    ]}
+                  />
+                ))}
+              </View>
             </View>
           </View>
         ))}
@@ -416,27 +503,31 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
+  indiaMapImage: {
+    resizeMode: "contain",
+    backgroundColor: "#e0f2fe", // Light blue that matches the app's theme
+  },
   heroButtonOverlay: {
     position: "absolute",
-    bottom: verticalScale(32),
+    bottom: verticalScale(20), // Moved down from 32 to 20
     left: 0,
     right: 0,
     justifyContent: "center",
     alignItems: "center",
   },
   getStartedButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    paddingVertical: verticalScale(10),
-    paddingHorizontal: scale(24),
-    borderRadius: scale(25),
-    elevation: 5,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.6)", // Slightly more transparent from 0.7 to 0.6
+    paddingVertical: verticalScale(8), // Reduced from 10 to 8
+    paddingHorizontal: scale(20), // Reduced from 24 to 20
+    borderRadius: scale(22), // Slightly reduced from 25 to 22
+    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15, // Reduced shadow opacity from 0.2 to 0.15
+    shadowRadius: 4,
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#075a7dff",
+    borderWidth: 1.5,
+    borderColor: "rgba(7, 90, 125, 0.7)", // Slightly more transparent border
   },
   getStartedText: {
     color: "#075a7dff",
@@ -445,6 +536,19 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     marginLeft: scale(8),
+  },
+  dotContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: verticalScale(12),
+  },
+  dot: {
+    width: scale(8),
+    height: scale(8),
+    borderRadius: scale(4),
+    marginHorizontal: scale(4),
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
   },
 
   // Legacy Hero Section Styles
