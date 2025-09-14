@@ -10,7 +10,7 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  ActivityIndicator, // Import ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 // REMOVED: import ClusteredMapView from "react-native-map-clustering"; // Removed as requested
@@ -19,6 +19,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import stationsData from "@/assets/Coordinates/stations.json";
 import type { FlatListProps } from "react-native";
 import React, { forwardRef } from "react"; // Import forwardRef
+import { useNavigation } from "@react-navigation/native";
 
 if (
   Platform.OS === "android" &&
@@ -202,6 +203,8 @@ function useDebounce<T>(value: T, delay = 250): T {
 
 // ================== MAIN MAPS SCREEN ==================
 export default function MapsScreen() {
+  const navigation = useNavigation<any>(); // add
+
   // Ref for the *static* map component
   const mapRef = useRef<MapView | null>(null);
 
@@ -254,13 +257,33 @@ export default function MapsScreen() {
     setPanelOpen((o) => !o);
   };
 
+  const handleStationPress = useCallback(
+    (st: Station) => {
+      navigation.navigate("StationDetail", {
+        station: {
+          code: st.station_code,
+          name: st.station_name,
+          district: st.district,
+          state: st.state,
+          lat: st.latitude,
+          lon: st.longitude,
+          status: st.station_status,
+        },
+      });
+    },
+    [navigation]
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: Station }) => {
       const active = selectedCode === item.station_code;
       return (
         <TouchableOpacity
           style={[styles.stationRow, active && styles.stationRowActive]}
-          onPress={() => focusStation(item)}
+          onPress={() => {
+            focusStation(item);
+            handleStationPress(item);
+          }}
         >
           <View
             style={[
@@ -287,7 +310,7 @@ export default function MapsScreen() {
         </TouchableOpacity>
       );
     },
-    [selectedCode, focusStation, statusColor]
+    [selectedCode, focusStation, handleStationPress, statusColor]
   );
 
   // FlatList perf helpers
@@ -307,6 +330,7 @@ export default function MapsScreen() {
       <StaticStationsMap
         ref={mapRef}
         onMapReady={() => setIsLoadingMap(false)}
+        onStationPress={handleStationPress} // pass handler
       />
 
       {/* Loading Overlay */}
@@ -412,11 +436,12 @@ export default function MapsScreen() {
 // ================== STATIC MAP (NO RE-RENDERS) ==================
 interface StaticStationsMapProps {
   onMapReady: () => void;
+  onStationPress: (st: Station) => void;
 }
 
 const StaticStationsMap = React.memo(
   forwardRef<MapView, StaticStationsMapProps>(function StaticStationsMap(
-    { onMapReady },
+    { onMapReady, onStationPress },
     ref
   ) {
     if (!hasStations) {
@@ -456,34 +481,15 @@ const StaticStationsMap = React.memo(
         toolbarEnabled={false}
         moveOnMarkerPress={false}
       >
-        <Marker coordinate={{ latitude: 9.6694, longitude: 78.1083 }} />
-
         {stations.map((st) => (
           <Marker
             key={`station-${st.station_code}`}
-            coordinate={{
-              latitude: st.latitude,
-              longitude: st.longitude,
-            }}
-            tracksViewChanges={false}
+            coordinate={{ latitude: st.latitude, longitude: st.longitude }}
             title={st.station_name}
             description={`Code: ${st.station_code} • ${st.district}`}
-          >
-            <View style={styles.markerWrapper}>
-              <View
-                style={[
-                  styles.markerDot,
-                  {
-                    backgroundColor:
-                      st.station_status === "Active" ? "#2E8B57" : "#B0B0B0",
-                  },
-                ]}
-              />
-              <Text numberOfLines={1} style={styles.markerLabel}>
-                {st.station_code}
-              </Text>
-            </View>
-          </Marker>
+            pinColor={st.station_status === "Active" ? "green" : "gray"}
+            onPress={() => onStationPress(st)}
+          />
         ))}
       </MapView>
     );
