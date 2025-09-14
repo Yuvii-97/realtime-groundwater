@@ -1,0 +1,342 @@
+# REALTIME GROUNDWATER MONITORING APP - CHATBOT CONTEXT
+
+## APP OVERVIEW
+**App Name**: Realtime Groundwater Analytics
+**Purpose**: A comprehensive groundwater monitoring and analytics mobile application built with React Native and Expo
+**Target Users**: Government officials, water management authorities, farmers, researchers, and the general public
+**Organization**: Central Ground Water Board (CGWB), India
+
+## TECHNICAL ARCHITECTURE
+
+### Framework & Platform
+- **Framework**: React Native with Expo (~53.0.22)
+- **Navigation**: Expo Router (~5.1.5) with drawer navigation
+- **Platform Support**: iOS, Android, and Web
+- **State Management**: React Context API
+- **Internationalization**: React i18next (supports 10+ Indian languages)
+- **Maps**: React Native Maps with Google Provider
+- **Charts**: React Native Chart Kit for data visualization
+- **Storage**: AsyncStorage for local settings and data
+
+### Key Dependencies
+- @google/generative-ai: For AI-powered insights and chat functionality
+- expo-location: For GPS location services
+- expo-localization: For multilingual support
+- react-native-maps: For interactive mapping features
+- react-native-chart-kit: For data visualization charts
+- @react-navigation/drawer: For side drawer navigation
+
+## APP STRUCTURE & NAVIGATION
+
+### Main Layout
+- **Root Layout**: Stack layout with Settings and Notification providers
+- **Navigation**: Drawer-based navigation with 8 main sections
+- **Header**: Persistent header with logo, menu, language selector, and notifications
+- **ChatBot**: Always-accessible floating chat interface
+
+### Navigation Sections (Drawer Menu)
+1. **Home** - Landing page with hero carousel and quick access
+2. **Dashboard** - Real-time data overview and monitoring
+3. **Groundwater Monitoring** - Detailed station-wise monitoring
+4. **Predictions** - AI-powered forecasting (currently in development)
+5. **Analytics** - Weather data integration and AI insights
+6. **Maps** - Interactive station mapping with 31,574+ stations
+7. **Reports** - Data export and report generation
+8. **Settings** - User preferences and configuration
+
+## DETAILED PAGE FUNCTIONALITY
+
+### 1. HOME PAGE (home.tsx)
+**Purpose**: Main landing page and app overview
+**Features**:
+- Hero carousel with 6 rotating slides showcasing app features
+- Quick navigation tiles to main sections
+- Welcome message and app introduction
+- Featured highlights of groundwater monitoring
+
+**Key Components**:
+- Animated hero carousel with auto-rotation (5-second intervals)
+- Quick access buttons to Dashboard, Analytics, Maps
+- Responsive design with device dimension adaptation
+
+### 2. DASHBOARD (dashboard.tsx)
+**Purpose**: Real-time monitoring and data overview
+**Features**:
+- Current groundwater levels display (sample: 6.2m depth)
+- Trend analysis with interactive charts
+- Regional monitoring with map integration
+- Policy metrics and performance indicators
+- Farmer guidance recommendations
+- Critical alerts system
+
+**Data Displayed**:
+- National average: 5.8m depth, 31,574 total stations, 16,346 monitored
+- State-wise breakdown (Maharashtra, Rajasthan, Tamil Nadu, etc.)
+- Recharge status indicators
+- Rainfall forecast integration
+- Monthly trend charts (LineChart and BarChart)
+
+**Interactive Features**:
+- Live data refresh
+- Regional filtering
+- Alert management
+- Performance metrics tracking
+
+### 3. GROUNDWATER MONITORING (groundwaterMonitoring.tsx)
+**Purpose**: Detailed station-wise monitoring and data analysis
+**Features**:
+- Hierarchical location selection (State → District → Station)
+- Interactive charts for water level trends
+- Customizable date range selection
+- Data insights and statistics
+- Export capabilities
+
+**Data Sources**:
+- Station network of 31,574+ monitoring wells
+- Historical trend data
+- Real-time measurements
+- Custom date range analysis
+
+**Analysis Tools**:
+- Statistical insights (average, min, max, trends)
+- Time series visualization
+- Comparative analysis tools
+
+### 4. PREDICTIONS (predictions.tsx)
+**Status**: Currently in development
+**Planned Features**:
+- AI-powered forecasting models
+- Seasonal trend predictions
+- Risk assessment algorithms
+- Early warning systems
+
+### 5. ANALYTICS (analytics.tsx)
+**Purpose**: Advanced data analysis with AI integration
+**Features**:
+- Weather data integration via OpenWeatherMap API
+- Google Gemini AI-powered insights
+- Location-based analysis
+- Multi-parameter correlation studies
+- Automated insight generation
+
+**External Integrations**:
+- OpenWeatherMap API for weather forecasting
+- Google Gemini AI for intelligent analysis
+- GPS location services for regional data
+
+**Analysis Capabilities**:
+- Weather-groundwater correlation analysis
+- Recharge potential assessment
+- Conservation recommendations
+- Risk level evaluation
+
+### 6. MAPS (maps.tsx)
+**Purpose**: Interactive geographical visualization
+**Features**:
+- Google Maps integration with 31,574+ station markers
+- Station search and filtering capabilities
+- State/district-wise navigation
+- Real-time station status indicators
+- Detailed station information pop-ups
+
+**Data Sources**:
+- Comprehensive stations.json database
+- Coordinate data for all monitoring wells
+- Station metadata (type, status, location details)
+
+**Interactive Features**:
+- Zoom-to-region functionality
+- Station clustering for performance
+- Search by station name/code
+- Filter by station status/type
+
+### 7. REPORTS (reports.tsx)
+**Purpose**: Data export and report generation
+**Features**:
+- Multiple export formats (CSV, JSON, PDF)
+- Customizable date ranges
+- Multi-parameter data selection
+- Chart screenshot capabilities
+- Automated report generation
+
+**Export Options**:
+- Groundwater level data
+- Rainfall measurements  
+- Temperature and humidity data
+- Recharge level information
+- Predictive analysis results
+
+**Report Types**:
+- Station-specific reports
+- Regional summaries
+- Comparative analysis reports
+- Trend analysis documents
+
+### 8. SETTINGS (settings.tsx)
+**Purpose**: User customization and app configuration
+**Features**:
+- Multi-language support (10+ Indian languages)
+- Theme switching (Light/Dark mode)
+- Notification preferences
+- Data refresh intervals
+- Unit preferences (metric/imperial)
+- Privacy controls
+
+**Supported Languages**:
+- English, Hindi, Telugu, Tamil, Kannada
+- Malayalam, Bengali, Gujarati, Marathi, Punjabi
+
+**Customization Options**:
+- Temperature units (Celsius/Fahrenheit)
+- Water level units (Meters/Feet)
+- Auto-refresh intervals (15min to 4hours)
+- Notification categories and timing
+
+## CORE FEATURES & CAPABILITIES
+
+### Real-time Monitoring
+- Live data from 31,574+ groundwater monitoring stations across India
+- Real-time alerts for critical water levels
+- Automatic data refresh with customizable intervals
+- Multi-parameter monitoring (level, quality, recharge rate)
+
+### AI Integration
+- Google Gemini AI for intelligent insights
+- Automated pattern recognition in groundwater data
+- Predictive analytics for seasonal trends
+- Natural language processing for user queries
+
+### Data Visualization
+- Interactive charts (Line, Bar, Pie charts)
+- Geographic visualization with Google Maps
+- Trend analysis with multiple timeframes
+- Comparative regional analysis
+
+### Multi-language Support
+- Complete internationalization (i18n) support
+- 10+ Indian regional languages
+- Dynamic language switching
+- Localized number formats and units
+
+### Export & Sharing
+- Multiple export formats (CSV, JSON, PDF)
+- Report generation with charts and analysis
+- Social sharing capabilities
+- Automated email reports
+
+### Location Services
+- GPS-based location detection
+- Regional data filtering
+- Proximity-based station recommendations
+- Geographic boundary awareness
+
+## TECHNICAL SPECIFICATIONS
+
+### Data Storage
+- AsyncStorage for user preferences
+- JSON-based station coordinate database
+- Local caching for offline functionality
+- Settings persistence across app sessions
+
+### API Integrations
+- OpenWeatherMap API for weather data
+- Google Gemini AI for intelligent analysis
+- Potential government data APIs (configurable)
+- Location services integration
+
+### Performance Optimizations
+- Lazy loading for large datasets
+- Image optimization and caching
+- Efficient chart rendering
+- Background data synchronization
+
+### Security & Privacy
+- User data privacy controls
+- Secure API key management
+- Optional data collection settings
+- Local data encryption capabilities
+
+## COMMON USER QUERIES & GUIDANCE
+
+### Navigation Help
+- "How do I check groundwater levels in my area?" → Guide to Maps section
+- "Where can I see the latest data?" → Direct to Dashboard
+- "How do I change the language?" → Settings > Language selection
+- "Can I export data?" → Reports section with export options
+
+### Data Understanding
+- "What do the water level numbers mean?" → Explain depth measurements
+- "How accurate is the prediction data?" → Explain AI model confidence
+- "Why are some stations showing no data?" → Explain monitoring status
+- "What is the normal groundwater level?" → Provide regional context
+
+### Feature Access
+- "How do I get alerts for low water levels?" → Settings > Notifications
+- "Can I compare data between regions?" → Analytics section capabilities
+- "How often is the data updated?" → Explain refresh intervals
+- "Is this data official?" → Confirm CGWB data source
+
+### Technical Support
+- "App is running slowly" → Suggest cache clearing in Settings
+- "Maps not loading" → Check internet connection and location permissions
+- "Charts not displaying" → Verify data availability and connection
+- "Language not changing" → Guide through language selection process
+
+## DATA SOURCES & ACCURACY
+
+### Primary Data Sources
+- Central Ground Water Board (CGWB) official monitoring network
+- 31,574 total monitoring stations across India
+- 16,346 actively monitored stations with real-time data
+- Historical records for trend analysis
+
+### Data Quality Indicators
+- Station status monitoring (active/inactive/maintenance)
+- Data freshness indicators
+- Quality control flags for anomalous readings
+- Regional data coverage statistics
+
+### Update Frequencies
+- Real-time data: Every 15-30 minutes (where available)
+- Weather integration: Hourly updates
+- AI insights: Daily analysis
+- System status: Continuous monitoring
+
+## TROUBLESHOOTING GUIDE
+
+### Common Issues
+1. **Location not detected** → Enable GPS and location permissions
+2. **Charts not loading** → Check internet connection, refresh data
+3. **Language not applying** → Restart app after language change
+4. **Export failing** → Verify storage permissions and available space
+5. **Notifications not working** → Enable notifications in device settings
+
+### Performance Tips
+- Regular cache clearing for optimal performance
+- Close background apps for better memory management
+- Update app regularly for latest features
+- Use WiFi for data-heavy operations
+
+### Feature Limitations
+- Predictions feature under development
+- Some rural stations may have delayed data
+- Export size limited by device storage
+- AI insights require internet connection
+
+## CONTACT & SUPPORT
+
+### App Support
+- Built for Central Ground Water Board (CGWB), India
+- Technical queries: Contact app development team
+- Data queries: Refer to CGWB official channels
+- Feature requests: Through app feedback system
+
+### Government Integration
+- Official CGWB data source verification
+- Policy compliance for water management
+- Integration with national water security initiatives
+- Support for drought monitoring and management
+
+---
+
+**Note for ChatBot**: Always provide helpful, accurate information based on this context. Guide users to appropriate app sections, explain features clearly, and acknowledge limitations where they exist. Prioritize user safety and data accuracy in all responses.
