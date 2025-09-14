@@ -22,12 +22,15 @@ export interface Notification {
 interface NotificationContextType {
   notifications: Notification[];
   unreadCount: number;
+  showNotificationPanel: boolean;
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
   deleteNotification: (id: string) => void;
   clearAllNotifications: () => void;
   getNotificationsByCategory: (category: NotificationCategory) => Notification[];
+  openNotificationPanel: () => void;
+  closeNotificationPanel: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -127,6 +130,7 @@ const generateSampleNotifications = (): Notification[] => {
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showNotificationPanel, setShowNotificationPanel] = useState(false);
   const { t } = useTranslation(); // Changed from useLanguage
   
   // Add a counter for unique IDs
@@ -480,17 +484,28 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return notifications.filter(notif => notif.category === category);
   };
 
+  const openNotificationPanel = () => {
+    setShowNotificationPanel(true);
+  };
+
+  const closeNotificationPanel = () => {
+    setShowNotificationPanel(false);
+  };
+
   const unreadCount = notifications.filter(notif => !notif.read).length;
 
   const value: NotificationContextType = {
     notifications,
     unreadCount,
+    showNotificationPanel,
     addNotification,
     markAsRead,
     markAllAsRead,
     deleteNotification,
     clearAllNotifications,
-    getNotificationsByCategory
+    getNotificationsByCategory,
+    openNotificationPanel,
+    closeNotificationPanel,
   };
 
   return (
