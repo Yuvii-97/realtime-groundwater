@@ -1,5 +1,53 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
+import * as Speech from "expo-speech";
+import { Audio } from "expo-av";
+
+/*
+ * SPEECH-TO-TEXT INTEGRATION GUIDE:
+ *
+ * For production speech-to-text, you can integrate with:
+ *
+ * 1. Google Cloud Speech-to-Text:
+ *    - Install: npm install @google-cloud/speech
+ *    - Send recorded audio file to Google's API
+ *
+ * 2. Azure Cognitive Services:
+ *    - Install: npm install microsoft-cognitiveservices-speech-sdk
+ *    - Use Azure Speech SDK for real-time transcription
+ *
+ * 3. AWS Transcribe:
+ *    - Install: npm install aws-sdk
+ *    - Upload audio to S3 and use Transcribe service
+ *
+ * 4. OpenAI Whisper API:
+ *    - Send audio file to OpenAI's Whisper endpoint
+ *    - More cost-effective for smaller applications
+ *
+ * Example function for OpenAI Whisper:
+ *
+ * const transcribeAudio = async (audioUri) => {
+ *   const formData = new FormData();
+ *   formData.append('file', {
+ *     uri: audioUri,
+ *     type: 'audio/m4a',
+ *     name: 'recording.m4a',
+ *   });
+ *   formData.append('model', 'whisper-1');
+ *
+ *   const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+ *     method: 'POST',
+ *     headers: {
+ *       'Authorization': `Bearer ${OPENAI_API_KEY}`,
+ *       'Content-Type': 'multipart/form-data',
+ *     },
+ *     body: formData,
+ *   });
+ *
+ *   const result = await response.json();
+ *   return result.text;
+ * };
+ */
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -53,6 +101,113 @@ const ChatBox = () => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [contextData, setContextData] = useState<string>("");
+  const [isSpeaking, setIsSpeaking] = useState<{ [key: number]: boolean }>({});
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [isListening, setIsListening] = useState(false);
+
+  const speakText = async (text: string, messageIndex: number) => {
+    try {
+      // Stop any current speech
+      if (isSpeaking[messageIndex]) {
+        await Speech.stop();
+        setIsSpeaking((prev) => ({ ...prev, [messageIndex]: false }));
+        return;
+      }
+
+      // Start speaking
+      setIsSpeaking((prev) => ({ ...prev, [messageIndex]: true }));
+
+      await Speech.speak(text, {
+        language: "en-US",
+        pitch: 1.0,
+        rate: 0.8,
+        onDone: () => {
+          setIsSpeaking((prev) => ({ ...prev, [messageIndex]: false }));
+        },
+        onError: (error) => {
+          console.error("Speech error:", error);
+          setIsSpeaking((prev) => ({ ...prev, [messageIndex]: false }));
+        },
+        onStopped: () => {
+          setIsSpeaking((prev) => ({ ...prev, [messageIndex]: false }));
+        },
+      });
+    } catch (error) {
+      console.error("Error in text-to-speech:", error);
+      setIsSpeaking((prev) => ({ ...prev, [messageIndex]: false }));
+    }
+  };
+
+  const transcribeAudioWithGemini = async (audioUri: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const audioBase64 = await FileSystem.readAsStringAsync(audioUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const audioPart = {
+        inlineData: {
+          mimeType: "audio/m4a",
+          data: audioBase64,
+        },
+      };
+
+      const result = await model.generateContent([
+        "Please transcribe this audio.",
+        audioPart,
+      ]);
+
+      const transcription = result.response.text();
+      setInput((prev) => prev + transcription);
+    } catch (err: any) {
+      console.error("Error transcribing audio:", err);
+      const errorMessage = err?.message?.includes("API key")
+        ? "I'm having trouble connecting to my AI services. Please check your internet connection or try again later."
+        : `Transcription failed: ${err?.message || "Unable to process audio"}.`;
+      setError(errorMessage);
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Web Speech API for browser testing (won't work on mobile)
+  const startWebSpeechRecognition = () => {
+    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
+      const recognition = new (window as any).webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput((prev) => prev + transcript);
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error);
+        setError("Speech recognition failed. Please try again.");
+        setIsListening(false);
+        setTimeout(() => setError(null), 3000);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+      return true;
+    }
+    return false;
+  };
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -212,6 +367,77 @@ Always provide helpful guidance to users and direct them to appropriate app sect
   };
 
   const fixedStyle = getFixedStyle();
+
+  const startRecording = async () => {
+    try {
+      // Try Web Speech API first (for web/browser testing)
+      if (Platform.OS === "web" && startWebSpeechRecognition()) {
+        return;
+      }
+
+      // Fallback to native recording for mobile
+      if (permissionResponse?.status !== "granted") {
+        console.log("Requesting permission..");
+        await requestPermission();
+      }
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      console.log("Starting recording..");
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(recording);
+      setIsRecording(true);
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Failed to start recording", err);
+      setError(
+        "Failed to start recording. Please check microphone permissions."
+      );
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  const stopRecording = async () => {
+    // Handle Web Speech API stopping
+    if (isListening && Platform.OS === "web") {
+      setIsListening(false);
+      // The onresult handler for Web Speech API already sets the input
+      return;
+    }
+
+    // Handle native recording stopping
+    console.log("Stopping recording..");
+    if (!recording) return;
+
+    setIsRecording(false);
+
+    try {
+      await recording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+      });
+
+      const uri = recording.getURI();
+      if (uri) {
+        console.log("Recording stopped and stored at", uri);
+        // Transcribe the audio using Gemini
+        await transcribeAudioWithGemini(uri);
+      } else {
+        throw new Error("Failed to get recording URI.");
+      }
+    } catch (err) {
+      console.error("Failed to stop or transcribe recording", err);
+      setError("Failed to process recording.");
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setRecording(null);
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -377,21 +603,39 @@ Respond based on the context provided and these instructions. If the user is ask
                         : styles.assistantMsgContainer
                     }
                   >
-                    <Text
-                      style={
-                        msg.role === "user"
-                          ? styles.userMsg
-                          : styles.assistantMsg
-                      }
-                    >
-                      {msg.content}
-                    </Text>
+                    {msg.role === "assistant" && (
+                      <View style={styles.assistantMsgWrapper}>
+                        <Text style={styles.assistantMsg}>{msg.content}</Text>
+                        <TouchableOpacity
+                          style={styles.speakerButton}
+                          onPress={() => speakText(msg.content, idx)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={styles.speakerIcon}>
+                            {isSpeaking[idx] ? "🔊" : "🔇"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                    {msg.role === "user" && (
+                      <Text style={styles.userMsg}>{msg.content}</Text>
+                    )}
                   </View>
                 ))}
                 {loading && (
                   <View style={styles.loadingContainer}>
                     <Text style={styles.loading}>
                       🤖 AI Assistant is thinking...
+                    </Text>
+                  </View>
+                )}
+                {(isRecording || isListening) && (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.recording}>
+                      🎤{" "}
+                      {isListening
+                        ? "Listening... Speak now!"
+                        : "Recording... Tap the red button to stop"}
                     </Text>
                   </View>
                 )}
@@ -406,6 +650,20 @@ Respond based on the context provided and these instructions. If the user is ask
                   placeholderTextColor="#999"
                   multiline
                 />
+                <TouchableOpacity
+                  style={[
+                    styles.micButton,
+                    (isRecording || isListening) && styles.micButtonActive,
+                  ]}
+                  onPress={
+                    isRecording || isListening ? stopRecording : startRecording
+                  }
+                  disabled={loading}
+                >
+                  <Text style={styles.micIcon}>
+                    {isRecording || isListening ? "🔴" : "🎤"}
+                  </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.sendBtn}
                   onPress={sendMessage}
@@ -517,6 +775,11 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginVertical: isTablet ? 6 : 4,
   },
+  assistantMsgWrapper: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    maxWidth: "85%",
+  },
   userMsg: {
     backgroundColor: "#075a7dff",
     color: "#fff",
@@ -533,15 +796,35 @@ const styles = StyleSheet.create({
     padding: isTablet ? 16 : 12,
     borderRadius: isTablet ? 20 : 16,
     borderBottomLeftRadius: 4,
-    maxWidth: "85%",
+    flex: 1,
     fontSize: isTablet ? 16 : 14,
     lineHeight: isTablet ? 22 : 18,
+  },
+  speakerButton: {
+    marginLeft: 8,
+    padding: 4,
+    backgroundColor: "#e5e7eb",
+    borderRadius: 16,
+    alignSelf: "flex-start",
+    marginTop: isTablet ? 4 : 2,
+  },
+  speakerIcon: {
+    fontSize: isTablet ? 16 : 14,
   },
   loading: {
     color: "#2563eb",
     fontStyle: "italic",
     padding: 12,
     textAlign: "center",
+  },
+  recording: {
+    color: "#dc2626",
+    fontStyle: "italic",
+    padding: 12,
+    textAlign: "center",
+    backgroundColor: "#fef2f2",
+    borderRadius: 8,
+    margin: 8,
   },
   loadingContainer: {
     alignItems: "center",
@@ -574,6 +857,26 @@ const styles = StyleSheet.create({
     maxHeight: isTablet ? 100 : 80,
     fontSize: isTablet ? 16 : 14,
     backgroundColor: "#f9fafb",
+  },
+  micButton: {
+    backgroundColor: "#f3f4f6",
+    borderRadius: isTablet ? 24 : 20,
+    paddingVertical: isTablet ? 16 : 12,
+    paddingHorizontal: isTablet ? 16 : 14,
+    marginRight: isTablet ? 8 : 6,
+    minHeight: isTablet ? 56 : 48,
+    minWidth: isTablet ? 56 : 48,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+  },
+  micButtonActive: {
+    backgroundColor: "#fecaca",
+    borderColor: "#f87171",
+  },
+  micIcon: {
+    fontSize: isTablet ? 18 : 16,
   },
   sendBtn: {
     backgroundColor: "#075a7dff",
