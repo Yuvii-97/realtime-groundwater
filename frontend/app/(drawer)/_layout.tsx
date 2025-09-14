@@ -17,7 +17,7 @@ import { useTheme } from "@/hooks/useTheme";
 export default function Layout() {
   const { t } = useTranslation(); // Changed from useLanguage
   const theme = useTheme();
-  
+
   const dynamicStyles = StyleSheet.create({
     drawerBackground: {
       flex: 1,
@@ -67,8 +67,8 @@ export default function Layout() {
               resizeMode="contain"
             />
             <View>
-              <Text style={dynamicStyles.title}>{t('groundWater')}</Text>
-              <Text style={dynamicStyles.subtitle}>{t('analytics')}</Text>
+              <Text style={dynamicStyles.title}>{t("groundWater")}</Text>
+              <Text style={dynamicStyles.subtitle}>{t("analytics")}</Text>
             </View>
           </View>
           <View style={dynamicStyles.divider} />
@@ -87,7 +87,10 @@ export default function Layout() {
           backgroundColor: theme.colors.surface,
         },
         header: () => (
-          <SafeAreaView edges={["top"]} style={{ backgroundColor: theme.colors.surface }}>
+          <SafeAreaView
+            edges={["top"]}
+            style={{ backgroundColor: theme.colors.surface }}
+          >
             <AppHeader
               onLanguageSwitch={() => console.log("Switch Language")}
               onNotificationsPress={() => console.log("Notifications")}
@@ -128,12 +131,12 @@ export default function Layout() {
         }}
       />
       <Drawer.Screen
-        name="livedata"
+        name="Predictions"
         options={{
-          title: t("drawer.liveData"),
+          title: t("drawer.predictions"),
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons
-              name="chart-line"
+              name="trending-up" // changed from "chart-line"
               size={size}
               color={color}
             />
@@ -178,6 +181,17 @@ export default function Layout() {
           drawerIcon: ({ color, size }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
           ),
+        }}
+      />
+      <Drawer.Screen
+        name="StationDetail"
+        options={{
+          drawerItemStyle: { height: 0 }, 
+          drawerLabel: () => null, 
+          title: "Station Detail", 
+          drawerIcon: () => null, 
+          swipeEnabled: false, 
+          headerShown: true, 
         }}
       />
     </Drawer>
