@@ -14,10 +14,7 @@ import {
 import { useTheme } from "../../hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import { scale, verticalScale } from "@/utils/styling";
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import LanguageSelector from "../../components/LanguageSelector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -71,9 +68,12 @@ const HeroCarousel = () => {
 
   // Create infinite slides by adding duplicate slides
   const infiniteSlides = [
-    { ...heroSlides[heroSlides.length - 1], key: 'last-duplicate' }, // Last slide at the beginning
-    ...heroSlides.map((slide, index) => ({ ...slide, key: `original-${index}` })),
-    { ...heroSlides[0], key: 'first-duplicate' }, // First slide at the end
+    { ...heroSlides[heroSlides.length - 1], key: "last-duplicate" }, // Last slide at the beginning
+    ...heroSlides.map((slide, index) => ({
+      ...slide,
+      key: `original-${index}`,
+    })),
+    { ...heroSlides[0], key: "first-duplicate" }, // First slide at the end
   ];
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const HeroCarousel = () => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         const nextIndex = prevIndex + 1;
-        
+
         if (slideRef.current) {
           slideRef.current.scrollTo({
             x: nextIndex * width,
@@ -99,7 +99,7 @@ const HeroCarousel = () => {
             animated: true,
           });
         }
-        
+
         return nextIndex;
       });
     }, 5000);
@@ -110,7 +110,7 @@ const HeroCarousel = () => {
   const handleMomentumScrollEnd = (event: any) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const currentSlide = Math.round(offsetX / width);
-    
+
     // Handle infinite loop
     if (currentSlide === 0) {
       // If we're at the duplicate last slide (position 0), jump to real last slide
@@ -194,22 +194,16 @@ const HeroCarousel = () => {
       >
         {infiniteSlides.map((slide, index) => (
           <View key={slide.key} style={[styles.heroSlide, { width }]}>
-            <Image 
-              source={slide.image} 
-              style={styles.heroBackgroundImage} 
-            />
+            <Image source={slide.image} style={styles.heroBackgroundImage} />
             <View style={styles.heroButtonOverlay}>
-              <TouchableOpacity
-                onPress={handleButtonPress}
-                activeOpacity={1}
-              >
+              <TouchableOpacity onPress={handleButtonPress} activeOpacity={1}>
                 <Animated.View
                   style={[
                     styles.getStartedButton,
                     {
                       transform: [{ scale: buttonScale }],
                       opacity: buttonOpacity,
-                    }
+                    },
                   ]}
                 >
                   <Text style={styles.getStartedText}>
@@ -223,7 +217,7 @@ const HeroCarousel = () => {
                   />
                 </Animated.View>
               </TouchableOpacity>
-              
+
               {/* Dot indicators */}
               <View style={styles.dotContainer}>
                 {heroSlides.map((_, index) => (
@@ -232,13 +226,15 @@ const HeroCarousel = () => {
                     style={[
                       styles.dot,
                       {
-                        backgroundColor: 
-                          (currentIndex === index + 1 || 
-                           (currentIndex === 0 && index === heroSlides.length - 1) ||
-                           (currentIndex === heroSlides.length + 1 && index === 0))
+                        backgroundColor:
+                          currentIndex === index + 1 ||
+                          (currentIndex === 0 &&
+                            index === heroSlides.length - 1) ||
+                          (currentIndex === heroSlides.length + 1 &&
+                            index === 0)
                             ? "#FFFFFF" // Solid white for active dot
-                            : "#888888" // Solid grey for inactive dots
-                      }
+                            : "#888888", // Solid grey for inactive dots
+                      },
                     ]}
                   />
                 ))}
@@ -252,12 +248,12 @@ const HeroCarousel = () => {
 };
 
 // Multilingual Feature Card Component with dual functionality
-const MultilingualFeatureCard = ({ 
-  iconName, 
-  iconLibrary = "Ionicons", 
-  title, 
-  description, 
-  dynamicStyles 
+const MultilingualFeatureCard = ({
+  iconName,
+  iconLibrary = "Ionicons",
+  title,
+  description,
+  dynamicStyles,
 }: {
   iconName: string;
   iconLibrary?: "Ionicons" | "MaterialCommunityIcons";
@@ -313,9 +309,9 @@ const MultilingualFeatureCard = ({
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     setIsExpanded(!isExpanded);
-    
+
     Animated.parallel([
       Animated.timing(heightAnim, {
         toValue,
@@ -361,7 +357,10 @@ const MultilingualFeatureCard = ({
     setShowLanguageSelector(false);
   };
 
-  const IconComponent = iconLibrary === "MaterialCommunityIcons" ? MaterialCommunityIcons : Ionicons;
+  const IconComponent =
+    iconLibrary === "MaterialCommunityIcons"
+      ? MaterialCommunityIcons
+      : Ionicons;
 
   // Dynamic styles for theme support
   const cardStyle = {
@@ -373,10 +372,15 @@ const MultilingualFeatureCard = ({
 
   const iconContainerStyle = {
     ...styles.compactIconContainer,
-    backgroundColor: theme.colors.primary + '20', // Primary color with opacity
+    // Light mode => fixed "#e0f2fe", Dark mode => previous translucent primary
+    backgroundColor: (theme as any).isDark
+      ? theme.colors.primary + "20"
+      : "#e0f2fe",
     borderWidth: 2,
-    borderColor: theme.colors.primary + '40', // Subtle border to indicate clickable
-    borderRadius: scale(20), // Ensure rounded corners
+    borderColor: (theme as any).isDark
+      ? theme.colors.primary + "40"
+      : "#bfe6f5",
+    borderRadius: scale(20),
   };
 
   const titleStyle = {
@@ -419,7 +423,7 @@ const MultilingualFeatureCard = ({
           cardStyle,
           {
             transform: [{ scale: scaleAnim }],
-          }
+          },
         ]}
       >
         <TouchableOpacity
@@ -442,32 +446,38 @@ const MultilingualFeatureCard = ({
                 transform: [{ scale: iconScale }],
               }}
             >
-              <IconComponent name={iconName as any} size={scale(24)} color={theme.colors.primary} />
+              <IconComponent
+                name={iconName as any}
+                size={scale(24)}
+                color={theme.colors.primary}
+              />
             </Animated.View>
           </TouchableOpacity>
-          <Text style={titleStyle} numberOfLines={2}>{title}</Text>
+          <Text style={titleStyle} numberOfLines={2}>
+            {title}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Expandable Information Section - Only shows when expanded */}
       {isExpanded && (
-        <Animated.View 
+        <Animated.View
           style={[
             expandedCardStyle,
             {
               opacity: opacityAnim,
               transform: [
-                { 
+                {
                   scaleY: heightAnim,
                 },
-                { 
+                {
                   translateY: heightAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-20, 0],
-                  })
-                }
+                  }),
+                },
               ],
-            }
+            },
           ]}
         >
           <View style={styles.expandedInfoContent}>
@@ -484,50 +494,55 @@ const MultilingualFeatureCard = ({
         animationType="fade"
         onRequestClose={() => setShowLanguageSelector(false)}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={{
             flex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
           }}
           activeOpacity={1}
           onPress={() => setShowLanguageSelector(false)}
         >
-          <TouchableOpacity 
+          <TouchableOpacity
             style={{
               backgroundColor: theme.colors.surface,
               borderRadius: scale(16),
               padding: scale(20),
-              width: '90%',
+              width: "90%",
               maxWidth: scale(400),
-              maxHeight: '70%',
+              maxHeight: "70%",
               ...theme.shadows.large,
             }}
             activeOpacity={1}
             onPress={() => {}}
           >
-            <Text style={{
-              fontSize: scale(20),
-              fontWeight: 'bold',
-              color: theme.colors.text,
-              textAlign: 'center',
-              marginBottom: scale(20),
-            }}>
+            <Text
+              style={{
+                fontSize: scale(20),
+                fontWeight: "bold",
+                color: theme.colors.text,
+                textAlign: "center",
+                marginBottom: scale(20),
+              }}
+            >
               Select Language
             </Text>
-            
+
             <ScrollView showsVerticalScrollIndicator={false}>
               {languages.map((language) => (
                 <TouchableOpacity
                   key={language.code}
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
+                    flexDirection: "row",
+                    alignItems: "center",
                     paddingVertical: scale(12),
                     paddingHorizontal: scale(16),
                     borderRadius: scale(8),
-                    backgroundColor: i18n.language === language.code ? theme.colors.primary + '20' : 'transparent',
+                    backgroundColor:
+                      i18n.language === language.code
+                        ? theme.colors.primary + "20"
+                        : "transparent",
                     marginVertical: scale(4),
                   }}
                   onPress={() => handleLanguageChange(language.code)}
@@ -536,26 +551,30 @@ const MultilingualFeatureCard = ({
                     {language.flag}
                   </Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={{
-                      fontSize: scale(16),
-                      color: theme.colors.text,
-                      fontWeight: '600',
-                    }}>
+                    <Text
+                      style={{
+                        fontSize: scale(16),
+                        color: theme.colors.text,
+                        fontWeight: "600",
+                      }}
+                    >
                       {language.name}
                     </Text>
-                    <Text style={{
-                      fontSize: scale(14),
-                      color: theme.colors.textSecondary,
-                      marginTop: scale(2),
-                    }}>
+                    <Text
+                      style={{
+                        fontSize: scale(14),
+                        color: theme.colors.textSecondary,
+                        marginTop: scale(2),
+                      }}
+                    >
                       {language.nativeName}
                     </Text>
                   </View>
                   {i18n.language === language.code && (
-                    <Ionicons 
-                      name="checkmark-circle" 
-                      size={scale(24)} 
-                      color={theme.colors.primary} 
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={scale(24)}
+                      color={theme.colors.primary}
                     />
                   )}
                 </TouchableOpacity>
@@ -568,16 +587,18 @@ const MultilingualFeatureCard = ({
                 borderRadius: scale(8),
                 paddingVertical: scale(12),
                 paddingHorizontal: scale(24),
-                alignSelf: 'center',
+                alignSelf: "center",
                 marginTop: scale(20),
               }}
               onPress={() => setShowLanguageSelector(false)}
             >
-              <Text style={{
-                color: theme.colors.surface,
-                fontSize: scale(16),
-                fontWeight: '600',
-              }}>
+              <Text
+                style={{
+                  color: theme.colors.surface,
+                  fontSize: scale(16),
+                  fontWeight: "600",
+                }}
+              >
                 Close
               </Text>
             </TouchableOpacity>
@@ -589,12 +610,12 @@ const MultilingualFeatureCard = ({
 };
 
 // Real Time Data Feature Card Component with dual functionality
-const RealTimeDataFeatureCard = ({ 
-  iconName, 
-  iconLibrary = "Ionicons", 
-  title, 
-  description, 
-  dynamicStyles 
+const RealTimeDataFeatureCard = ({
+  iconName,
+  iconLibrary = "Ionicons",
+  title,
+  description,
+  dynamicStyles,
 }: {
   iconName: string;
   iconLibrary?: "Ionicons" | "MaterialCommunityIcons";
@@ -648,9 +669,9 @@ const RealTimeDataFeatureCard = ({
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     setIsExpanded(!isExpanded);
-    
+
     Animated.parallel([
       Animated.timing(heightAnim, {
         toValue,
@@ -683,10 +704,13 @@ const RealTimeDataFeatureCard = ({
     ]).start();
 
     // Navigate to Groundwater Monitoring page
-    router.push('/(drawer)/groundwaterMonitoring');
+    router.push("/(drawer)/groundwaterMonitoring");
   };
 
-  const IconComponent = iconLibrary === "MaterialCommunityIcons" ? MaterialCommunityIcons : Ionicons;
+  const IconComponent =
+    iconLibrary === "MaterialCommunityIcons"
+      ? MaterialCommunityIcons
+      : Ionicons;
 
   // Dynamic styles for theme support
   const cardStyle = {
@@ -698,10 +722,15 @@ const RealTimeDataFeatureCard = ({
 
   const iconContainerStyle = {
     ...styles.compactIconContainer,
-    backgroundColor: theme.colors.primary + '20', // Primary color with opacity
+    // Light mode => fixed "#e0f2fe", Dark mode => previous translucent primary
+    backgroundColor: (theme as any).isDark
+      ? theme.colors.primary + "20"
+      : "#e0f2fe",
     borderWidth: 2,
-    borderColor: theme.colors.primary + '40', // Subtle border to indicate clickable
-    borderRadius: scale(20), // Ensure rounded corners
+    borderColor: (theme as any).isDark
+      ? theme.colors.primary + "40"
+      : "#bfe6f5",
+    borderRadius: scale(20),
   };
 
   const titleStyle = {
@@ -734,7 +763,7 @@ const RealTimeDataFeatureCard = ({
           cardStyle,
           {
             transform: [{ scale: scaleAnim }],
-          }
+          },
         ]}
       >
         <TouchableOpacity
@@ -757,32 +786,38 @@ const RealTimeDataFeatureCard = ({
                 transform: [{ scale: iconScale }],
               }}
             >
-              <IconComponent name={iconName as any} size={scale(24)} color={theme.colors.primary} />
+              <IconComponent
+                name={iconName as any}
+                size={scale(24)}
+                color={theme.colors.primary}
+              />
             </Animated.View>
           </TouchableOpacity>
-          <Text style={titleStyle} numberOfLines={2}>{title}</Text>
+          <Text style={titleStyle} numberOfLines={2}>
+            {title}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Expandable Information Section - Only shows when expanded */}
       {isExpanded && (
-        <Animated.View 
+        <Animated.View
           style={[
             expandedCardStyle,
             {
               opacity: opacityAnim,
               transform: [
-                { 
+                {
                   scaleY: heightAnim,
                 },
-                { 
+                {
                   translateY: heightAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-20, 0],
-                  })
-                }
+                  }),
+                },
               ],
-            }
+            },
           ]}
         >
           <View style={styles.expandedInfoContent}>
@@ -796,12 +831,12 @@ const RealTimeDataFeatureCard = ({
 };
 
 // AI Predictions Feature Card Component with dual functionality
-const AIPredictionsFeatureCard = ({ 
-  iconName, 
-  iconLibrary = "Ionicons", 
-  title, 
-  description, 
-  dynamicStyles 
+const AIPredictionsFeatureCard = ({
+  iconName,
+  iconLibrary = "Ionicons",
+  title,
+  description,
+  dynamicStyles,
 }: {
   iconName: string;
   iconLibrary?: "Ionicons" | "MaterialCommunityIcons";
@@ -855,9 +890,9 @@ const AIPredictionsFeatureCard = ({
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     setIsExpanded(!isExpanded);
-    
+
     Animated.parallel([
       Animated.timing(heightAnim, {
         toValue,
@@ -890,10 +925,13 @@ const AIPredictionsFeatureCard = ({
     ]).start();
 
     // Navigate to Dashboard page
-    router.push('/(drawer)/dashboard');
+    router.push("/(drawer)/dashboard");
   };
 
-  const IconComponent = iconLibrary === "MaterialCommunityIcons" ? MaterialCommunityIcons : Ionicons;
+  const IconComponent =
+    iconLibrary === "MaterialCommunityIcons"
+      ? MaterialCommunityIcons
+      : Ionicons;
 
   // Dynamic styles for theme support
   const cardStyle = {
@@ -905,10 +943,15 @@ const AIPredictionsFeatureCard = ({
 
   const iconContainerStyle = {
     ...styles.compactIconContainer,
-    backgroundColor: theme.colors.primary + '20', // Primary color with opacity
+    // Light mode => fixed "#e0f2fe", Dark mode => previous translucent primary
+    backgroundColor: (theme as any).isDark
+      ? theme.colors.primary + "20"
+      : "#e0f2fe",
     borderWidth: 2,
-    borderColor: theme.colors.primary + '40', // Subtle border to indicate clickable
-    borderRadius: scale(20), // Ensure rounded corners
+    borderColor: (theme as any).isDark
+      ? theme.colors.primary + "40"
+      : "#bfe6f5",
+    borderRadius: scale(20),
   };
 
   const titleStyle = {
@@ -941,7 +984,7 @@ const AIPredictionsFeatureCard = ({
           cardStyle,
           {
             transform: [{ scale: scaleAnim }],
-          }
+          },
         ]}
       >
         <TouchableOpacity
@@ -964,32 +1007,38 @@ const AIPredictionsFeatureCard = ({
                 transform: [{ scale: iconScale }],
               }}
             >
-              <IconComponent name={iconName as any} size={scale(24)} color={theme.colors.primary} />
+              <IconComponent
+                name={iconName as any}
+                size={scale(24)}
+                color={theme.colors.primary}
+              />
             </Animated.View>
           </TouchableOpacity>
-          <Text style={titleStyle} numberOfLines={2}>{title}</Text>
+          <Text style={titleStyle} numberOfLines={2}>
+            {title}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Expandable Information Section - Only shows when expanded */}
       {isExpanded && (
-        <Animated.View 
+        <Animated.View
           style={[
             expandedCardStyle,
             {
               opacity: opacityAnim,
               transform: [
-                { 
+                {
                   scaleY: heightAnim,
                 },
-                { 
+                {
                   translateY: heightAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-20, 0],
-                  })
-                }
+                  }),
+                },
               ],
-            }
+            },
           ]}
         >
           <View style={styles.expandedInfoContent}>
@@ -1003,12 +1052,12 @@ const AIPredictionsFeatureCard = ({
 };
 
 // Status Alerts Feature Card Component with dual functionality
-const StatusAlertsFeatureCard = ({ 
-  iconName, 
-  iconLibrary = "Ionicons", 
-  title, 
-  description, 
-  dynamicStyles 
+const StatusAlertsFeatureCard = ({
+  iconName,
+  iconLibrary = "Ionicons",
+  title,
+  description,
+  dynamicStyles,
 }: {
   iconName: string;
   iconLibrary?: "Ionicons" | "MaterialCommunityIcons";
@@ -1062,9 +1111,9 @@ const StatusAlertsFeatureCard = ({
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     setIsExpanded(!isExpanded);
-    
+
     Animated.parallel([
       Animated.timing(heightAnim, {
         toValue,
@@ -1100,7 +1149,10 @@ const StatusAlertsFeatureCard = ({
     openNotificationPanel();
   };
 
-  const IconComponent = iconLibrary === "MaterialCommunityIcons" ? MaterialCommunityIcons : Ionicons;
+  const IconComponent =
+    iconLibrary === "MaterialCommunityIcons"
+      ? MaterialCommunityIcons
+      : Ionicons;
 
   // Dynamic styles for theme support
   const cardStyle = {
@@ -1112,10 +1164,15 @@ const StatusAlertsFeatureCard = ({
 
   const iconContainerStyle = {
     ...styles.compactIconContainer,
-    backgroundColor: theme.colors.primary + '20', // Primary color with opacity
+    // Light mode => fixed "#e0f2fe", Dark mode => previous translucent primary
+    backgroundColor: (theme as any).isDark
+      ? theme.colors.primary + "20"
+      : "#e0f2fe",
     borderWidth: 2,
-    borderColor: theme.colors.primary + '40', // Subtle border to indicate clickable
-    borderRadius: scale(20), // Ensure rounded corners
+    borderColor: (theme as any).isDark
+      ? theme.colors.primary + "40"
+      : "#bfe6f5",
+    borderRadius: scale(20),
   };
 
   const titleStyle = {
@@ -1148,7 +1205,7 @@ const StatusAlertsFeatureCard = ({
           cardStyle,
           {
             transform: [{ scale: scaleAnim }],
-          }
+          },
         ]}
       >
         <TouchableOpacity
@@ -1171,32 +1228,38 @@ const StatusAlertsFeatureCard = ({
                 transform: [{ scale: iconScale }],
               }}
             >
-              <IconComponent name={iconName as any} size={scale(24)} color={theme.colors.primary} />
+              <IconComponent
+                name={iconName as any}
+                size={scale(24)}
+                color={theme.colors.primary}
+              />
             </Animated.View>
           </TouchableOpacity>
-          <Text style={titleStyle} numberOfLines={2}>{title}</Text>
+          <Text style={titleStyle} numberOfLines={2}>
+            {title}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Expandable Information Section - Only shows when expanded */}
       {isExpanded && (
-        <Animated.View 
+        <Animated.View
           style={[
             expandedCardStyle,
             {
               opacity: opacityAnim,
               transform: [
-                { 
+                {
                   scaleY: heightAnim,
                 },
-                { 
+                {
                   translateY: heightAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-20, 0],
-                  })
-                }
+                  }),
+                },
               ],
-            }
+            },
           ]}
         >
           <View style={styles.expandedInfoContent}>
@@ -1210,12 +1273,12 @@ const StatusAlertsFeatureCard = ({
 };
 
 // Interactive Map Feature Card Component with dual functionality
-const InteractiveMapFeatureCard = ({ 
-  iconName, 
-  iconLibrary = "Ionicons", 
-  title, 
-  description, 
-  dynamicStyles 
+const InteractiveMapFeatureCard = ({
+  iconName,
+  iconLibrary = "Ionicons",
+  title,
+  description,
+  dynamicStyles,
 }: {
   iconName: string;
   iconLibrary?: "Ionicons" | "MaterialCommunityIcons";
@@ -1269,9 +1332,9 @@ const InteractiveMapFeatureCard = ({
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     setIsExpanded(!isExpanded);
-    
+
     Animated.parallel([
       Animated.timing(heightAnim, {
         toValue,
@@ -1304,10 +1367,13 @@ const InteractiveMapFeatureCard = ({
     ]).start();
 
     // Navigate to Maps page
-    router.push('/(drawer)/maps');
+    router.push("/(drawer)/maps");
   };
 
-  const IconComponent = iconLibrary === "MaterialCommunityIcons" ? MaterialCommunityIcons : Ionicons;
+  const IconComponent =
+    iconLibrary === "MaterialCommunityIcons"
+      ? MaterialCommunityIcons
+      : Ionicons;
 
   // Dynamic styles for theme support
   const cardStyle = {
@@ -1319,10 +1385,15 @@ const InteractiveMapFeatureCard = ({
 
   const iconContainerStyle = {
     ...styles.compactIconContainer,
-    backgroundColor: theme.colors.primary + '20', // Primary color with opacity
+    // Light mode => fixed "#e0f2fe", Dark mode => previous translucent primary
+    backgroundColor: (theme as any).isDark
+      ? theme.colors.primary + "20"
+      : "#e0f2fe",
     borderWidth: 2,
-    borderColor: theme.colors.primary + '40', // Subtle border to indicate clickable
-    borderRadius: scale(20), // Ensure rounded corners
+    borderColor: (theme as any).isDark
+      ? theme.colors.primary + "40"
+      : "#bfe6f5",
+    borderRadius: scale(20),
   };
 
   const titleStyle = {
@@ -1355,7 +1426,7 @@ const InteractiveMapFeatureCard = ({
           cardStyle,
           {
             transform: [{ scale: scaleAnim }],
-          }
+          },
         ]}
       >
         <TouchableOpacity
@@ -1378,32 +1449,38 @@ const InteractiveMapFeatureCard = ({
                 transform: [{ scale: iconScale }],
               }}
             >
-              <IconComponent name={iconName as any} size={scale(24)} color={theme.colors.primary} />
+              <IconComponent
+                name={iconName as any}
+                size={scale(24)}
+                color={theme.colors.primary}
+              />
             </Animated.View>
           </TouchableOpacity>
-          <Text style={titleStyle} numberOfLines={2}>{title}</Text>
+          <Text style={titleStyle} numberOfLines={2}>
+            {title}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Expandable Information Section - Only shows when expanded */}
       {isExpanded && (
-        <Animated.View 
+        <Animated.View
           style={[
             expandedCardStyle,
             {
               opacity: opacityAnim,
               transform: [
-                { 
+                {
                   scaleY: heightAnim,
                 },
-                { 
+                {
                   translateY: heightAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-20, 0],
-                  })
-                }
+                  }),
+                },
               ],
-            }
+            },
           ]}
         >
           <View style={styles.expandedInfoContent}>
@@ -1417,12 +1494,12 @@ const InteractiveMapFeatureCard = ({
 };
 
 // Compact Feature Card Component
-const AnimatedFeatureCard = ({ 
-  iconName, 
-  iconLibrary = "Ionicons", 
-  title, 
-  description, 
-  dynamicStyles 
+const AnimatedFeatureCard = ({
+  iconName,
+  iconLibrary = "Ionicons",
+  title,
+  description,
+  dynamicStyles,
 }: {
   iconName: string;
   iconLibrary?: "Ionicons" | "MaterialCommunityIcons";
@@ -1456,9 +1533,9 @@ const AnimatedFeatureCard = ({
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     setIsExpanded(!isExpanded);
-    
+
     Animated.parallel([
       Animated.timing(heightAnim, {
         toValue,
@@ -1475,7 +1552,10 @@ const AnimatedFeatureCard = ({
     ]).start();
   };
 
-  const IconComponent = iconLibrary === "MaterialCommunityIcons" ? MaterialCommunityIcons : Ionicons;
+  const IconComponent =
+    iconLibrary === "MaterialCommunityIcons"
+      ? MaterialCommunityIcons
+      : Ionicons;
 
   // Dynamic styles for theme support
   const cardStyle = {
@@ -1487,7 +1567,10 @@ const AnimatedFeatureCard = ({
 
   const iconContainerStyle = {
     ...styles.compactIconContainer,
-    backgroundColor: theme.colors.primary + '20', // Primary color with opacity
+    // Light mode => fixed "#e0f2fe", Dark mode => previous translucent primary
+    backgroundColor: (theme as any).isDark
+      ? theme.colors.primary + "20"
+      : "#e0f2fe",
   };
 
   const titleStyle = {
@@ -1520,7 +1603,7 @@ const AnimatedFeatureCard = ({
           cardStyle,
           {
             transform: [{ scale: scaleAnim }],
-          }
+          },
         ]}
       >
         <TouchableOpacity
@@ -1531,31 +1614,37 @@ const AnimatedFeatureCard = ({
           style={styles.compactCardHeader}
         >
           <View style={iconContainerStyle}>
-            <IconComponent name={iconName as any} size={scale(24)} color={theme.colors.primary} />
+            <IconComponent
+              name={iconName as any}
+              size={scale(24)}
+              color={theme.colors.primary}
+            />
           </View>
-          <Text style={titleStyle} numberOfLines={2}>{title}</Text>
+          <Text style={titleStyle} numberOfLines={2}>
+            {title}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
-      
+
       {/* Expandable Information Section - Only shows when expanded */}
       {isExpanded && (
-        <Animated.View 
+        <Animated.View
           style={[
             expandedCardStyle,
             {
               opacity: opacityAnim,
               transform: [
-                { 
+                {
                   scaleY: heightAnim,
                 },
-                { 
+                {
                   translateY: heightAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-20, 0],
-                  })
-                }
+                  }),
+                },
               ],
-            }
+            },
           ]}
         >
           <View style={styles.expandedInfoContent}>
@@ -1569,10 +1658,10 @@ const AnimatedFeatureCard = ({
 };
 
 // Animated Benefit Item Component
-const AnimatedBenefitItem = ({ 
-  title, 
-  description, 
-  dynamicStyles 
+const AnimatedBenefitItem = ({
+  title,
+  description,
+  dynamicStyles,
 }: {
   title: string;
   description: string;
@@ -1624,7 +1713,7 @@ const AnimatedBenefitItem = ({
 
   const benefitIconContainerStyle = {
     ...styles.benefitIconContainer,
-    backgroundColor: theme.colors.success + '20', // Success color with opacity
+    backgroundColor: theme.colors.success + "20", // Success color with opacity
   };
 
   const benefitTitleStyle = {
@@ -1649,7 +1738,7 @@ const AnimatedBenefitItem = ({
           {
             transform: [{ scale: scaleAnim }],
             opacity: opacityAnim,
-          }
+          },
         ]}
       >
         <View style={benefitIconContainerStyle}>
@@ -1661,9 +1750,7 @@ const AnimatedBenefitItem = ({
         </View>
         <View style={styles.benefitContent}>
           <Text style={benefitTitleStyle}>{title}</Text>
-          <Text style={benefitDescriptionStyle}>
-            {description}
-          </Text>
+          <Text style={benefitDescriptionStyle}>{description}</Text>
         </View>
       </Animated.View>
     </TouchableOpacity>
@@ -1671,10 +1758,10 @@ const AnimatedBenefitItem = ({
 };
 
 // Animated Step Item Component
-const AnimatedStepItem = ({ 
-  stepNumber, 
-  stepText, 
-  dynamicStyles 
+const AnimatedStepItem = ({
+  stepNumber,
+  stepText,
+  dynamicStyles,
 }: {
   stepNumber: string;
   stepText: string;
@@ -1751,7 +1838,7 @@ const AnimatedStepItem = ({
                 }),
               },
             ],
-          }
+          },
         ]}
       >
         <View style={stepNumberContainerStyle}>
@@ -1764,10 +1851,10 @@ const AnimatedStepItem = ({
 };
 
 // Animated Section Component
-const AnimatedSection = ({ 
-  title, 
-  children, 
-  dynamicStyles 
+const AnimatedSection = ({
+  title,
+  children,
+  dynamicStyles,
 }: {
   title: string;
   children: React.ReactNode;
@@ -1812,7 +1899,7 @@ const AnimatedSection = ({
         {
           opacity: fadeAnim,
           transform: [{ translateY: slideAnim }],
-        }
+        },
       ]}
     >
       <Text style={sectionTitleStyle}>{title}</Text>
@@ -1884,8 +1971,8 @@ export default function Home() {
       <HeroCarousel />
 
       {/* Why This App Section */}
-      <AnimatedSection 
-        title={t("home.whyThisApp")} 
+      <AnimatedSection
+        title={t("home.whyThisApp")}
         dynamicStyles={dynamicStyles}
       >
         <Text style={dynamicStyles.sectionText}>
@@ -1894,8 +1981,8 @@ export default function Home() {
       </AnimatedSection>
 
       {/* Key Features Section */}
-      <AnimatedSection 
-        title={t("home.keyFeatures")} 
+      <AnimatedSection
+        title={t("home.keyFeatures")}
         dynamicStyles={dynamicStyles}
       >
         <View style={styles.featureGrid}>
@@ -1942,8 +2029,8 @@ export default function Home() {
       </AnimatedSection>
 
       {/* How It Works Section */}
-      <AnimatedSection 
-        title={t("home.howItWorks")} 
+      <AnimatedSection
+        title={t("home.howItWorks")}
         dynamicStyles={dynamicStyles}
       >
         <AnimatedStepItem
@@ -1966,10 +2053,7 @@ export default function Home() {
       </AnimatedSection>
 
       {/* Why Use It Section */}
-      <AnimatedSection 
-        title={t("home.whyUseIt")} 
-        dynamicStyles={dynamicStyles}
-      >
+      <AnimatedSection title={t("home.whyUseIt")} dynamicStyles={dynamicStyles}>
         <AnimatedBenefitItem
           title={t("home.forCitizens")}
           description={t("home.forCitizensDesc")}
@@ -2271,7 +2355,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: scale(4),
   },
-  
+
   // Compact Feature Card Styles
   compactCardContainer: {
     marginVertical: verticalScale(8),
@@ -2311,7 +2395,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: verticalScale(16),
   },
-  
+
   // Expanded Info Card Styles
   expandedInfoCard: {
     backgroundColor: "#FFFFFF",
