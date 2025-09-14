@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import * as FileSystem from "expo-file-system";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -16,9 +17,9 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  Keyboard,
 } from "react-native";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Picker } from "@react-native-picker/picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const screenWidth = Dimensions.get("window").width;
@@ -35,48 +36,158 @@ const model: any = genAI
   ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
   : null;
 
-const locations = [
-  { label: "Station 1 (Delhi)", value: "Delhi" },
-  { label: "Station 2 (Mumbai)", value: "Mumbai" },
-  { label: "Station 3 (Chennai)", value: "Chennai" },
-];
-
 const ChatBox = () => {
   const insets = useSafeAreaInsets();
   // Always visible, circle mode
   const [expanded, setExpanded] = useState(false);
-  const [location, setLocation] = useState(locations[0].value);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: "assistant",
+      content:
+        "Hello! I'm your Groundwater Assistant. I can help you with information about groundwater data, monitoring, predictions, analytics, and guide you through the app.\nHow can I assist you today?",
+    },
+  ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [contextData, setContextData] = useState<string>("");
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Responsive dimensions based on device type
+  // Load context data on component mount
+  useEffect(() => {
+    const loadContextData = async () => {
+      try {
+        // Try to read the context file from the app bundle
+        const contextPath = `${FileSystem.bundleDirectory}ChatBotContext.txt`;
+        let contextContent = "";
+
+        try {
+          contextContent = await FileSystem.readAsStringAsync(contextPath);
+        } catch (bundleError) {
+          // Fallback: If bundle path doesn't work, try document directory
+          const docPath = `${FileSystem.documentDirectory}ChatBotContext.txt`;
+          try {
+            contextContent = await FileSystem.readAsStringAsync(docPath);
+          } catch (docError) {
+            // If file not found, use embedded fallback context
+            contextContent = `
+# REALTIME GROUNDWATER MONITORING APP - CHATBOT CONTEXT
+
+## APP OVERVIEW
+App Name: Realtime Groundwater Analytics
+Purpose: Comprehensive groundwater monitoring and analytics mobile application
+Target Users: Government officials, water management authorities, farmers, researchers
+Organization: Central Ground Water Board (CGWB), India
+
+## MAIN FEATURES
+- Real-time monitoring of 31,574+ groundwater stations across India
+- Interactive maps with Google Maps integration
+- AI-powered analytics and predictions
+- Multi-language support (10+ Indian languages)
+- Data export capabilities (CSV, JSON, PDF)
+- Weather integration with OpenWeatherMap API
+
+## APP SECTIONS
+1. Home - Landing page with hero carousel
+2. Dashboard - Real-time data overview and monitoring
+3. Groundwater Monitoring - Detailed station-wise analysis
+4. Analytics - AI-powered insights with weather integration
+5. Maps - Interactive station mapping
+6. Reports - Data export and report generation
+7. Settings - Multilingual preferences and configuration
+
+## DATA SOURCES
+- Central Ground Water Board (CGWB) official data
+- 31,574 total monitoring stations
+- 16,346 actively monitored stations
+- Real-time updates every 15-30 minutes
+
+Always provide helpful guidance to users and direct them to appropriate app sections.
+            `.trim();
+          }
+        }
+
+        setContextData(contextContent);
+      } catch (error) {
+        console.error("Error loading context data:", error);
+        // Set minimal fallback context
+        setContextData(
+          "Groundwater monitoring app with real-time data from 31,574+ stations across India. Features include Dashboard, Maps, Analytics, and Reports."
+        );
+      }
+    };
+
+    loadContextData();
+  }, []);
+
+  // Keyboard event listeners
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+        setIsKeyboardVisible(true);
+        // Auto-scroll to bottom when keyboard opens and there are messages
+        if (messages.length > 0) {
+          setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }, 100);
+        }
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardHeight(0);
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, [messages.length]);
+
+  // Responsive dimensions based on device type and keyboard visibility
   const getModalDimensions = () => {
+    const availableHeight = isKeyboardVisible
+      ? screenHeight - keyboardHeight - insets.top - insets.bottom - 40
+      : screenHeight - insets.top - insets.bottom - 80;
+
     if (isTablet) {
       return {
         width: Math.min(screenWidth * 0.6, 600),
-        height: Math.min(screenHeight * 0.8, 700),
+        height: Math.min(
+          availableHeight * 0.9,
+          isKeyboardVisible ? availableHeight : 700
+        ),
       };
     }
 
     if (isSmallScreen) {
       return {
         width: screenWidth - 20,
-        height: screenHeight * 0.85,
+        height: Math.min(availableHeight * 0.95, availableHeight),
       };
     }
 
     return {
       width: screenWidth * 0.9,
-      height: Math.min(screenHeight * 0.75, 600),
+      height: Math.min(
+        availableHeight * 0.9,
+        isKeyboardVisible ? availableHeight : 600
+      ),
     };
   };
 
   const { width: modalWidth, height: modalHeight } = getModalDimensions();
-  const chatAreaHeight = modalHeight - (isTablet ? 160 : 140); // More space for tablets
+  const headerHeight = isTablet ? 60 : 50; // Header with title and close button
+  const inputHeight = isTablet ? 90 : 70; // Input row with padding
+  const chatAreaHeight = modalHeight - headerHeight - inputHeight;
 
   // Fixed position: right bottom corner with safe area and responsive positioning
   const getFixedStyle = () => {
@@ -116,7 +227,31 @@ const ChatBox = () => {
 
     try {
       if (!model) throw new Error("Gemini model not initialized");
-      const result = await model.generateContent(input);
+
+      // Create agentic prompt with context
+      const agenticPrompt = `
+You are an intelligent AI assistant for the Realtime Groundwater Monitoring App. Your role is to help users navigate the app, understand groundwater data, and provide accurate information based on the app's features and data sources.
+
+CONTEXT ABOUT THE APP:
+${contextData}
+
+INSTRUCTIONS FOR YOUR RESPONSES:
+1. Always be helpful, accurate, and professional
+2. Guide users to appropriate app sections when relevant (Dashboard, Maps, Analytics, etc.)
+3. Explain technical terms in simple language
+4. If asked about specific data, mention it comes from CGWB (Central Ground Water Board)
+5. For navigation questions, provide clear step-by-step directions
+6. If you don't know something specific, acknowledge it and suggest where users might find the information
+7. Prioritize user safety and data accuracy
+8. Be concise but comprehensive in your responses
+9. Use relevant emojis occasionally to make responses more engaging
+10. Always maintain a helpful and friendly tone
+
+USER QUESTION: ${input}
+
+Respond based on the context provided and these instructions. If the user is asking about app features, guide them to the right section. If they need technical help, provide clear steps. If they want to understand data, explain it clearly with proper context.`;
+
+      const result = await model.generateContent(agenticPrompt);
       const resp = await result.response;
       const reply = resp.text();
       setMessages((msgs) => [...msgs, { role: "assistant", content: reply }]);
@@ -127,11 +262,19 @@ const ChatBox = () => {
         100
       );
     } catch (err: any) {
+      const errorMessage = err?.message?.includes("API key")
+        ? "I'm having trouble connecting to my AI services. Please check your internet connection or try again later."
+        : err?.message?.includes("quota")
+        ? "I'm currently experiencing high usage. Please try again in a few moments."
+        : `I encountered an error: ${
+            err?.message || "Unable to process your request"
+          }. Please try rephrasing your question.`;
+
       setMessages((msgs) => [
         ...msgs,
         {
           role: "assistant",
-          content: String(err?.message || "Failed to get response."),
+          content: errorMessage,
         },
       ]);
       setTimeout(
@@ -161,60 +304,69 @@ const ChatBox = () => {
             isSmallScreen && styles.circleTextSmall,
           ]}
         >
-          💬
+          🤖
         </Text>
       </TouchableOpacity>
       <Modal
         visible={expanded}
         transparent
         animationType="slide"
-        onRequestClose={() => setExpanded(false)}
+        onRequestClose={() => {
+          setExpanded(false);
+        }}
       >
-        <View style={styles.modalOverlay}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => {}}
+        >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
-            style={styles.modalBox}
+            keyboardVerticalOffset={0}
+            style={[
+              styles.modalBox,
+              isKeyboardVisible && {
+                justifyContent: "flex-start",
+                paddingTop: insets.top + 20,
+              },
+            ]}
           >
-            <View
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {}} // Prevent closing when touching the modal content
               style={[
                 styles.expandedBox,
                 {
                   width: modalWidth,
                   height: modalHeight,
-                  marginTop: insets.top + 20,
-                  marginBottom: insets.bottom + 20,
+                  marginTop: isKeyboardVisible ? 0 : insets.top + 20,
+                  marginBottom: isKeyboardVisible ? 0 : insets.bottom + 20,
                 },
               ]}
             >
               <View style={styles.expandedHeader}>
                 <Text style={styles.title}>Groundwater Assistant</Text>
-                <TouchableOpacity onPress={() => setExpanded(false)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setExpanded(false);
+                  }}
+                >
                   <Text style={styles.minimize}>✕</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.locationRow}>
-                <Text style={styles.label}>Location:</Text>
-                <Picker
-                  selectedValue={location}
-                  style={styles.picker}
-                  onValueChange={setLocation}
-                >
-                  {locations.map((loc) => (
-                    <Picker.Item
-                      key={loc.value}
-                      label={loc.label}
-                      value={loc.value}
-                    />
-                  ))}
-                </Picker>
-              </View>
               <ScrollView
                 ref={scrollViewRef}
-                style={[styles.chatArea, { maxHeight: chatAreaHeight }]}
-                contentContainerStyle={styles.chatContent}
+                style={[styles.chatArea, { height: chatAreaHeight }]}
+                contentContainerStyle={[
+                  styles.chatContent,
+                  { minHeight: chatAreaHeight },
+                ]}
                 showsVerticalScrollIndicator={true}
                 keyboardShouldPersistTaps="handled"
+                maintainVisibleContentPosition={{
+                  minIndexForVisible: 0,
+                  autoscrollToTopThreshold: 10,
+                }}
               >
                 {messages.map((msg, idx) => (
                   <View
@@ -236,7 +388,13 @@ const ChatBox = () => {
                     </Text>
                   </View>
                 ))}
-                {loading && <Text style={styles.loading}>Typing...</Text>}
+                {loading && (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.loading}>
+                      🤖 AI Assistant is thinking...
+                    </Text>
+                  </View>
+                )}
                 {error && <Text style={styles.error}>{error}</Text>}
               </ScrollView>
               <View style={styles.inputRow}>
@@ -244,7 +402,7 @@ const ChatBox = () => {
                   style={styles.input}
                   value={input}
                   onChangeText={setInput}
-                  placeholder="Ask about groundwater data..."
+                  placeholder="Ask about app..."
                   placeholderTextColor="#999"
                   multiline
                 />
@@ -256,9 +414,9 @@ const ChatBox = () => {
                   <Text style={styles.sendText}>Send</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </TouchableOpacity>
           </KeyboardAvoidingView>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -342,24 +500,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     padding: isTablet ? 6 : 4,
   },
-  locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: isTablet ? 20 : 16,
-    paddingVertical: isTablet ? 12 : 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  label: {
-    fontWeight: "600",
-    marginRight: 8,
-    fontSize: isTablet ? 16 : 14,
-    color: "#374151",
-  },
-  picker: {
-    flex: 1,
-    height: 40,
-  },
   chatArea: {
     flex: 1,
     paddingHorizontal: isTablet ? 20 : 16,
@@ -402,6 +542,10 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     padding: 12,
     textAlign: "center",
+  },
+  loadingContainer: {
+    alignItems: "center",
+    marginVertical: isTablet ? 8 : 6,
   },
   error: {
     color: "#dc2626",
@@ -455,7 +599,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    height: "100%",
+    flex: 1,
   },
 });
 
