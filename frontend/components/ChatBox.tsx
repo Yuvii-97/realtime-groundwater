@@ -69,6 +69,7 @@ import {
 } from "react-native";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -104,6 +105,7 @@ const ChatBox = () => {
   const [isSpeaking, setIsSpeaking] = useState<{ [key: number]: boolean }>({});
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [isListening, setIsListening] = useState(false);
 
@@ -141,7 +143,7 @@ const ChatBox = () => {
   };
 
   const transcribeAudioWithGemini = async (audioUri: string) => {
-    setLoading(true);
+    setIsTranscribing(true);
     setError(null);
     try {
       const audioBase64 = await FileSystem.readAsStringAsync(audioUri, {
@@ -156,12 +158,14 @@ const ChatBox = () => {
       };
 
       const result = await model.generateContent([
-        "Please transcribe this audio.",
+        "Please transcribe this audio. Only return the spoken text, without any additional sounds or noises like [breathing] or [background noise]. If no speech is detected, return an empty string.",
         audioPart,
       ]);
 
-      const transcription = result.response.text();
-      setInput((prev) => prev + transcription);
+      const transcription = result.response.text().trim();
+      if (transcription) {
+        setInput((prev) => (prev ? `${prev} ${transcription}` : transcription));
+      }
     } catch (err: any) {
       console.error("Error transcribing audio:", err);
       const errorMessage = err?.message?.includes("API key")
@@ -170,7 +174,7 @@ const ChatBox = () => {
       setError(errorMessage);
       setTimeout(() => setError(null), 5000);
     } finally {
-      setLoading(false);
+      setIsTranscribing(false);
     }
   };
 
@@ -622,14 +626,19 @@ Respond based on the context provided and these instructions. If the user is ask
                     )}
                   </View>
                 ))}
-                {loading && (
+                {loading && !isTranscribing && (
                   <View style={styles.loadingContainer}>
                     <Text style={styles.loading}>
                       🤖 AI Assistant is thinking...
                     </Text>
                   </View>
                 )}
-                {(isRecording || isListening) && (
+                {isTranscribing && (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.loading}>🎤 Transcribing audio...</Text>
+                  </View>
+                )}
+                {(isRecording || isListening) && !isTranscribing && (
                   <View style={styles.loadingContainer}>
                     <Text style={styles.recording}>
                       🎤{" "}
@@ -642,28 +651,33 @@ Respond based on the context provided and these instructions. If the user is ask
                 {error && <Text style={styles.error}>{error}</Text>}
               </ScrollView>
               <View style={styles.inputRow}>
-                <TextInput
-                  style={styles.input}
-                  value={input}
-                  onChangeText={setInput}
-                  placeholder="Ask about app..."
-                  placeholderTextColor="#999"
-                  multiline
-                />
-                <TouchableOpacity
-                  style={[
-                    styles.micButton,
-                    (isRecording || isListening) && styles.micButtonActive,
-                  ]}
-                  onPress={
-                    isRecording || isListening ? stopRecording : startRecording
-                  }
-                  disabled={loading}
-                >
-                  <Text style={styles.micIcon}>
-                    {isRecording || isListening ? "🔴" : "🎤"}
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.input}
+                    value={input}
+                    onChangeText={setInput}
+                    placeholder="Ask about app..."
+                    placeholderTextColor="#999"
+                    multiline
+                  />
+                  <TouchableOpacity
+                    style={styles.micButton}
+                    onPress={
+                      isRecording || isListening
+                        ? stopRecording
+                        : startRecording
+                    }
+                    disabled={loading}
+                  >
+                    <MaterialIcons
+                      name={isRecording || isListening ? "mic-off" : "mic"}
+                      size={isTablet ? 28 : 24}
+                      color={
+                        isRecording || isListening ? "#dc2626" : "#075a7dff"
+                      }
+                    />
+                  </TouchableOpacity>
+                </View>
                 <TouchableOpacity
                   style={styles.sendBtn}
                   onPress={sendMessage}
@@ -846,37 +860,25 @@ const styles = StyleSheet.create({
     borderTopColor: "#e5e7eb",
     backgroundColor: "#fff",
   },
-  input: {
+  inputContainer: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: isTablet ? 24 : 20,
-    paddingHorizontal: isTablet ? 20 : 16,
-    paddingVertical: isTablet ? 16 : 12,
-    marginRight: isTablet ? 12 : 8,
-    maxHeight: isTablet ? 100 : 80,
-    fontSize: isTablet ? 16 : 14,
-    backgroundColor: "#f9fafb",
-  },
-  micButton: {
-    backgroundColor: "#f3f4f6",
-    borderRadius: isTablet ? 24 : 20,
-    paddingVertical: isTablet ? 16 : 12,
-    paddingHorizontal: isTablet ? 16 : 14,
-    marginRight: isTablet ? 8 : 6,
-    minHeight: isTablet ? 56 : 48,
-    minWidth: isTablet ? 56 : 48,
-    justifyContent: "center",
+    flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#d1d5db",
+    borderRadius: isTablet ? 24 : 20,
+    marginRight: isTablet ? 12 : 8,
+    backgroundColor: "#f9fafb",
   },
-  micButtonActive: {
-    backgroundColor: "#fecaca",
-    borderColor: "#f87171",
+  input: {
+    flex: 1,
+    paddingHorizontal: isTablet ? 20 : 16,
+    paddingVertical: isTablet ? 16 : 12,
+    maxHeight: isTablet ? 100 : 80,
+    fontSize: isTablet ? 16 : 14,
   },
-  micIcon: {
-    fontSize: isTablet ? 18 : 16,
+  micButton: {
+    padding: isTablet ? 12 : 8,
   },
   sendBtn: {
     backgroundColor: "#075a7dff",
