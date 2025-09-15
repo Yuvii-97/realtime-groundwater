@@ -29,8 +29,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const theme = useTheme();
   const { notificationsEnabled } = useSettings();
   const { t, i18n } = useTranslation(); // Use i18next's translation hook
-  const { unreadCount = 0 } = useNotifications() || {};
-  const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+  const { unreadCount = 0, showNotificationPanel, openNotificationPanel, closeNotificationPanel } = useNotifications() || {};
 
   // Language change handler
   const handleLanguageChange = useCallback(
@@ -50,7 +49,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   );
 
   const handleNotificationPress = () => {
-    setShowNotificationPanel(true);
+    openNotificationPanel();
     if (onNotificationsPress) {
       onNotificationsPress();
     }
@@ -122,7 +121,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
       <NotificationPanel
         visible={showNotificationPanel}
-        onClose={() => setShowNotificationPanel(false)}
+        onClose={() => closeNotificationPanel()}
       />
     </View>
   );
