@@ -82,7 +82,7 @@ const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 const model: any = genAI
-  ? genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+  ? genAI.getGenerativeModel({ model: "gemini-2.5-pro" })
   : null;
 
 const ChatBox = () => {
