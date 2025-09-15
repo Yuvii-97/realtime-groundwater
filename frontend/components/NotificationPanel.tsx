@@ -15,6 +15,7 @@ import {
 } from "../contexts/NotificationContext";
 import { useTranslation } from "react-i18next"; // Changed from useLanguage
 import { scale } from "../utils/styling";
+import { Ionicons } from "@expo/vector-icons";
 
 interface NotificationPanelProps {
   visible: boolean;
@@ -39,34 +40,23 @@ const CategoryFilter = ({
     {
       key: "all",
       label: t("notifications.all"),
-      icon: "📋",
+      icon: "list",
+      iconType: "Ionicons" as const,
       count: safeNotifications.length,
     },
     {
       key: "water_level",
       label: t("notifications.waterLevelAlerts"),
-      icon: "💧",
+      icon: "water",
+      iconType: "Ionicons" as const,
       count: safeNotifications.filter((n) => n && n.category === "water_level")
-        .length,
-    },
-    {
-      key: "prediction",
-      label: t("notifications.predictions"),
-      icon: "🔮",
-      count: safeNotifications.filter((n) => n && n.category === "prediction")
-        .length,
-    },
-    {
-      key: "system",
-      label: t("notifications.system"),
-      icon: "⚙️",
-      count: safeNotifications.filter((n) => n && n.category === "system")
         .length,
     },
     {
       key: "tip",
       label: t("notifications.tips"),
-      icon: "💡",
+      icon: "bulb-outline",
+      iconType: "Ionicons" as const,
       count: safeNotifications.filter((n) => n && n.category === "tip").length,
     },
   ];
@@ -103,9 +93,12 @@ const CategoryFilter = ({
             minHeight: scale(32),
           }}
         >
-          <Text style={{ fontSize: scale(14), marginRight: scale(4) }}>
-            {category.icon}
-          </Text>
+          <Ionicons 
+            name={category.icon as any} 
+            size={scale(14)} 
+            color={selectedCategory === category.key ? "#FFFFFF" : "#333333"}
+            style={{ marginRight: scale(4) }}
+          />
           <Text
             style={{
               color: selectedCategory === category.key ? "#FFFFFF" : "#333333",
@@ -204,6 +197,26 @@ const NotificationItem = ({
     }
   };
 
+  const getNotificationIcon = (category: NotificationCategory, type: string) => {
+    switch (category) {
+      case 'water_level':
+        switch (type) {
+          case 'critical':
+            return { name: 'warning', library: 'Ionicons' };
+          case 'warning':
+            return { name: 'alert-circle', library: 'Ionicons' };
+          case 'success':
+            return { name: 'checkmark-circle', library: 'Ionicons' };
+          default:
+            return { name: 'water', library: 'Ionicons' };
+        }
+      case 'tip':
+        return { name: 'bulb-outline', library: 'Ionicons' };
+      default:
+        return { name: 'information-circle', library: 'Ionicons' };
+    }
+  };
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -238,11 +251,12 @@ const NotificationItem = ({
               marginBottom: scale(4),
             }}
           >
-            {notification.icon && (
-              <Text style={{ fontSize: scale(16), marginRight: scale(8) }}>
-                {notification.icon}
-              </Text>
-            )}
+            <Ionicons 
+              name={getNotificationIcon(notification.category, notification.type).name as any}
+              size={scale(16)} 
+              color={getTypeColor(notification.type)}
+              style={{ marginRight: scale(8) }}
+            />
             <Text
               style={{
                 fontSize: scale(14),
@@ -286,15 +300,22 @@ const NotificationItem = ({
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               {notification.location && (
-                <Text
-                  style={{
-                    fontSize: scale(11),
-                    color: "#999999",
-                    marginRight: scale(12),
-                  }}
-                >
-                  📍 {notification.location}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", marginRight: scale(12) }}>
+                  <Ionicons 
+                    name="location" 
+                    size={scale(11)} 
+                    color="#999999" 
+                    style={{ marginRight: scale(2) }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: scale(11),
+                      color: "#999999",
+                    }}
+                  >
+                    {notification.location}
+                  </Text>
+                </View>
               )}
               <Text
                 style={{
@@ -349,7 +370,7 @@ const NotificationItem = ({
             padding: scale(4),
           }}
         >
-          <Text style={{ fontSize: scale(16), color: "#CCCCCC" }}>✕</Text>
+          <Ionicons name="close" size={scale(16)} color="#CCCCCC" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -470,15 +491,20 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons 
+                name="notifications" 
+                size={scale(24)} 
+                color="#333333" 
+                style={{ marginRight: scale(8) }}
+              />
               <Text
                 style={{
                   fontSize: scale(24),
                   fontWeight: "bold",
                   color: "#333333",
-                  marginRight: scale(8),
                 }}
               >
-                🔔 {t("notifications.notifications")}
+                {t("notifications.notifications")}
               </Text>
               {unreadCount > 0 && (
                 <View
@@ -532,15 +558,20 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                 alignItems: "center",
               }}
             >
+              <Ionicons 
+                name="checkmark-done" 
+                size={scale(13)} 
+                color="#FFFFFF" 
+                style={{ marginRight: scale(4) }}
+              />
               <Text
                 style={{
                   color: "#FFFFFF",
                   fontSize: scale(13),
                   fontWeight: "600",
-                  marginRight: scale(4),
                 }}
               >
-                ✓ {t("notifications.markAllAsRead")}
+                {t("notifications.markAllAsRead")}
               </Text>
             </TouchableOpacity>
 
@@ -555,15 +586,20 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                 alignItems: "center",
               }}
             >
+              <Ionicons 
+                name="trash" 
+                size={scale(13)} 
+                color="#FFFFFF" 
+                style={{ marginRight: scale(4) }}
+              />
               <Text
                 style={{
                   color: "#FFFFFF",
                   fontSize: scale(13),
                   fontWeight: "600",
-                  marginRight: scale(4),
                 }}
               >
-                🗑️ {t("notifications.clearAll")}
+                {t("notifications.clearAll")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -597,9 +633,12 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
                 paddingVertical: scale(60),
               }}
             >
-              <Text style={{ fontSize: scale(48), marginBottom: scale(16) }}>
-                📭
-              </Text>
+              <Ionicons 
+                name="notifications-off" 
+                size={scale(48)} 
+                color="#CCCCCC" 
+                style={{ marginBottom: scale(16) }}
+              />
               <Text
                 style={{
                   fontSize: scale(18),
