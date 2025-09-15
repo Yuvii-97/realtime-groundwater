@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import * as Speech from "expo-speech";
 import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
 
 /*
  * SPEECH-TO-TEXT INTEGRATION GUIDE:
@@ -66,6 +67,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Keyboard,
+  Animated,
 } from "react-native";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -108,7 +110,12 @@ const ChatBox = () => {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [isListening, setIsListening] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
 
+  // Animation for recording pulse
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const cursorAnim = useRef(new Animated.Value(1)).current;
+  const messageOpacity = useRef(new Animated.Value(1)).current;
   const speakText = async (text: string, messageIndex: number) => {
     try {
       // Stop any current speech
@@ -215,6 +222,97 @@ const ChatBox = () => {
 
   const scrollViewRef = useRef<ScrollView>(null);
 
+  // Function to simulate streaming text effect with optimized character batching
+  const streamText = async (fullText: string) => {
+    setIsStreaming(true);
+
+    // Add empty assistant message first with fade-in animation
+    const messageIndex = messages.length + 1; // +1 because we already added user message
+    setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+    // Start with fade-in animation for the new message
+    messageOpacity.setValue(0);
+    Animated.timing(messageOpacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    // Wait for fade-in to start before beginning text stream
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Stream text with optimized batching for smoother performance
+    let currentText = "";
+    let i = 0;
+
+    while (i < fullText.length) {
+      // Batch characters for better performance
+      let batchSize = 1;
+      let currentChar = fullText[i];
+
+      // Batch alphanumeric characters together for smoother flow
+      if (/[a-zA-Z0-9]/.test(currentChar)) {
+        batchSize = Math.min(3, fullText.length - i); // Process up to 3 chars at once
+      }
+
+      // Add batch to current text
+      for (let j = 0; j < batchSize && i + j < fullText.length; j++) {
+        currentText += fullText[i + j];
+      }
+      i += batchSize;
+
+      // Update the last message with current text using a more efficient update
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        if (newMessages[messageIndex]) {
+          newMessages[messageIndex] = {
+            role: "assistant",
+            content: currentText,
+          };
+        }
+        return newMessages;
+      });
+
+      // Auto-scroll to bottom less frequently to reduce jitter
+      if (i % 8 === 0 || i >= fullText.length) {
+        requestAnimationFrame(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: false });
+        });
+      }
+
+      // Variable delay based on character type for natural feel
+      let delay = 25; // Base delay for smooth streaming
+
+      if (currentChar === ".") {
+        delay = 250; // Long pause after periods
+      } else if (currentChar === "!" || currentChar === "?") {
+        delay = 200; // Medium-long pause after exclamation/question
+      } else if (currentChar === "," || currentChar === ";") {
+        delay = 80; // Short pause after commas
+      } else if (currentChar === " ") {
+        delay = 15; // Very short pause between words
+      } else if (currentChar === "\n") {
+        delay = 120; // Pause at line breaks
+      }
+
+      // Add minimal randomization for natural feel without jitter
+      delay += Math.random() * 5;
+
+      // Add subtle haptic feedback occasionally for typing feel (very light)
+      if (i % 10 === 0 && Platform.OS !== "web") {
+        try {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } catch (error) {
+          // Haptics not available, continue silently
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    setIsStreaming(false);
+  };
+
   // Load context data on component mount
   useEffect(() => {
     const loadContextData = async () => {
@@ -310,6 +408,62 @@ Always provide helpful guidance to users and direct them to appropriate app sect
       keyboardDidShowListener.remove();
     };
   }, [messages.length]);
+
+  // Pulse animation for recording state
+  useEffect(() => {
+    if (isRecording || isListening) {
+      const pulseAnimation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.2,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      pulseAnimation.start();
+
+      return () => {
+        pulseAnimation.stop();
+        pulseAnim.setValue(1);
+      };
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [isRecording, isListening, pulseAnim]);
+
+  // Cursor blinking animation for streaming
+  useEffect(() => {
+    if (isStreaming) {
+      const blinkAnimation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(cursorAnim, {
+            toValue: 0,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(cursorAnim, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      blinkAnimation.start();
+
+      return () => {
+        blinkAnimation.stop();
+        cursorAnim.setValue(1);
+      };
+    } else {
+      cursorAnim.setValue(1);
+    }
+  }, [isStreaming, cursorAnim]);
 
   // Responsive dimensions based on device type and keyboard visibility
   const getModalDimensions = () => {
@@ -484,14 +638,13 @@ Respond based on the context provided and these instructions. If the user is ask
       const result = await model.generateContent(agenticPrompt);
       const resp = await result.response;
       const reply = resp.text();
-      setMessages((msgs) => [...msgs, { role: "assistant", content: reply }]);
 
-      // Auto-scroll to bottom after adding assistant message
-      setTimeout(
-        () => scrollViewRef.current?.scrollToEnd({ animated: true }),
-        100
-      );
+      setLoading(false);
+
+      // Use streaming effect for the response
+      await streamText(reply);
     } catch (err: any) {
+      setLoading(false);
       const errorMessage = err?.message?.includes("API key")
         ? "I'm having trouble connecting to my AI services. Please check your internet connection or try again later."
         : err?.message?.includes("quota")
@@ -500,20 +653,10 @@ Respond based on the context provided and these instructions. If the user is ask
             err?.message || "Unable to process your request"
           }. Please try rephrasing your question.`;
 
-      setMessages((msgs) => [
-        ...msgs,
-        {
-          role: "assistant",
-          content: errorMessage,
-        },
-      ]);
-      setTimeout(
-        () => scrollViewRef.current?.scrollToEnd({ animated: true }),
-        100
-      );
+      // Stream error message as well
+      await streamText(errorMessage);
     }
     setInput("");
-    setLoading(false);
   };
 
   return (
@@ -608,28 +751,53 @@ Respond based on the context provided and these instructions. If the user is ask
                     }
                   >
                     {msg.role === "assistant" && (
-                      <View style={styles.assistantMsgWrapper}>
-                        <Text style={styles.assistantMsg}>{msg.content}</Text>
+                      <Animated.View
+                        style={[
+                          styles.assistantMsgWrapper,
+                          isStreaming &&
+                            messages.indexOf(msg) === messages.length - 1 && {
+                              opacity: messageOpacity,
+                            },
+                        ]}
+                      >
+                        <Text style={styles.assistantMsg}>
+                          {msg.content}
+                          {isStreaming &&
+                            messages.indexOf(msg) === messages.length - 1 && (
+                              <Animated.Text
+                                style={[styles.cursor, { opacity: cursorAnim }]}
+                              >
+                                |
+                              </Animated.Text>
+                            )}
+                        </Text>
                         <TouchableOpacity
                           style={styles.speakerButton}
                           onPress={() => speakText(msg.content, idx)}
                           activeOpacity={0.7}
+                          disabled={
+                            isStreaming &&
+                            messages.indexOf(msg) === messages.length - 1
+                          }
                         >
                           <Text style={styles.speakerIcon}>
                             {isSpeaking[idx] ? "🔊" : "🔇"}
                           </Text>
                         </TouchableOpacity>
-                      </View>
+                      </Animated.View>
                     )}
                     {msg.role === "user" && (
                       <Text style={styles.userMsg}>{msg.content}</Text>
                     )}
                   </View>
                 ))}
-                {loading && !isTranscribing && (
+                {(loading || isStreaming) && !isTranscribing && (
                   <View style={styles.loadingContainer}>
                     <Text style={styles.loading}>
-                      🤖 AI Assistant is thinking...
+                      🤖{" "}
+                      {loading
+                        ? "AI Assistant is thinking..."
+                        : "AI Assistant is responding..."}
                     </Text>
                   </View>
                 )}
@@ -644,7 +812,7 @@ Respond based on the context provided and these instructions. If the user is ask
                       🎤{" "}
                       {isListening
                         ? "Listening... Speak now!"
-                        : "Recording... Tap the red button to stop"}
+                        : "Recording... Tap the stop button to finish"}
                     </Text>
                   </View>
                 )}
@@ -659,29 +827,54 @@ Respond based on the context provided and these instructions. If the user is ask
                     placeholder="Ask about app..."
                     placeholderTextColor="#999"
                     multiline
+                    editable={!loading && !isStreaming}
                   />
-                  <TouchableOpacity
-                    style={styles.micButton}
-                    onPress={
-                      isRecording || isListening
-                        ? stopRecording
-                        : startRecording
-                    }
-                    disabled={loading}
+                  <Animated.View
+                    style={[
+                      { transform: [{ scale: pulseAnim }] },
+                      (isRecording || isListening) && {
+                        shadowColor: "#dc2626",
+                        shadowOpacity: 0.5,
+                        shadowOffset: { width: 0, height: 0 },
+                        shadowRadius: 8,
+                        elevation: 8,
+                      },
+                    ]}
                   >
-                    <MaterialIcons
-                      name={isRecording || isListening ? "mic-off" : "mic"}
-                      size={isTablet ? 28 : 24}
-                      color={
-                        isRecording || isListening ? "#dc2626" : "#075a7dff"
+                    <TouchableOpacity
+                      style={[
+                        styles.micButton,
+                        (isRecording || isListening) &&
+                          styles.micButtonRecording,
+                      ]}
+                      onPress={
+                        isRecording || isListening
+                          ? stopRecording
+                          : startRecording
                       }
-                    />
-                  </TouchableOpacity>
+                      disabled={loading || isStreaming}
+                    >
+                      <MaterialIcons
+                        name={
+                          isRecording || isListening
+                            ? "fiber-manual-record"
+                            : "mic"
+                        }
+                        size={isTablet ? 28 : 24}
+                        color={
+                          isRecording || isListening ? "#ffffff" : "#075a7dff"
+                        }
+                      />
+                    </TouchableOpacity>
+                  </Animated.View>
                 </View>
                 <TouchableOpacity
-                  style={styles.sendBtn}
+                  style={[
+                    styles.sendBtn,
+                    (loading || isStreaming) && styles.sendBtnDisabled,
+                  ]}
                   onPress={sendMessage}
-                  disabled={loading}
+                  disabled={loading || isStreaming}
                 >
                   <Text style={styles.sendText}>Send</Text>
                 </TouchableOpacity>
@@ -825,6 +1018,12 @@ const styles = StyleSheet.create({
   speakerIcon: {
     fontSize: isTablet ? 16 : 14,
   },
+  cursor: {
+    color: "#075a7dff",
+    fontWeight: "bold",
+    fontSize: isTablet ? 18 : 16,
+    opacity: 0.9,
+  },
   loading: {
     color: "#2563eb",
     fontStyle: "italic",
@@ -880,6 +1079,15 @@ const styles = StyleSheet.create({
   micButton: {
     padding: isTablet ? 12 : 8,
   },
+  micButtonRecording: {
+    backgroundColor: "#dc2626",
+    borderRadius: isTablet ? 20 : 16,
+    shadowColor: "#dc2626",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
+  },
   sendBtn: {
     backgroundColor: "#075a7dff",
     borderRadius: isTablet ? 24 : 20,
@@ -888,6 +1096,10 @@ const styles = StyleSheet.create({
     minHeight: isTablet ? 56 : 48,
     justifyContent: "center",
     alignItems: "center",
+  },
+  sendBtnDisabled: {
+    backgroundColor: "#9ca3af",
+    opacity: 0.6,
   },
   sendText: {
     color: "#fff",
