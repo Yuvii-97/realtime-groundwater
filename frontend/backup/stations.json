@@ -1,0 +1,6412 @@
+[
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY1",
+        "station_name":"Keelkavarapalayam- OW-1",
+        "latitude":11.3478,
+        "longitude":79.3842,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY2",
+        "station_name":"V.Ramanapuram OW_1",
+        "latitude":11.1756,
+        "longitude":79.1094,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY296",
+        "station_name":"Keelkavarapalayam- Ow-2",
+        "latitude":11.3478,
+        "longitude":79.3842,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY297",
+        "station_name":"Mahimapuram Ow-2_1",
+        "latitude":11.3478,
+        "longitude":79.3842,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY298",
+        "station_name":"Oliyur Ew_1",
+        "latitude":11.3992,
+        "longitude":79.3208,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY299",
+        "station_name":"Oliyur Ow 1_1",
+        "latitude":11.3992,
+        "longitude":79.3208,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY3",
+        "station_name":"V.Ramanapuram PZ_1",
+        "latitude":11.1756,
+        "longitude":79.1094,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY300",
+        "station_name":"Oliyur Ow 2_1",
+        "latitude":11.3992,
+        "longitude":79.3208,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY301",
+        "station_name":"Palinganatham_1",
+        "latitude":10.9592,
+        "longitude":78.9711,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY4",
+        "station_name":"G.K.Cholapuram -EW_1",
+        "latitude":11.2081,
+        "longitude":79.4475,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY5",
+        "station_name":"G.K.Cholapuram -OW-1-Pz_1",
+        "latitude":11.2081,
+        "longitude":79.4475,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"ARIY6",
+        "station_name":"G.K.Cholapuram -OW-2_1",
+        "latitude":11.2081,
+        "longitude":79.4475,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"CGWBTN03",
+        "station_name":"Mahimapuram OW- 1 (EW) ANDIMADAM Ariyalur Tamil Nadu",
+        "latitude":11.3478,
+        "longitude":79.3842,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ariyalur",
+        "station_code":"CGWBTN04",
+        "station_name":"Palinganatham Ow Ariyalur Taluk Ariyalur Tamil Nadu",
+        "latitude":10.9594,
+        "longitude":78.9713,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Chennai",
+        "station_code":"CHEN302",
+        "station_name":"Pallavaram_2",
+        "latitude":12.9728,
+        "longitude":80.1544,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Chennai",
+        "station_code":"CHEN7",
+        "station_name":"Taramani (NITTR PZ)",
+        "latitude":12.9867,
+        "longitude":80.2497,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Chennai",
+        "station_code":"CHEN8",
+        "station_name":"Guindy (CLRI)",
+        "latitude":12.9867,
+        "longitude":80.2497,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Chennai",
+        "station_code":"TNGW0018",
+        "station_name":"BEASANT NAGAR",
+        "latitude":12.9985,
+        "longitude":80.2645,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Chennai",
+        "station_code":"TNGW0022",
+        "station_name":"WASAHERMENPET",
+        "latitude":13.117,
+        "longitude":80.2852,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Chennai",
+        "station_code":"TNGW0025",
+        "station_name":"ADAYAR_1",
+        "latitude":13.0089,
+        "longitude":80.2627,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"CGWBTN05",
+        "station_name":"Anamalai ANAMALAI Coimbatore Tamil Nadu",
+        "latitude":10.6564,
+        "longitude":76.9344,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"CGWBTN07",
+        "station_name":"Rayarpalayam- Annanagar Sulur Coimbatore Tamil Nadu",
+        "latitude":11.174,
+        "longitude":77.118,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"CGWBTN08",
+        "station_name":"Chettipalayam Madukarai Coimbatore Tamil Nadu",
+        "latitude":10.917,
+        "longitude":77.036,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"CGWBTN09",
+        "station_name":"Vadasithur O.W Kinathukadavu Coimbatore Tamil Nadu",
+        "latitude":10.832,
+        "longitude":77.08,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"CGWBTN10",
+        "station_name":"Edayarpalayam Sultanpet Coimbatore Tamil Nadu",
+        "latitude":10.922,
+        "longitude":77.108,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM248",
+        "station_name":"Kallampalayam_1",
+        "latitude":11.0303,
+        "longitude":77.2833,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM249",
+        "station_name":"Kunnakalpalayam pz_1",
+        "latitude":11.0456,
+        "longitude":77.3272,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM250",
+        "station_name":"Peruntholavu Pz_1",
+        "latitude":11.0467,
+        "longitude":77.3814,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM251",
+        "station_name":"Andipalayam_2",
+        "latitude":11.005,
+        "longitude":77.4039,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM252",
+        "station_name":"Sulur pz",
+        "latitude":11.0181,
+        "longitude":77.1236,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM256",
+        "station_name":"Alandurai pz_1",
+        "latitude":10.9625,
+        "longitude":76.8008,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM257",
+        "station_name":"Chennanur pz_1",
+        "latitude":10.9453,
+        "longitude":76.835,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM258",
+        "station_name":"Coimbatore Taluk Office_1",
+        "latitude":11.0017,
+        "longitude":76.9711,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM259",
+        "station_name":"OhT Campus pz_1",
+        "latitude":11.0008,
+        "longitude":76.9511,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM260",
+        "station_name":"Sugarcane Institute pz",
+        "latitude":11.0097,
+        "longitude":76.9186,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM261",
+        "station_name":"Tn Urban Studies pz",
+        "latitude":11.0219,
+        "longitude":76.9419,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM262",
+        "station_name":"Pillaimpalayam pz_1",
+        "latitude":11.1914,
+        "longitude":77.09,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM263",
+        "station_name":"Annur pz_1",
+        "latitude":11.225,
+        "longitude":77.1083,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM264",
+        "station_name":"Alathur pz_1",
+        "latitude":11.3,
+        "longitude":77.1894,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM265",
+        "station_name":"Thathanur Aanaikalpalayam pz_1",
+        "latitude":11.3067,
+        "longitude":77.2789,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM266",
+        "station_name":"Saravanampatti1_1",
+        "latitude":11.075,
+        "longitude":77.0014,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM267",
+        "station_name":"Sarkar samakulam pz",
+        "latitude":11.1333,
+        "longitude":77.0333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM268",
+        "station_name":"Ganganaickenpalayam pz_1",
+        "latitude":11.1092,
+        "longitude":77.4356,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM270",
+        "station_name":"Samalapuram_1",
+        "latitude":11.0875,
+        "longitude":77.1792,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM271",
+        "station_name":"Boyampalayam pz_1",
+        "latitude":11.1347,
+        "longitude":77.3519,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM272",
+        "station_name":"Cbe Stock Exchange pz",
+        "latitude":10.9964,
+        "longitude":77.005,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM273",
+        "station_name":"Thondamuthur_1",
+        "latitude":10.9833,
+        "longitude":76.8333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM274",
+        "station_name":"Tirupur_2",
+        "latitude":11.0972,
+        "longitude":77.3528,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM277",
+        "station_name":"Angalakurichi_1",
+        "latitude":10.525,
+        "longitude":76.9994,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM278",
+        "station_name":"Thivansapudur_1",
+        "latitude":10.6283,
+        "longitude":76.8753,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM279",
+        "station_name":"Varadharajapuram Murungapatti pz",
+        "latitude":10.6797,
+        "longitude":77.2719,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM280",
+        "station_name":"Seeliyur_1",
+        "latitude":11.1792,
+        "longitude":76.7583,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM281",
+        "station_name":"Thekkampatti pz",
+        "latitude":11.2558,
+        "longitude":76.9347,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM282",
+        "station_name":"Anaikatti pz",
+        "latitude":11.1131,
+        "longitude":76.7508,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM283",
+        "station_name":"Kalviramapalayam_1",
+        "latitude":11.0417,
+        "longitude":76.8875,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM288",
+        "station_name":"Mettupalayam pz",
+        "latitude":11.3,
+        "longitude":76.9472,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM289",
+        "station_name":"Periya Negamam pz",
+        "latitude":10.7403,
+        "longitude":77.1014,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM290",
+        "station_name":"Madukkarai-PZ",
+        "latitude":10.9083,
+        "longitude":76.9667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM291",
+        "station_name":"Pichanur_1",
+        "latitude":10.875,
+        "longitude":76.9,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM292",
+        "station_name":"Cwc Campus pz",
+        "latitude":11.0414,
+        "longitude":77.0006,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM293",
+        "station_name":"Ghs Ganapathi pz_1",
+        "latitude":11.0419,
+        "longitude":76.9419,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM294",
+        "station_name":"P.S.G. college_1",
+        "latitude":11.0217,
+        "longitude":77.0025,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM303",
+        "station_name":"Pathampatti Pz_1",
+        "latitude":10.6781,
+        "longitude":77.2147,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM304",
+        "station_name":"Kattampatty Pz",
+        "latitude":10.8053,
+        "longitude":77.1425,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM305",
+        "station_name":"Kinathukadavu Pz",
+        "latitude":10.8167,
+        "longitude":77.0167,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM306",
+        "station_name":"Vellakinaru Pz",
+        "latitude":11.0733,
+        "longitude":76.9528,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM307",
+        "station_name":"Samathoor Hss_1",
+        "latitude":10.6022,
+        "longitude":77.0092,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM308",
+        "station_name":"Velampalayam_1",
+        "latitude":11.1447,
+        "longitude":77.3094,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM309",
+        "station_name":"Devarayapuram Pz",
+        "latitude":10.9953,
+        "longitude":76.8017,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM310",
+        "station_name":"Kuniyamuthur_1",
+        "latitude":10.9667,
+        "longitude":76.9167,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM311",
+        "station_name":"Sundakkamuthur Pz",
+        "latitude":10.9528,
+        "longitude":76.9217,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM312",
+        "station_name":"Telngupalayam_1",
+        "latitude":10.9833,
+        "longitude":76.9228,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM313",
+        "station_name":"Kalviramapalayam_2",
+        "latitude":11.0417,
+        "longitude":76.8875,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Coimbatore",
+        "station_code":"COIM314",
+        "station_name":"Pallapalayam Pz_1",
+        "latitude":10.5256,
+        "longitude":77.2181,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN01",
+        "station_name":"Vadalur OW1 Kurinjipadi Cuddalore  Tamil Nadu",
+        "latitude":11.2333,
+        "longitude":79.315,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN11",
+        "station_name":"Vadalur OW-2 (EW) KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5603,
+        "longitude":79.5561,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN12",
+        "station_name":"Teerthanagiri OW-2 KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5772,
+        "longitude":79.6831,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN13",
+        "station_name":"Sethiathope1 MELBHUVANAGIRI Cuddalore Tamil Nadu",
+        "latitude":11.4322,
+        "longitude":79.5425,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN14",
+        "station_name":"Srimushnam Srimushnam Cuddalore Tamil Nadu",
+        "latitude":11.6178,
+        "longitude":79.7194,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN141",
+        "station_name":"Pathirikuppam Cuddalore Cuddalore Tamil Nadu",
+        "latitude":12.7126,
+        "longitude":79.2229,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN15",
+        "station_name":"Teerthanagiri OW-1 KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5772,
+        "longitude":79.6831,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN16",
+        "station_name":"Rajankuppam PZ KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5417,
+        "longitude":79.5778,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN17",
+        "station_name":"C.Keeranur OW-2 KAMMAPURAM Cuddalore Tamil Nadu",
+        "latitude":11.4569,
+        "longitude":79.3739,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN18",
+        "station_name":"C.Keeranur EW KAMMAPURAM Cuddalore Tamil Nadu",
+        "latitude":11.4569,
+        "longitude":79.3739,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN19",
+        "station_name":"Sethiathope II MELBHUVANAGIRI Cuddalore Tamil Nadu",
+        "latitude":11.4325,
+        "longitude":79.5425,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN20",
+        "station_name":"Palaiyamkottai OW -1 KUMARATCHI Cuddalore Tamil Nadu",
+        "latitude":11.3619,
+        "longitude":79.4669,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN21",
+        "station_name":"Kattusagai(s) CUDDALORE Cuddalore Tamil Nadu",
+        "latitude":11.65,
+        "longitude":79.65,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN22",
+        "station_name":"Ramapuram -I EW CUDDALORE Cuddalore Tamil Nadu",
+        "latitude":11.6872,
+        "longitude":79.6942,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN23",
+        "station_name":"Pacharapalayam II- EW KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5922,
+        "longitude":79.5922,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN24",
+        "station_name":"Palaiyamkottai OW-2 KUMARATCHI Cuddalore Tamil Nadu",
+        "latitude":11.3619,
+        "longitude":79.4669,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN25",
+        "station_name":"Silaminathanpettai II CUDDALORE Cuddalore Tamil Nadu",
+        "latitude":11.6956,
+        "longitude":79.61,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN26",
+        "station_name":"Sengalpalayam Ii pz KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5386,
+        "longitude":79.5189,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN27",
+        "station_name":"Vanathirayapuram II KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5867,
+        "longitude":79.5333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN28",
+        "station_name":"Kattiyankuppam Pz- 2 KURINJIPADI Cuddalore Tamil Nadu",
+        "latitude":11.5036,
+        "longitude":79.6325,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN29",
+        "station_name":"Marungur -I EW ANNAGRAMAM Cuddalore Tamil Nadu",
+        "latitude":11.7436,
+        "longitude":79.6403,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN30",
+        "station_name":"Nadiyappatu Viridhachalam Cuddalore Tamil Nadu",
+        "latitude":11.6167,
+        "longitude":79.425,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CGWBTN33",
+        "station_name":"Maruthur Chidhambaram Cuddalore Tamil Nadu",
+        "latitude":11.5564,
+        "longitude":79.4578,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD10",
+        "station_name":"Chidhambaram annamalainagar_1",
+        "latitude":11.3919,
+        "longitude":79.7072,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD11",
+        "station_name":"Pathirikuppam OW_1",
+        "latitude":11.7495,
+        "longitude":79.7339,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD12",
+        "station_name":"Ramapuram -II EW1_1",
+        "latitude":11.6872,
+        "longitude":79.6942,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD13",
+        "station_name":"Indiira Nagar",
+        "latitude":11.7703,
+        "longitude":79.7342,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD14",
+        "station_name":"Reddipalayam pz_1",
+        "latitude":11.5322,
+        "longitude":79.5967,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD15",
+        "station_name":"Vadalur OW-1",
+        "latitude":11.5603,
+        "longitude":79.5561,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD16",
+        "station_name":"Mangalur_2",
+        "latitude":11.5125,
+        "longitude":79.0111,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD17",
+        "station_name":"Puduchatram PZ",
+        "latitude":11.5203,
+        "longitude":79.7197,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD315",
+        "station_name":"Kattusagai(N)_1",
+        "latitude":11.65,
+        "longitude":79.65,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD316",
+        "station_name":"Silaminathanpettai I_1",
+        "latitude":11.6956,
+        "longitude":79.61,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD317",
+        "station_name":"C.Keeranur Ow-2_1",
+        "latitude":11.4569,
+        "longitude":79.3739,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD318",
+        "station_name":"Nadiyapattu_1",
+        "latitude":11.6647,
+        "longitude":79.4039,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD319",
+        "station_name":"Srimushanam Pz",
+        "latitude":11.405,
+        "longitude":79.3983,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD320",
+        "station_name":"Nallur_4",
+        "latitude":11.33,
+        "longitude":79.7753,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD321",
+        "station_name":"Palaiyamkottai Ew_1",
+        "latitude":11.3619,
+        "longitude":79.4669,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD322",
+        "station_name":"Vilathur (Budangudi) Ow_1",
+        "latitude":11.32,
+        "longitude":79.6,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD323",
+        "station_name":"Arasadikuppam_1",
+        "latitude":11.6619,
+        "longitude":79.5667,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD324",
+        "station_name":"Kattiyankuppam Pz-1_1",
+        "latitude":11.5036,
+        "longitude":79.6325,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD325",
+        "station_name":"Kattiyankuppam Pz-2_1",
+        "latitude":11.5036,
+        "longitude":79.6325,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD326",
+        "station_name":"Kodandaramapuram Pz_1",
+        "latitude":11.5228,
+        "longitude":79.6533,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD327",
+        "station_name":"Kudikadu Pz 1",
+        "latitude":11.6833,
+        "longitude":79.7739,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD328",
+        "station_name":"Pacharapalayam Pzi-Ow_1",
+        "latitude":11.5922,
+        "longitude":79.5922,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD329",
+        "station_name":"Sengalpalayam I Pz_1",
+        "latitude":11.5386,
+        "longitude":79.5189,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD330",
+        "station_name":"Teerthanagiri Ew",
+        "latitude":11.5772,
+        "longitude":79.6831,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD331",
+        "station_name":"Thaiyalkunapattinam Pz_1",
+        "latitude":11.5839,
+        "longitude":79.6336,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD332",
+        "station_name":"Vanathirayapuram I_1",
+        "latitude":11.5867,
+        "longitude":79.5333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD333",
+        "station_name":"Maruthur Ew",
+        "latitude":11.4922,
+        "longitude":79.6028,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD334",
+        "station_name":"Maruthur Ii",
+        "latitude":11.4922,
+        "longitude":79.6028,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD335",
+        "station_name":"Maruthur Iv",
+        "latitude":11.4922,
+        "longitude":79.6028,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD336",
+        "station_name":"Parudur Pz-1_1",
+        "latitude":11.4161,
+        "longitude":79.5722,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD337",
+        "station_name":"Parudur Pz-2_1",
+        "latitude":11.4161,
+        "longitude":79.5722,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD338",
+        "station_name":"Sakthi Nagar Ow_1",
+        "latitude":11.6194,
+        "longitude":79.5586,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD339",
+        "station_name":"Ammeri - Thoppulikuppam_1",
+        "latitude":11.5506,
+        "longitude":79.4522,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD340",
+        "station_name":"Marungur-Ii Ow_1",
+        "latitude":11.7436,
+        "longitude":79.6403,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD341",
+        "station_name":"Virudachalam1",
+        "latitude":11.5167,
+        "longitude":79.3375,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"CUDD9",
+        "station_name":"Nellikuppam PZ",
+        "latitude":11.7758,
+        "longitude":79.6733,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0001",
+        "station_name":"KUDIKADU_1",
+        "latitude":11.6822,
+        "longitude":79.7519,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0002",
+        "station_name":"KUDIKADU_2",
+        "latitude":11.6822,
+        "longitude":79.7519,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0003",
+        "station_name":"KUDIKADU_3",
+        "latitude":11.6822,
+        "longitude":79.7519,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0004",
+        "station_name":"POOVALAI_1",
+        "latitude":11.5138,
+        "longitude":79.6453,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0005",
+        "station_name":"POOVALAI_2",
+        "latitude":11.5138,
+        "longitude":79.6453,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0006",
+        "station_name":"POOVALAI_3",
+        "latitude":11.5138,
+        "longitude":79.6453,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0007",
+        "station_name":"CAPPER QUARRY",
+        "latitude":11.722,
+        "longitude":79.7234,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0027",
+        "station_name":"MANJAKUPPAM_1",
+        "latitude":11.7665,
+        "longitude":79.7678,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0028",
+        "station_name":"MANJAKUPPAM_2",
+        "latitude":11.7665,
+        "longitude":79.7678,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0042",
+        "station_name":"VAZHISOTHANAIPALAYAM_1",
+        "latitude":11.6914,
+        "longitude":79.7214,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0043",
+        "station_name":"VAZHISOTHANAIPALAYA_2",
+        "latitude":11.6914,
+        "longitude":79.7214,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Cuddalore",
+        "station_code":"TNGW0044",
+        "station_name":"VAZHISOTHANAIPALAYA_3",
+        "latitude":11.6914,
+        "longitude":79.7214,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN02",
+        "station_name":"Anchetty Thali Dharmapuri  Tamil Nadu",
+        "latitude":11.2836,
+        "longitude":79.2839,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN109",
+        "station_name":"Marandahalli Palacode  Dharmapuri  Tamil Nadu",
+        "latitude":13.3166,
+        "longitude":80.146,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN111",
+        "station_name":"Ootamalai Pennagram Dharmapuri  Tamil Nadu",
+        "latitude":13.2199,
+        "longitude":79.7304,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN119",
+        "station_name":"Palayampudhur  Nallampalli  Dharmapuri  Tamil Nadu",
+        "latitude":12.3875,
+        "longitude":79.1,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN144",
+        "station_name":"B.Thurinjipatty Pappireddypatty Dharmapuri  Tamil Nadu",
+        "latitude":12.7417,
+        "longitude":79.6756,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN152",
+        "station_name":"Pennagram Pennagram Dharmapuri  Tamil Nadu",
+        "latitude":12.825,
+        "longitude":79.3917,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN157",
+        "station_name":"Maniyathahalli Nallampalli  Dharmapuri  Tamil Nadu",
+        "latitude":13.1314,
+        "longitude":79.2535,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN40",
+        "station_name":"Karimangalam Karimangalam Dharmapuri  Tamil Nadu",
+        "latitude":10.1906,
+        "longitude":77.7867,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN50",
+        "station_name":"K.Vetrapatty Harur Dharmapuri  Tamil Nadu",
+        "latitude":12.8916,
+        "longitude":80.0694,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN52",
+        "station_name":"Morappur Morappur  Dharmapuri  Tamil Nadu",
+        "latitude":12.9237,
+        "longitude":79.7455,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN53",
+        "station_name":"Papparapatty Pennagram  Dharmapuri  Tamil Nadu",
+        "latitude":12.9237,
+        "longitude":79.7455,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN56",
+        "station_name":"Palacode  Palacode Dharmapuri  Tamil Nadu",
+        "latitude":12.9035,
+        "longitude":79.9139,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN57",
+        "station_name":"Golasanahalli Palacode Dharmapuri  Tamil Nadu",
+        "latitude":12.8792,
+        "longitude":80.0886,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN66",
+        "station_name":"Melkottai Burgur Dharmapuri  Tamil Nadu",
+        "latitude":10.8106,
+        "longitude":77.9642,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN78",
+        "station_name":"Santhur Pochampalli  Dharmapuri  Tamil Nadu",
+        "latitude":10.9917,
+        "longitude":79.5681,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN89",
+        "station_name":"Soolakarai Mathur Dharmapuri  Tamil Nadu",
+        "latitude":11.3658,
+        "longitude":78.1192,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN90",
+        "station_name":"Upparapatty Uthankarai Dharmapuri  Tamil Nadu",
+        "latitude":11.3658,
+        "longitude":78.1192,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"CGWBTN95",
+        "station_name":"Mattiyamapatti Harur Dharmapuri  Tamil Nadu",
+        "latitude":10.3108,
+        "longitude":79.0596,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR18",
+        "station_name":"Dharmapuri2_1",
+        "latitude":12.1375,
+        "longitude":78.1708,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR19",
+        "station_name":"Harur2_1",
+        "latitude":12.0514,
+        "longitude":78.4833,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR20",
+        "station_name":"Adhikarapatti (Palayampalli)_1",
+        "latitude":11.9339,
+        "longitude":78.3908,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR21",
+        "station_name":"Ecchambadi_1",
+        "latitude":12.2017,
+        "longitude":78.3544,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR22",
+        "station_name":"Jaggubathipalayam_1",
+        "latitude":12.1942,
+        "longitude":78.295,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR23",
+        "station_name":"Maniyampadi (Keserkuli R.F.ext",
+        "latitude":12.1244,
+        "longitude":78.2844,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR24",
+        "station_name":"Thoppur_2",
+        "latitude":11.95,
+        "longitude":78.05,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR25",
+        "station_name":"Boothanatham (Keserkuli R.F)_1",
+        "latitude":11.9508,
+        "longitude":78.4689,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR26",
+        "station_name":"Pattakarankottai (Jarimankurichy) OW_1",
+        "latitude":12.0275,
+        "longitude":77.8103,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dharmapuri",
+        "station_code":"DHAR342",
+        "station_name":"Konnagihalli_1",
+        "latitude":12.1342,
+        "longitude":77.9683,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"CGWBTN154",
+        "station_name":"Ottanchathram Ottanchathram Dindigul Tamil Nadu",
+        "latitude":12.4942,
+        "longitude":79.4486,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"CGWBTN155",
+        "station_name":"Sithayankottai Sempatti Dindigul Tamil Nadu",
+        "latitude":12.8809,
+        "longitude":79.2643,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"CGWBTN36",
+        "station_name":"Siluvathur OW DINDIGUL Dindigul Tamil Nadu",
+        "latitude":10.3436,
+        "longitude":78.0856,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"CGWBTN37",
+        "station_name":"R.Vellodu GUZILIAMPARAI Dindigul Tamil Nadu",
+        "latitude":10.7501,
+        "longitude":78.0182,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"CGWBTN39",
+        "station_name":"Citharevu (Manalur) EW Athoor Dindigul Tamil Nadu",
+        "latitude":10.2381,
+        "longitude":77.7714,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND27",
+        "station_name":"Dindigul1_1",
+        "latitude":10.4083,
+        "longitude":77.9667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND28",
+        "station_name":"R. Pudukottai OW_1",
+        "latitude":10.6131,
+        "longitude":78.0506,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND29",
+        "station_name":"Servaikaranpatti_1",
+        "latitude":10.7472,
+        "longitude":78.0917,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND30",
+        "station_name":"Kovilur (Ramanathapuram)_1",
+        "latitude":10.5917,
+        "longitude":78.0861,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND31",
+        "station_name":"Nattam_1",
+        "latitude":10.2328,
+        "longitude":78.2333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND32",
+        "station_name":"Pallapatti OW_1",
+        "latitude":10.135,
+        "longitude":77.9158,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND33",
+        "station_name":"Puliyurnatham OW_1",
+        "latitude":10.5594,
+        "longitude":77.8028,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND34",
+        "station_name":"Sanarpatti_1",
+        "latitude":10.2583,
+        "longitude":78.1,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND343",
+        "station_name":"Siddayamkottai_1",
+        "latitude":10.2725,
+        "longitude":77.8356,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND344",
+        "station_name":"Ayyalur_1",
+        "latitude":10.4792,
+        "longitude":78.1833,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND345",
+        "station_name":"Chitterivu Pz_1",
+        "latitude":10.2378,
+        "longitude":77.7708,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND346",
+        "station_name":"Chattarapatti Pz_1",
+        "latitude":10.4619,
+        "longitude":77.9467,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND347",
+        "station_name":"Kullanampatti_1",
+        "latitude":10.3417,
+        "longitude":77.9917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND348",
+        "station_name":"Oddanchatram1_1",
+        "latitude":10.4908,
+        "longitude":77.7528,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND349",
+        "station_name":"Pittalaipatti_1",
+        "latitude":10.3278,
+        "longitude":77.9333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Dindigul",
+        "station_code":"DIND35",
+        "station_name":"Kallimandiam_1",
+        "latitude":10.5833,
+        "longitude":77.6944,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"CGWBTN43",
+        "station_name":"Ponnapuram Pz DHARAPURAM Erode Tamil Nadu",
+        "latitude":10.7008,
+        "longitude":77.3919,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"CGWBTN44",
+        "station_name":"Pethampalayam Perundurai Erode Tamil Nadu",
+        "latitude":11.3317,
+        "longitude":77.5181,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD350",
+        "station_name":"Ammapet1_1",
+        "latitude":11.625,
+        "longitude":77.7167,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD351",
+        "station_name":"Chennampatti Pz_1",
+        "latitude":11.7011,
+        "longitude":77.6719,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD352",
+        "station_name":"Guruvareddiyur_1",
+        "latitude":11.6417,
+        "longitude":77.6833,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD353",
+        "station_name":"Kurichi Pz_1",
+        "latitude":11.5731,
+        "longitude":77.695,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD354",
+        "station_name":"Kattupalayam Pz_1",
+        "latitude":11.5453,
+        "longitude":77.5953,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD355",
+        "station_name":"Kavundappadi_1",
+        "latitude":11.4333,
+        "longitude":77.5583,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD356",
+        "station_name":"Punnam Pz",
+        "latitude":11.5072,
+        "longitude":77.6139,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD357",
+        "station_name":"Settunampalayam Pz_1",
+        "latitude":11.52,
+        "longitude":77.6033,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD358",
+        "station_name":"Urachikottai_1",
+        "latitude":11.4847,
+        "longitude":77.6917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD359",
+        "station_name":"Kottamangalam_1",
+        "latitude":11.4583,
+        "longitude":77.1333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD360",
+        "station_name":"Pungaipuliampatti_1",
+        "latitude":11.35,
+        "longitude":77.1667,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD361",
+        "station_name":"Vinnampalli_1",
+        "latitude":11.4328,
+        "longitude":77.2022,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD362",
+        "station_name":"Basuvapatti Pz",
+        "latitude":11.1381,
+        "longitude":77.6053,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD363",
+        "station_name":"Chennimalai1_1",
+        "latitude":11.1583,
+        "longitude":77.5917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD364",
+        "station_name":"Ingur Pz_2",
+        "latitude":11.2261,
+        "longitude":77.5817,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD365",
+        "station_name":"Alangiyam_1",
+        "latitude":10.6583,
+        "longitude":77.4958,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD366",
+        "station_name":"Dharapuram1_1",
+        "latitude":10.7333,
+        "longitude":77.5333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD367",
+        "station_name":"Govindhapuram Pz_1",
+        "latitude":10.7133,
+        "longitude":77.4225,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD368",
+        "station_name":"Periyapuliyur Pz",
+        "latitude":11.4283,
+        "longitude":77.6492,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD369",
+        "station_name":"Erode Pz",
+        "latitude":11.3661,
+        "longitude":77.7169,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD370",
+        "station_name":"Gobichettipalayam_1",
+        "latitude":11.45,
+        "longitude":77.45,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD371",
+        "station_name":"Kugalur Pz",
+        "latitude":11.4833,
+        "longitude":77.4806,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD372",
+        "station_name":"Kangayam1_1",
+        "latitude":10.9917,
+        "longitude":77.5583,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD373",
+        "station_name":"Padiyur Pz",
+        "latitude":11.0639,
+        "longitude":77.4922,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD374",
+        "station_name":"Kodumudi Pz",
+        "latitude":11.0819,
+        "longitude":77.8853,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD375",
+        "station_name":"Priyakolanalli Pz",
+        "latitude":11.1744,
+        "longitude":77.8567,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD376",
+        "station_name":"Sangarandampalayam Pz_1",
+        "latitude":10.8306,
+        "longitude":77.5864,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD377",
+        "station_name":"Chengapalli_2",
+        "latitude":11.225,
+        "longitude":77.4436,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD378",
+        "station_name":"Arachchalur_1",
+        "latitude":11.1667,
+        "longitude":77.7,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD379",
+        "station_name":"Avalpundurai_1",
+        "latitude":11.2333,
+        "longitude":77.7208,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD380",
+        "station_name":"E.Vellampalayam Pz_1",
+        "latitude":11.1697,
+        "longitude":77.6806,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD381",
+        "station_name":"Mulanur1_1",
+        "latitude":10.7972,
+        "longitude":77.7222,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD382",
+        "station_name":"Nilangelvalasu Pz",
+        "latitude":10.6431,
+        "longitude":77.7342,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD383",
+        "station_name":"Kosanam Pz",
+        "latitude":11.3711,
+        "longitude":77.3578,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD384",
+        "station_name":"Malaiyapalayam Pz",
+        "latitude":11.2903,
+        "longitude":77.3306,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD385",
+        "station_name":"Kambaliyampatti Pz_1",
+        "latitude":11.2314,
+        "longitude":77.5253,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD386",
+        "station_name":"Nallampatti Pz",
+        "latitude":11.3333,
+        "longitude":77.5417,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD387",
+        "station_name":"Pandiyampalayam Pz",
+        "latitude":11.3983,
+        "longitude":77.5175,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD388",
+        "station_name":"Nagalapuram(Nagappapalaya M)",
+        "latitude":9.2333,
+        "longitude":78.1306,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD389",
+        "station_name":"Ariyappanpalayam Pz_1",
+        "latitude":11.4756,
+        "longitude":77.2542,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD390",
+        "station_name":"Kathampalayam Pz",
+        "latitude":11.4256,
+        "longitude":77.2411,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD391",
+        "station_name":"Kavilipalayam Pz_1",
+        "latitude":11.3792,
+        "longitude":77.2278,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD392",
+        "station_name":"Asanur Pz",
+        "latitude":11.6739,
+        "longitude":77.1289,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD393",
+        "station_name":"Velliyampalayamputhur Pz_1",
+        "latitude":11.4886,
+        "longitude":77.1564,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD394",
+        "station_name":"Alukuli Pz",
+        "latitude":11.4481,
+        "longitude":77.3578,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD395",
+        "station_name":"Kambanaickenpalayam Pz",
+        "latitude":11.5297,
+        "longitude":77.2953,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD396",
+        "station_name":"Kasipalayam Pz_1",
+        "latitude":11.4544,
+        "longitude":77.3344,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD397",
+        "station_name":"Karumancheri Pz_1",
+        "latitude":11.1578,
+        "longitude":77.4444,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD398",
+        "station_name":"Kunnathur_1",
+        "latitude":11.2792,
+        "longitude":77.4125,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD399",
+        "station_name":"Uthukuli Pz_1",
+        "latitude":11.1744,
+        "longitude":77.4472,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD400",
+        "station_name":"Muttur_1",
+        "latitude":11.05,
+        "longitude":77.75,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD401",
+        "station_name":"Olapalayam Pz",
+        "latitude":10.9583,
+        "longitude":77.6833,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Erode",
+        "station_code":"EROD402",
+        "station_name":"Puduppai Pz_1",
+        "latitude":10.9586,
+        "longitude":77.7225,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN45",
+        "station_name":"Ponmar KATTANKOLATHUR Kancheepuram Tamil Nadu",
+        "latitude":12.8847,
+        "longitude":80.1136,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN46",
+        "station_name":"Nedunkundram KATTANKOLATHUR Kancheepur am Tamil Nadu",
+        "latitude":12.8847,
+        "longitude":80.1136,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN47",
+        "station_name":"Panruti Kandigai SRIPERUMBUDUR Kancheepur am Tamil Nadu",
+        "latitude":12.8506,
+        "longitude":79.9119,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN48",
+        "station_name":"Tiruporur THIRUPORUR Kancheepur am Tamil Nadu",
+        "latitude":12.7208,
+        "longitude":80.185,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN49",
+        "station_name":"Kunnattur Sriperumbudur Kancheepur am Tamil Nadu",
+        "latitude":13.0027,
+        "longitude":80.0992,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN51",
+        "station_name":"Podavur (Melpodavur) Kancheepuram Kancheepur am Tamil Nadu",
+        "latitude":12.9237,
+        "longitude":79.7455,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN54",
+        "station_name":"Tirumani Tirukkundram Kancheepur am Tamil Nadu",
+        "latitude":12.6658,
+        "longitude":79.993,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"CGWBTN55",
+        "station_name":"Uttiramerur Uttiramerur Kancheepur am Tamil Nadu",
+        "latitude":12.6333,
+        "longitude":79.7607,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC36",
+        "station_name":"Athur1_1",
+        "latitude":12.3478,
+        "longitude":79.8892,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC37",
+        "station_name":"Guduvancheri pz",
+        "latitude":12.8417,
+        "longitude":80.0667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC38",
+        "station_name":"Chunambedu_2",
+        "latitude":12.2669,
+        "longitude":79.9844,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC39",
+        "station_name":"Arasanimangalam_1",
+        "latitude":12.5689,
+        "longitude":79.7233,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC40",
+        "station_name":"Mannivakkam_1",
+        "latitude":12.8922,
+        "longitude":80.0689,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC403",
+        "station_name":"Vadekkal (Palnallur)_1",
+        "latitude":12.9036,
+        "longitude":79.9139,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC404",
+        "station_name":"Rettamangalam_1",
+        "latitude":12.6333,
+        "longitude":79.8333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC405",
+        "station_name":"Baluchettychatram(Muttavakkam)",
+        "latitude":12.88,
+        "longitude":79.62,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC41",
+        "station_name":"Maduranthakam_1",
+        "latitude":12.5083,
+        "longitude":79.8917,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC42",
+        "station_name":"Paddapai_1",
+        "latitude":12.9125,
+        "longitude":80.0125,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC43",
+        "station_name":"Vadakkupattu pz",
+        "latitude":12.8181,
+        "longitude":79.9367,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC44",
+        "station_name":"Perungulathur_1",
+        "latitude":12.9167,
+        "longitude":80.1083,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC45",
+        "station_name":"Thirumukkudal_1",
+        "latitude":12.7375,
+        "longitude":79.8417,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"KANC46",
+        "station_name":"Uthukkadu pz",
+        "latitude":12.8292,
+        "longitude":79.83,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"TNGW0017",
+        "station_name":"VAYAULUR",
+        "latitude":12.5014,
+        "longitude":80.0816,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"TNGW0023",
+        "station_name":"THIRUVANMAIYOUR",
+        "latitude":12.9879,
+        "longitude":80.2678,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"TNGW0024",
+        "station_name":"UTHANDI_1",
+        "latitude":12.8638,
+        "longitude":80.244,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"TNGW0029",
+        "station_name":"PUDUPATTINAM",
+        "latitude":12.5035,
+        "longitude":80.1547,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"TNGW0030",
+        "station_name":"NEMMILI",
+        "latitude":12.7206,
+        "longitude":80.2279,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"TNGW0031",
+        "station_name":"INJAMBAKKAM_1",
+        "latitude":12.9263,
+        "longitude":80.2506,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kancheepuram",
+        "station_code":"TNGW0033",
+        "station_name":"PANAIYUR_1",
+        "latitude":12.8956,
+        "longitude":80.25,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"CGWBTN59",
+        "station_name":"Chenpagaramanpud ur Kanyakumari Kanyakumari Tamil Nadu",
+        "latitude":8.298,
+        "longitude":77.4903,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"CGWBTN60",
+        "station_name":"Puthukadal Thiruvettur Kanyakumari Tamil Nadu",
+        "latitude":8.21,
+        "longitude":79.55,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"KANY406",
+        "station_name":"Kundal(West) Pz",
+        "latitude":8.1028,
+        "longitude":77.5439,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"KANY407",
+        "station_name":"Rajakamangalam_1",
+        "latitude":8.1319,
+        "longitude":77.3667,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"KANY408",
+        "station_name":"Thakkalai1_1",
+        "latitude":8.2486,
+        "longitude":77.3083,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"KANY47",
+        "station_name":"Kanyakumari PZ",
+        "latitude":8.0889,
+        "longitude":77.55,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"KANY48",
+        "station_name":"Karungal pz",
+        "latitude":8.2347,
+        "longitude":77.2347,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"KANY49",
+        "station_name":"Marthandam_1",
+        "latitude":8.3098,
+        "longitude":77.2144,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Kanyakumari",
+        "station_code":"KANY50",
+        "station_name":"Thiruvattar_1",
+        "latitude":8.3333,
+        "longitude":77.2678,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"CGWBTN61",
+        "station_name":"Ayyampalayam pz KARUR Karur Tamil Nadu",
+        "latitude":11.0572,
+        "longitude":78.0308,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"CGWBTN62",
+        "station_name":"Noyyil pz KARUR Karur Tamil Nadu",
+        "latitude":11.0606,
+        "longitude":77.9333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"CGWBTN63",
+        "station_name":"Echampatti pz THOGAMALAI Karur Tamil Nadu",
+        "latitude":10.8586,
+        "longitude":78.4228,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"CGWBTN64",
+        "station_name":"Choladasanpatti pz ARAVAKURICHI Karur Tamil Nadu",
+        "latitude":10.7022,
+        "longitude":78.0019,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU284",
+        "station_name":"Pethachinagar (Euruarpatti) OW_1",
+        "latitude":10.7042,
+        "longitude":77.9578,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU285",
+        "station_name":"Peria Varapalayam (Punjai pugalur_1",
+        "latitude":11.0556,
+        "longitude":78.0731,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU286",
+        "station_name":"KAKAVADI_1",
+        "latitude":10.8867,
+        "longitude":78.0394,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU287",
+        "station_name":"Chinnakulathupatti(paganatham)",
+        "latitude":10.8406,
+        "longitude":78.0533,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU409",
+        "station_name":"Kovilur_2",
+        "latitude":10.7603,
+        "longitude":77.8289,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU410",
+        "station_name":"Kadavur Colony (D. Edayapatti East_1",
+        "latitude":10.5875,
+        "longitude":78.1944,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU411",
+        "station_name":"Veeranampatti (Melappaguthi)_1",
+        "latitude":10.7289,
+        "longitude":78.2103,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU412",
+        "station_name":"Mayanur Ow Pz_1",
+        "latitude":10.9542,
+        "longitude":78.2389,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU413",
+        "station_name":"Ayyarmalai Pz_1",
+        "latitude":10.8792,
+        "longitude":78.4917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Karur",
+        "station_code":"KARU414",
+        "station_name":"Enungur Pz_1",
+        "latitude":10.85,
+        "longitude":78.4917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN138",
+        "station_name":"Natrampalayam  Thally Krishnagiri Tamil Nadu",
+        "latitude":13.2451,
+        "longitude":80.0939,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN158",
+        "station_name":"Thally Thally Krishnagiri Tamil Nadu",
+        "latitude":11.955,
+        "longitude":79.4183,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN32",
+        "station_name":"Ullukurukai Kelamangalam  Krishnagiri Tamil Nadu",
+        "latitude":11.274,
+        "longitude":79.55,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN67",
+        "station_name":"Keezhkuppam Pz UTHANGARAI Krishnagiri Tamil Nadu",
+        "latitude":12.2228,
+        "longitude":78.5283,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN68",
+        "station_name":"Billakottai Pz KRISHNAGIRI Krishnagiri Tamil Nadu",
+        "latitude":12.4072,
+        "longitude":78.1658,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN69",
+        "station_name":"Unichetty (P.H) Gullatty OW KELAMANGALAM Krishnagiri Tamil Nadu",
+        "latitude":12.4369,
+        "longitude":77.8503,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN71",
+        "station_name":"Udhanapalli (Muthanthalli) OW SHOOLAGIRI Krishnagiri Tamil Nadu",
+        "latitude":12.6103,
+        "longitude":77.9394,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN74",
+        "station_name":"Manchukondapalli Thally Krishnagiri Tamil Nadu",
+        "latitude":12.2492,
+        "longitude":77.5353,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"CGWBTN75",
+        "station_name":"Pannandur Ow Pochampalli Krishnagiri Tamil Nadu",
+        "latitude":12.3014,
+        "longitude":78.2786,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS415",
+        "station_name":"Megalachinnapalli_1",
+        "latitude":12.625,
+        "longitude":78.2542,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS51",
+        "station_name":"Bargur_1",
+        "latitude":12.5458,
+        "longitude":78.3583,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS52",
+        "station_name":"Mallapadi OW_1",
+        "latitude":12.5342,
+        "longitude":78.375,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS53",
+        "station_name":"Hosur HP",
+        "latitude":12.7167,
+        "longitude":77.8333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS54",
+        "station_name":"ENUSONAI_2",
+        "latitude":12.6136,
+        "longitude":78.0175,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS55",
+        "station_name":"Kaveripatnam_1",
+        "latitude":12.4125,
+        "longitude":78.2292,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS56",
+        "station_name":"Nattanmai Kottai_1",
+        "latitude":12.4719,
+        "longitude":78.2153,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS57",
+        "station_name":"Krishnagiri1_1",
+        "latitude":12.5306,
+        "longitude":78.2306,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS58",
+        "station_name":"Kattupatti OW",
+        "latitude":12.2442,
+        "longitude":78.415,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS59",
+        "station_name":"Mattur2_1",
+        "latitude":12.3833,
+        "longitude":78.4167,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS60",
+        "station_name":"Pannandur_1",
+        "latitude":12.3011,
+        "longitude":78.2794,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS61",
+        "station_name":"Athimugam1_1",
+        "latitude":12.7583,
+        "longitude":77.9792,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS62",
+        "station_name":"Pudur Punganai OW_1",
+        "latitude":12.1861,
+        "longitude":78.4842,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS63",
+        "station_name":"Gurubarapalli (Billanakuppam)_1",
+        "latitude":12.5972,
+        "longitude":78.1331,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Krishnagiri",
+        "station_code":"KRIS64",
+        "station_name":"Billanakuppam_1",
+        "latitude":12.6025,
+        "longitude":78.1853,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"CGWBTN153",
+        "station_name":"Thummakundu Peraiyur Madurai Tamil Nadu",
+        "latitude":13.1061,
+        "longitude":79.4913,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"CGWBTN76",
+        "station_name":"Cellampatti Pz CHELLAMPATTI Madurai Tamil Nadu",
+        "latitude":9.9436,
+        "longitude":77.8961,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"CGWBTN77",
+        "station_name":"Vellalapatti pz MELUR Madurai Tamil Nadu",
+        "latitude":10.0597,
+        "longitude":78.2708,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU416",
+        "station_name":"Alanganallur_1",
+        "latitude":10.05,
+        "longitude":78.0967,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU417",
+        "station_name":"Narayanapuram_1",
+        "latitude":9.9572,
+        "longitude":78.1333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU418",
+        "station_name":"T.Ramanathapuram Pz",
+        "latitude":9.8325,
+        "longitude":77.7167,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU419",
+        "station_name":"Surakulam Pz",
+        "latitude":9.8364,
+        "longitude":78.0567,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU420",
+        "station_name":"Valayankulam_2",
+        "latitude":9.8042,
+        "longitude":78.0917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU65",
+        "station_name":"Kulamnagalm pz",
+        "latitude":10.0139,
+        "longitude":78.1147,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU66",
+        "station_name":"Thandalai pz",
+        "latitude":10.0186,
+        "longitude":78.1011,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU67",
+        "station_name":"Chekkanoorani pz_1",
+        "latitude":9.9414,
+        "longitude":77.9681,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU68",
+        "station_name":"Tirumangalam_2",
+        "latitude":9.9208,
+        "longitude":77.8833,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU69",
+        "station_name":"Avalsuranpatti pz",
+        "latitude":9.6414,
+        "longitude":77.9744,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU70",
+        "station_name":"Kottampatti pz",
+        "latitude":10.2219,
+        "longitude":78.3772,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU71",
+        "station_name":"Thonthilingapuram pz",
+        "latitude":10.2597,
+        "longitude":78.3586,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU72",
+        "station_name":"Thumbaipatti pz",
+        "latitude":10.0858,
+        "longitude":78.3747,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU73",
+        "station_name":"Andarkottaram pz",
+        "latitude":9.9086,
+        "longitude":78.1858,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU74",
+        "station_name":"Kunnathur pz",
+        "latitude":9.8967,
+        "longitude":78.255,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU75",
+        "station_name":"Varichiyur pz",
+        "latitude":9.9125,
+        "longitude":78.2569,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU76",
+        "station_name":"Kallandri1_1",
+        "latitude":10.0458,
+        "longitude":78.2,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU77",
+        "station_name":"M.Chathirapatti pz",
+        "latitude":10.0517,
+        "longitude":78.1656,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU78",
+        "station_name":"Omachikulam pz",
+        "latitude":9.995,
+        "longitude":78.1469,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU79",
+        "station_name":"Thethankulam pz",
+        "latitude":9.9775,
+        "longitude":78.1958,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU80",
+        "station_name":"Ambalakaranpatti pz",
+        "latitude":9.9683,
+        "longitude":78.3914,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU81",
+        "station_name":"Melur1_1",
+        "latitude":10.0306,
+        "longitude":78.3333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU82",
+        "station_name":"Thaniyamangalam pz",
+        "latitude":10.0328,
+        "longitude":78.3936,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU83",
+        "station_name":"Saptur pz",
+        "latitude":9.7628,
+        "longitude":77.7392,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU84",
+        "station_name":"Sedapatti_1",
+        "latitude":9.75,
+        "longitude":77.675,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU85",
+        "station_name":"Kolluveeranpatti pz_1",
+        "latitude":9.7069,
+        "longitude":77.8856,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU86",
+        "station_name":"Peraiyur pz_1",
+        "latitude":9.7428,
+        "longitude":77.7922,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU87",
+        "station_name":"Keelakottai pz",
+        "latitude":9.7867,
+        "longitude":78.0019,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU88",
+        "station_name":"P.Ammapatti pz",
+        "latitude":9.8458,
+        "longitude":77.8947,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU89",
+        "station_name":"Nilaiyur pz",
+        "latitude":9.8553,
+        "longitude":78.0589,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU90",
+        "station_name":"Nallathevanpatti OW_1",
+        "latitude":9.9364,
+        "longitude":77.7836,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Madurai",
+        "station_code":"MADU91",
+        "station_name":"Vadipatti Pz_1",
+        "latitude":10.0814,
+        "longitude":77.9669,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"CGWBTN79",
+        "station_name":"Nagapattina m Sirkalzhi Puttur Tamil Nadu",
+        "latitude":11.2953,
+        "longitude":79.7161,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"CGWBTN83",
+        "station_name":"Vengitangal EW Kilvelur Nagapattina m Tamil Nadu",
+        "latitude":10.8229,
+        "longitude":79.7711,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"NAGA421",
+        "station_name":"Theti (Puliyanthurai)",
+        "latitude":10.8033,
+        "longitude":79.8333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"NAGA422",
+        "station_name":"Paramasivapuram Iii_1",
+        "latitude":10.9914,
+        "longitude":79.5667,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"NAGA423",
+        "station_name":"Sangamangalam (Manjamalli A\/B) Ow",
+        "latitude":10.7728,
+        "longitude":79.8025,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"NAGA424",
+        "station_name":"Vadavoor(Tholur)",
+        "latitude":10.7153,
+        "longitude":79.8172,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"NAGA425",
+        "station_name":"Agarakondagai (Komal-West)",
+        "latitude":10.8656,
+        "longitude":79.8117,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"NAGA426",
+        "station_name":"Valmangalam(Kilaiyur)",
+        "latitude":10.8739,
+        "longitude":79.8097,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"NAGA440",
+        "station_name":"Myladuthurai Ow_1",
+        "latitude":11.0975,
+        "longitude":79.6564,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"TNGW0036",
+        "station_name":"VAITHEESWARANKOIL",
+        "latitude":11.1964,
+        "longitude":79.7139,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nagapattinam",
+        "station_code":"TNGW0049",
+        "station_name":"THIRUKADAIYUR_1",
+        "latitude":11.0671,
+        "longitude":79.8106,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"CGWBTN85",
+        "station_name":"Kokkarayanpettai D THIRUCHENGODU Namakkal Tamil Nadu",
+        "latitude":11.3106,
+        "longitude":77.7825,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"CGWBTN86",
+        "station_name":"Kokkarayanpettai S THIRUCHENGODU Namakkal Tamil Nadu",
+        "latitude":11.3106,
+        "longitude":77.7772,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"CGWBTN87",
+        "station_name":"Anaipalayam S RASIPURAM Namakkal Tamil Nadu",
+        "latitude":11.4267,
+        "longitude":78.1597,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"CGWBTN88",
+        "station_name":"Anaipalayam D RASIPURAM Namakkal Tamil Nadu",
+        "latitude":11.4267,
+        "longitude":78.1597,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"CGWBTN93",
+        "station_name":"Selur Ow (Valavanthinadu) Kolli Hills Kollimalai Namakkal Tamil Nadu",
+        "latitude":11.4692,
+        "longitude":78.5664,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM427",
+        "station_name":"Tiruchengodu_2",
+        "latitude":11.4083,
+        "longitude":77.9583,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM428",
+        "station_name":"Solasiramani_1",
+        "latitude":11.25,
+        "longitude":77.9083,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM429",
+        "station_name":"Ramapuram_2",
+        "latitude":11.4403,
+        "longitude":78.0092,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM430",
+        "station_name":"Namakkal2_1",
+        "latitude":11.2167,
+        "longitude":78.1722,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM431",
+        "station_name":"Nallurgaundanpalayam_1",
+        "latitude":11.2667,
+        "longitude":77.975,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM432",
+        "station_name":"Paramarthi_1",
+        "latitude":11.1542,
+        "longitude":78.0208,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM433",
+        "station_name":"Minnampalli Ow_1",
+        "latitude":11.3164,
+        "longitude":78.1864,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Namakkal",
+        "station_code":"NAMM434",
+        "station_name":"Mohanur1_1",
+        "latitude":11.5125,
+        "longitude":78.1417,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nilgiris",
+        "station_code":"NILI435",
+        "station_name":"Gudalur_1",
+        "latitude":11.4997,
+        "longitude":76.4861,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Nilgiris",
+        "station_code":"NILI436",
+        "station_name":"Masinigudi (Vazhai Thottam)",
+        "latitude":11.5317,
+        "longitude":76.6967,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Perambalur",
+        "station_code":"PERA437",
+        "station_name":"Padalur Pz",
+        "latitude":11.0961,
+        "longitude":78.8253,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Perambalur",
+        "station_code":"PERA92",
+        "station_name":"Perambalur1_1",
+        "latitude":11.2342,
+        "longitude":78.8911,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Perambalur",
+        "station_code":"PERA93",
+        "station_name":"Ranjankudi_1",
+        "latitude":11.2583,
+        "longitude":78.9417,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Perambalur",
+        "station_code":"PERA94",
+        "station_name":"Annukkur_1",
+        "latitude":11.3369,
+        "longitude":78.6853,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Perambalur",
+        "station_code":"PERA95",
+        "station_name":"Veppur1_1",
+        "latitude":11.3417,
+        "longitude":79.0625,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"CGWBTN94",
+        "station_name":"Kooliangadu EW Thiruvarangulam Pudukkottai Tamil Nadu",
+        "latitude":11.7834,
+        "longitude":79.6891,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU103",
+        "station_name":"Sundarapatti",
+        "latitude":10.3589,
+        "longitude":78.7069,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU104",
+        "station_name":"Vadhiripatti (Vellanjar)",
+        "latitude":10.4839,
+        "longitude":78.6803,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU105",
+        "station_name":"Vayalogam",
+        "latitude":10.3972,
+        "longitude":78.6919,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU106",
+        "station_name":"Lekkanapatti_1",
+        "latitude":10.5597,
+        "longitude":78.7264,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU107",
+        "station_name":"Mangathevanpatti_1",
+        "latitude":10.5719,
+        "longitude":78.8325,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU108",
+        "station_name":"Alavayal_2",
+        "latitude":10.3178,
+        "longitude":78.5461,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU109",
+        "station_name":"Oliyamangalam_1",
+        "latitude":10.4183,
+        "longitude":78.5294,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU110",
+        "station_name":"Sadayampatti_1",
+        "latitude":10.3894,
+        "longitude":78.5508,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU111",
+        "station_name":"Thirukkalambur_2",
+        "latitude":10.2083,
+        "longitude":78.4911,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU112",
+        "station_name":"Vegupatti_1",
+        "latitude":10.2756,
+        "longitude":78.5619,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU113",
+        "station_name":"Pudukkottai_2",
+        "latitude":10.3861,
+        "longitude":78.8042,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU114",
+        "station_name":"Nathampannai 9A (Nenmeli)",
+        "latitude":10.4086,
+        "longitude":78.7944,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU115",
+        "station_name":"Melur_2",
+        "latitude":10.2408,
+        "longitude":78.7339,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU116",
+        "station_name":"Thirumayam1(Tllalur)",
+        "latitude":10.2333,
+        "longitude":78.7458,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU117",
+        "station_name":"Perambur",
+        "latitude":10.6167,
+        "longitude":78.645,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU118",
+        "station_name":"Thondaimanallur_1",
+        "latitude":10.6083,
+        "longitude":78.775,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU119",
+        "station_name":"Viralimalai1_1",
+        "latitude":10.6028,
+        "longitude":78.5667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU438",
+        "station_name":"Annavasal_3",
+        "latitude":10.45,
+        "longitude":78.7028,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"PUDU439",
+        "station_name":"Thirunaloor North Ow_1",
+        "latitude":10.0678,
+        "longitude":79.0228,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Pudukkottai",
+        "station_code":"TNGW0045",
+        "station_name":"NAGUDI_1",
+        "latitude":10.1517,
+        "longitude":79.1056,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ramanathapuram",
+        "station_code":"RAMA120",
+        "station_name":"Abiramam(kandigal)",
+        "latitude":9.4403,
+        "longitude":78.4514,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ramanathapuram",
+        "station_code":"RAMA121",
+        "station_name":"Kamudhi_1",
+        "latitude":9.4083,
+        "longitude":78.4083,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ramanathapuram",
+        "station_code":"TNGW0008",
+        "station_name":"EMANESWARAM",
+        "latitude":9.5404,
+        "longitude":78.6086,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ramanathapuram",
+        "station_code":"TNGW0009",
+        "station_name":"R S MANGALAM",
+        "latitude":9.6431,
+        "longitude":78.8472,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Ramanathapuram",
+        "station_code":"TNGW0015",
+        "station_name":"VATHAVANERI",
+        "latitude":9.5775,
+        "longitude":78.7664,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"CGWBTN100",
+        "station_name":"Veerakkalputtur Mettur Salem Tamil Nadu",
+        "latitude":11.8165,
+        "longitude":77.8577,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"CGWBTN96",
+        "station_name":"Sendarpatti GANGAVALLI Salem Tamil Nadu",
+        "latitude":11.4375,
+        "longitude":78.5,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"CGWBTN97",
+        "station_name":"Samudram pz NANGAVALLI Salem Tamil Nadu",
+        "latitude":11.7472,
+        "longitude":77.9306,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"CGWBTN98",
+        "station_name":"Karuppur (Periyar University) Omalur Salem Tamil Nadu",
+        "latitude":11.7178,
+        "longitude":78.077,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"CGWBTN99",
+        "station_name":"Panaimadal Pethanaickenpalay am Salem Tamil Nadu",
+        "latitude":11.7185,
+        "longitude":78.4755,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE122",
+        "station_name":"Athur_2",
+        "latitude":11.5917,
+        "longitude":78.5861,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE123",
+        "station_name":"Kullampatti_1",
+        "latitude":11.5833,
+        "longitude":77.7917,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE124",
+        "station_name":"Kulathur_2",
+        "latitude":11.8472,
+        "longitude":77.7472,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE125",
+        "station_name":"Konganapuram_1",
+        "latitude":11.5667,
+        "longitude":77.9,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE126",
+        "station_name":"Nangavalli_1",
+        "latitude":11.7583,
+        "longitude":77.8958,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE127",
+        "station_name":"P.N.Palayam1_1",
+        "latitude":11.6472,
+        "longitude":78.5125,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE128",
+        "station_name":"Chittoor pz_1",
+        "latitude":11.6442,
+        "longitude":77.825,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE129",
+        "station_name":"Utamacholapuram deep pz",
+        "latitude":11.6139,
+        "longitude":78.1064,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Salem",
+        "station_code":"SALE130",
+        "station_name":"Veraganur_1",
+        "latitude":11.475,
+        "longitude":78.7375,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Sivaganga",
+        "station_code":"CGWBTN102",
+        "station_name":"Sakottai SAKKOTTAI Sivaganga Tamil Nadu",
+        "latitude":10.0958,
+        "longitude":78.8583,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Sivaganga",
+        "station_code":"SIVA131",
+        "station_name":"Devakottai_1",
+        "latitude":9.9517,
+        "longitude":78.8144,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Sivaganga",
+        "station_code":"SIVA132",
+        "station_name":"Manamadurai1_1",
+        "latitude":9.7083,
+        "longitude":78.475,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Sivaganga",
+        "station_code":"SIVA133",
+        "station_name":"Muthupettai_2",
+        "latitude":9.8569,
+        "longitude":78.4833,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Sivaganga",
+        "station_code":"SIVA134",
+        "station_name":"Padamathur(KUMIZHI)",
+        "latitude":9.8514,
+        "longitude":78.375,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Sivaganga",
+        "station_code":"SIVA135",
+        "station_name":"Gowripatti(melkalvory)",
+        "latitude":9.8956,
+        "longitude":78.5553,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Sivaganga",
+        "station_code":"SIVA136",
+        "station_name":"Tirupathur1 (sengadu)",
+        "latitude":10.1583,
+        "longitude":78.575,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Thanjavur",
+        "station_code":"TNGW0010",
+        "station_name":"VILANKULAM_1",
+        "latitude":10.1982,
+        "longitude":79.2323,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Thanjavur",
+        "station_code":"TNGW0011",
+        "station_name":"ALAGINAYAGIPURAM",
+        "latitude":10.3077,
+        "longitude":79.3014,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Thanjavur",
+        "station_code":"TNGW0047",
+        "station_name":"ADIRAMAPATTINAM",
+        "latitude":10.3441,
+        "longitude":79.3879,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Thanjavur",
+        "station_code":"TNGW0048",
+        "station_name":"MANJAVAYAL",
+        "latitude":10.3685,
+        "longitude":79.4123,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"CGWBTN103",
+        "station_name":"Kamayagoundanpat ti pz CUMBUM Theni Tamil Nadu",
+        "latitude":9.7367,
+        "longitude":77.3169,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"CGWBTN104",
+        "station_name":"Okkaraipatti Andipatti Theni Tamil Nadu",
+        "latitude":9.9625,
+        "longitude":77.5694,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"CGWBTN105",
+        "station_name":"Appipatti Alagapuri Chinnamanur Theni Tamil Nadu",
+        "latitude":9.81,
+        "longitude":77.4103,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"CGWBTN106",
+        "station_name":"Thevaram (Tevaram) UTHAMAPALAYAM Theni Tamil Nadu",
+        "latitude":9.8847,
+        "longitude":77.2847,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"CGWBTN107",
+        "station_name":"Balakombai PZ ANDIPATTI Theni Tamil Nadu",
+        "latitude":9.9036,
+        "longitude":77.6233,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"CGWBTN108",
+        "station_name":"Gandamanur OW THENI Theni Tamil Nadu",
+        "latitude":9.9218,
+        "longitude":77.5185,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"CGWBTN35",
+        "station_name":"Thevaram Uthamapalayam Theni Tamil Nadu",
+        "latitude":11.9098,
+        "longitude":78.6213,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN137",
+        "station_name":"Andipatti1_1",
+        "latitude":9.9917,
+        "longitude":77.6167,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN138",
+        "station_name":"M.Subbalapuram pz",
+        "latitude":9.9717,
+        "longitude":77.5564,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN139",
+        "station_name":"T.Subbalapuram pz",
+        "latitude":10.0064,
+        "longitude":77.6547,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN140",
+        "station_name":"Kodangipatti pz",
+        "latitude":9.9917,
+        "longitude":77.4306,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN141",
+        "station_name":"Theni1_1",
+        "latitude":10.0042,
+        "longitude":77.2847,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN142",
+        "station_name":"Veerapandi pz",
+        "latitude":9.9606,
+        "longitude":77.4467,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN143",
+        "station_name":"Chinnamanur pz",
+        "latitude":9.8472,
+        "longitude":77.3825,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN144",
+        "station_name":"Dumbacheri pz",
+        "latitude":9.9586,
+        "longitude":77.3911,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN145",
+        "station_name":"Seelampatti PZ",
+        "latitude":9.8742,
+        "longitude":77.3928,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN146",
+        "station_name":"Cumbum pz",
+        "latitude":9.7283,
+        "longitude":77.2783,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN147",
+        "station_name":"Surelipatti pz_1",
+        "latitude":9.7092,
+        "longitude":77.3006,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN148",
+        "station_name":"Erasakkanaayakanur_1",
+        "latitude":9.925,
+        "longitude":77.5417,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN149",
+        "station_name":"Manthisunai OW_1",
+        "latitude":9.795,
+        "longitude":77.5581,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN150",
+        "station_name":"Kadamalaikundu pz",
+        "latitude":9.8072,
+        "longitude":77.5031,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN151",
+        "station_name":"Varusandu pz_1",
+        "latitude":9.7358,
+        "longitude":77.5203,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN152",
+        "station_name":"A.Vadipatti pz",
+        "latitude":10.0958,
+        "longitude":77.6881,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN153",
+        "station_name":"Ganguvarpatti pz",
+        "latitude":10.1669,
+        "longitude":77.6944,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN154",
+        "station_name":"Periyakulam OW_1",
+        "latitude":10.1228,
+        "longitude":77.5367,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN155",
+        "station_name":"Koduvilarpatti pz",
+        "latitude":9.9719,
+        "longitude":77.4919,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN156",
+        "station_name":"Thevaram_1",
+        "latitude":9.8847,
+        "longitude":77.2847,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN157",
+        "station_name":"Kombai pz_1",
+        "latitude":9.8442,
+        "longitude":77.2981,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN158",
+        "station_name":"Ramakrishnapuram pz_1",
+        "latitude":9.9392,
+        "longitude":77.3017,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN159",
+        "station_name":"Sankarapuram pz",
+        "latitude":9.9069,
+        "longitude":77.3297,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN160",
+        "station_name":"ThamminaickPatti pz",
+        "latitude":9.9164,
+        "longitude":77.2997,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THEN161",
+        "station_name":"U Ammapatti pz",
+        "latitude":9.8394,
+        "longitude":77.3447,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Theni",
+        "station_code":"THENI441",
+        "station_name":"Kottur Pz",
+        "latitude":9.9061,
+        "longitude":77.4058,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI449",
+        "station_name":"Thiruchirapalli_1",
+        "latitude":10.8542,
+        "longitude":78.7083,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI450",
+        "station_name":"Manachanallur_1",
+        "latitude":10.985,
+        "longitude":78.7656,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI451",
+        "station_name":"Karvadi Ew_1",
+        "latitude":10.4889,
+        "longitude":78.4283,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI452",
+        "station_name":"Manaparai Pz",
+        "latitude":10.6144,
+        "longitude":78.4253,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI453",
+        "station_name":"Marungapuri_2",
+        "latitude":10.4358,
+        "longitude":78.4106,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI454",
+        "station_name":"Musiri Ow",
+        "latitude":10.9597,
+        "longitude":78.4397,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI455",
+        "station_name":"Pullambadi_1",
+        "latitude":11.0458,
+        "longitude":78.9583,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI456",
+        "station_name":"Paithambarai Ow_1",
+        "latitude":11.0708,
+        "longitude":78.4719,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI457",
+        "station_name":"Thottiyam_1",
+        "latitude":10.9917,
+        "longitude":78.3353,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI458",
+        "station_name":"Thottiyam Ow_1",
+        "latitude":10.9931,
+        "longitude":78.3264,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI459",
+        "station_name":"Siruganatham Ow_1",
+        "latitude":11.1856,
+        "longitude":78.5722,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI460",
+        "station_name":"Thuraiyur_1",
+        "latitude":11.15,
+        "longitude":78.6,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI461",
+        "station_name":"Valaiyeduppu (Vadakkuveli)_1",
+        "latitude":11.0975,
+        "longitude":78.4792,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI462",
+        "station_name":"Valavanthankottai Ow",
+        "latitude":10.7597,
+        "longitude":78.8336,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruchirappalli",
+        "station_code":"TPLI463",
+        "station_name":"Talugai (Mammalai R.F.) A\/C Ow_1",
+        "latitude":11.7386,
+        "longitude":78.9608,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN122",
+        "station_name":"Taruvai MANUR Tirunelveli Tamil Nadu",
+        "latitude":8.6667,
+        "longitude":77.6806,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN123",
+        "station_name":"Nanguneri1 NANGUNERI Tirunelveli Tamil Nadu",
+        "latitude":8.4917,
+        "longitude":77.7042,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN124",
+        "station_name":"Molaikkaraipatti VALLIYOOR Tirunelveli Tamil Nadu",
+        "latitude":8.3167,
+        "longitude":77.5792,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN125",
+        "station_name":"N. Vijayanarayanam NANGUNERI Tirunelveli Tamil Nadu",
+        "latitude":8.5333,
+        "longitude":77.7917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN126",
+        "station_name":"TenkasiPZ TENKASI Tirunelveli Tamil Nadu",
+        "latitude":9.0317,
+        "longitude":77.2717,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN127",
+        "station_name":"Therkuvalliyur OW VALLIYOOR Tirunelveli Tamil Nadu",
+        "latitude":8.3331,
+        "longitude":77.6239,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN128",
+        "station_name":"Mayaneri (Karuppukatti) OW NANGUNERI Tirunelveli Tamil Nadu",
+        "latitude":8.5711,
+        "longitude":77.7011,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN129",
+        "station_name":"Sivagiri OW VASUDEVANALLUR Tirunelveli Tamil Nadu",
+        "latitude":9.34,
+        "longitude":77.4383,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN130",
+        "station_name":"Rajapathi OW (Not outsourcing key, New key) MANUR Tirunelveli Tamil Nadu",
+        "latitude":8.8517,
+        "longitude":77.7694,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN131",
+        "station_name":"Ambalam Nanguneri Tirunelveli Tamil Nadu",
+        "latitude":9.0011,
+        "longitude":77.43,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN132",
+        "station_name":"Munanchipatti Palayamkottai Tirunelveli Tamil Nadu",
+        "latitude":8.31,
+        "longitude":77.47,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN133",
+        "station_name":"Samugarangapuram Radhapuram Tirunelveli Tamil Nadu",
+        "latitude":8.2,
+        "longitude":77.41,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"CGWBTN134",
+        "station_name":"Seetharappanallur Pappakudi Tirunelveli Tamil Nadu",
+        "latitude":8.7939,
+        "longitude":77.6017,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU184",
+        "station_name":"Sivalarkulam OW_1",
+        "latitude":8.8692,
+        "longitude":77.5292,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU185",
+        "station_name":"Ambasamudram_1",
+        "latitude":8.7194,
+        "longitude":77.4361,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU186",
+        "station_name":"Iyan Singampatty(Vairavikulam)",
+        "latitude":8.6708,
+        "longitude":77.4456,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU187",
+        "station_name":"Kadayam_3",
+        "latitude":8.8333,
+        "longitude":77.4083,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU188",
+        "station_name":"Kadayanallur_1",
+        "latitude":9.0667,
+        "longitude":77.3458,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU189",
+        "station_name":"Kalakadu_1",
+        "latitude":8.4806,
+        "longitude":77.5986,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU190",
+        "station_name":"Marudakulam",
+        "latitude":8.5833,
+        "longitude":77.7153,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU191",
+        "station_name":"Tirunelveli1_1",
+        "latitude":8.7056,
+        "longitude":77.7222,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU192",
+        "station_name":"Charanmadevi_1",
+        "latitude":8.8278,
+        "longitude":77.575,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU193",
+        "station_name":"Tiruvembalapuram_1",
+        "latitude":8.2542,
+        "longitude":77.7583,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU194",
+        "station_name":"Sankarankoil1_1",
+        "latitude":9.2083,
+        "longitude":77.5583,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU195",
+        "station_name":"Virasikhamani OW_1",
+        "latitude":9.0919,
+        "longitude":77.4447,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU196",
+        "station_name":"Tenkasi OW",
+        "latitude":8.9631,
+        "longitude":77.3114,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU197",
+        "station_name":"Muthumottamozhi OW_1",
+        "latitude":8.3086,
+        "longitude":77.8603,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU198",
+        "station_name":"Chettikulam_1",
+        "latitude":8.1667,
+        "longitude":77.6167,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU199",
+        "station_name":"Udayattur A\/B OW_1",
+        "latitude":8.2325,
+        "longitude":77.7206,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU200",
+        "station_name":"Valliyur_1",
+        "latitude":8.3861,
+        "longitude":77.6167,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU201",
+        "station_name":"Vasudevanallur1_1",
+        "latitude":9.2417,
+        "longitude":77.4083,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU464",
+        "station_name":"Kilpaur_1",
+        "latitude":8.9167,
+        "longitude":77.3833,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU465",
+        "station_name":"Alankulam_1",
+        "latitude":8.9,
+        "longitude":77.475,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU466",
+        "station_name":"Ramakrishnapuram Ow_1",
+        "latitude":8.4847,
+        "longitude":77.7964,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU467",
+        "station_name":"Mukkudal_2",
+        "latitude":8.7347,
+        "longitude":77.5208,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU468",
+        "station_name":"Panpoli_1",
+        "latitude":9.0167,
+        "longitude":77.2528,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TIRU469",
+        "station_name":"Puliyankudi Ow_1",
+        "latitude":9.1817,
+        "longitude":77.4389,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TNGW0012",
+        "station_name":"KUTTAM_1",
+        "latitude":8.3315,
+        "longitude":77.9346,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tirunelveli",
+        "station_code":"TNGW0041",
+        "station_name":"NAVALADI",
+        "latitude":8.258,
+        "longitude":77.8248,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIPR470",
+        "station_name":"Karattoluvu_1",
+        "latitude":10.6236,
+        "longitude":77.375,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIRU253",
+        "station_name":"Palavanchipalayam pz_1",
+        "latitude":11.0689,
+        "longitude":77.3519,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIRU254",
+        "station_name":"Kettanur_1",
+        "latitude":10.9153,
+        "longitude":77.2611,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIRU255",
+        "station_name":"Nachipalayam1_1",
+        "latitude":11.0806,
+        "longitude":77.4528,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIRU269",
+        "station_name":"KaravallurPZ_1",
+        "latitude":11.2894,
+        "longitude":77.1692,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIRU275",
+        "station_name":"Rengagoundanpalayam pz_1",
+        "latitude":11.0697,
+        "longitude":77.3844,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIRU276",
+        "station_name":"Vijayapuram pz_1",
+        "latitude":11.0897,
+        "longitude":77.4008,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruppur",
+        "station_code":"TIRU295",
+        "station_name":"Kumaralingam1_1",
+        "latitude":10.4833,
+        "longitude":77.3667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN110",
+        "station_name":"Goonipalayam Ow Uthukottai Thiruvallur Tamil Nadu",
+        "latitude":13.2792,
+        "longitude":79.8507,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN112",
+        "station_name":"Padirivedu Ow Gummidipoondi Thiruvallur Tamil Nadu",
+        "latitude":13.4501,
+        "longitude":80.0103,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN113",
+        "station_name":"Placepalayam Ow Tiruthani Thiruvallur Tamil Nadu",
+        "latitude":13.2784,
+        "longitude":79.7705,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN135",
+        "station_name":"Ambattur VILLIVAKKAM Tiruvallur Tamil Nadu",
+        "latitude":13.1186,
+        "longitude":80.1547,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN136",
+        "station_name":"PLACEPALAYAM POONDI Tiruvallur Tamil Nadu",
+        "latitude":13.2783,
+        "longitude":79.7703,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN137",
+        "station_name":"PADIRIVEDU GUMMIDIPOONDI Tiruvallur Tamil Nadu",
+        "latitude":13.45,
+        "longitude":80.0008,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN139",
+        "station_name":"Avadi Ponnamallee Tiruvallur Tamil Nadu",
+        "latitude":13.1306,
+        "longitude":80.1081,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN31",
+        "station_name":"Chinnambedu Ponneri Thiruvallur Tamil Nadu",
+        "latitude":11.6833,
+        "longitude":79.7739,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"CGWBTN58",
+        "station_name":"Thirukkandalam Billapuram Tiruvallur Tamil Nadu",
+        "latitude":12.8395,
+        "longitude":79.6787,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR162",
+        "station_name":"Enambakkam_2",
+        "latitude":13.2864,
+        "longitude":80.0,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR163",
+        "station_name":"Panapakkam_2",
+        "latitude":13.2961,
+        "longitude":80.0644,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR164",
+        "station_name":"Kottaiyur_2",
+        "latitude":13.0008,
+        "longitude":79.8661,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR165",
+        "station_name":"Velliagram_1",
+        "latitude":13.3275,
+        "longitude":79.4228,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR166",
+        "station_name":"Ponneri PZ",
+        "latitude":13.33,
+        "longitude":80.1956,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR167",
+        "station_name":"Chinnambedu_2",
+        "latitude":13.3161,
+        "longitude":80.1458,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR168",
+        "station_name":"Thiruninravur_1",
+        "latitude":13.1192,
+        "longitude":80.1608,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR169",
+        "station_name":"Avadi OW",
+        "latitude":13.1306,
+        "longitude":80.1081,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR170",
+        "station_name":"Balapuram (Veeramangalam)_1",
+        "latitude":13.1531,
+        "longitude":79.3825,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR171",
+        "station_name":"Agoor_1",
+        "latitude":13.1897,
+        "longitude":79.5831,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR172",
+        "station_name":"Madam_2",
+        "latitude":13.1728,
+        "longitude":79.6128,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR173",
+        "station_name":"Poonimangadu_1",
+        "latitude":13.175,
+        "longitude":79.6083,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR174",
+        "station_name":"Goonipalayam_1",
+        "latitude":13.2789,
+        "longitude":79.8508,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR442",
+        "station_name":"Valasai Vettikadu (Illupur) Ow",
+        "latitude":13.035,
+        "longitude":79.9283,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"THIR471",
+        "station_name":"Tiruttani(Near Temple)",
+        "latitude":13.1417,
+        "longitude":79.5472,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"TNGW0019",
+        "station_name":"NALLUR_3",
+        "latitude":13.2198,
+        "longitude":80.1605,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"TNGW0020",
+        "station_name":"VANNIPAKAM",
+        "latitude":13.2862,
+        "longitude":80.2191,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"TNGW0021",
+        "station_name":"MATHUR_1",
+        "latitude":13.1723,
+        "longitude":80.2498,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"TNGW0026",
+        "station_name":"VOYALUR_1",
+        "latitude":13.3167,
+        "longitude":80.2782,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"TNGW0032",
+        "station_name":"AMOOR_1",
+        "latitude":13.2986,
+        "longitude":80.1812,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"TNGW0034",
+        "station_name":"KODUR_1",
+        "latitude":13.3196,
+        "longitude":80.1709,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvallur",
+        "station_code":"TNGW0035",
+        "station_name":"ELAIMBEDU",
+        "latitude":13.34,
+        "longitude":80.1757,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvarur",
+        "station_code":"THRU447",
+        "station_name":"Kilkudi_2",
+        "latitude":10.8772,
+        "longitude":79.5936,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvarur",
+        "station_code":"THRU448",
+        "station_name":"Pulavarnatham Ow_1",
+        "latitude":10.8136,
+        "longitude":79.4044,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tiruvarur",
+        "station_code":"TNGW0046",
+        "station_name":"ADICHAPURAM",
+        "latitude":10.6372,
+        "longitude":79.5387,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"CGWBTN147",
+        "station_name":"Kadambur Kayathar Tuticorin Tamil Nadu",
+        "latitude":11.9,
+        "longitude":79.05,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"CGWBTN148",
+        "station_name":"Pasuvanthanai Ottapidaram Tuticorin Tamil Nadu",
+        "latitude":9.0014,
+        "longitude":77.9594,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"CGWBTN149",
+        "station_name":"Sivagnanapuram Vilathikulam Tuticorin Tamil Nadu",
+        "latitude":9.0545,
+        "longitude":78.0867,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TNGW0013",
+        "station_name":"ARUMUGANERI_1",
+        "latitude":8.5657,
+        "longitude":78.0978,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TNGW0016",
+        "station_name":"VEMBAR",
+        "latitude":9.0778,
+        "longitude":78.3578,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI202",
+        "station_name":"Thailapuram_1",
+        "latitude":8.6083,
+        "longitude":77.85,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI203",
+        "station_name":"Kalugumalai_1",
+        "latitude":9.1486,
+        "longitude":77.7167,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI204",
+        "station_name":"Ettayapuram_1",
+        "latitude":9.2178,
+        "longitude":77.9833,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI205",
+        "station_name":"Nallattinputhur_1",
+        "latitude":9.1583,
+        "longitude":77.8417,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI206",
+        "station_name":"Villiseri_1",
+        "latitude":9.0583,
+        "longitude":77.85,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI207",
+        "station_name":"Maniyachi_1",
+        "latitude":8.8667,
+        "longitude":77.9,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI208",
+        "station_name":"Pudur_4",
+        "latitude":9.3136,
+        "longitude":78.1361,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI209",
+        "station_name":"Satankulam_1",
+        "latitude":8.4333,
+        "longitude":77.9028,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI210",
+        "station_name":"Petmanagar_1",
+        "latitude":8.65,
+        "longitude":77.95,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Tuticorin",
+        "station_code":"TUTI472",
+        "station_name":"Paikulam_1",
+        "latitude":8.5181,
+        "longitude":77.8556,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"CGWBTN150",
+        "station_name":"Timiri THIMIRI Vellore Tamil Nadu",
+        "latitude":12.8278,
+        "longitude":79.3028,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"CGWBTN151",
+        "station_name":"Abdullapuram pz VELLORE Vellore Tamil Nadu",
+        "latitude":12.9119,
+        "longitude":79.0858,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"CGWBTN156",
+        "station_name":"Kothur Natrampalli Vellore Tamil Nadu",
+        "latitude":12.6099,
+        "longitude":78.4324,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL211",
+        "station_name":"Chinnapallikuppam pz",
+        "latitude":12.7633,
+        "longitude":78.8386,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL212",
+        "station_name":"Kv Kuppam_1",
+        "latitude":12.9611,
+        "longitude":78.98,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL213",
+        "station_name":"Kandili_2",
+        "latitude":12.4778,
+        "longitude":78.4556,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL214",
+        "station_name":"Jaffrapet OW_1",
+        "latitude":12.9597,
+        "longitude":79.1125,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL215",
+        "station_name":"Kariyakudal_1",
+        "latitude":12.9897,
+        "longitude":79.6178,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL216",
+        "station_name":"Palligonda_1",
+        "latitude":12.9,
+        "longitude":78.9458,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL217",
+        "station_name":"Karkur EW",
+        "latitude":12.8747,
+        "longitude":78.7597,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL218",
+        "station_name":"Pernambattu_1",
+        "latitude":12.9375,
+        "longitude":78.725,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL219",
+        "station_name":"Ponnai_1",
+        "latitude":13.1111,
+        "longitude":79.4264,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL220",
+        "station_name":"Virupachipuram(bagayam)_1",
+        "latitude":12.8778,
+        "longitude":79.1333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL221",
+        "station_name":"Avarakarai_1",
+        "latitude":12.9625,
+        "longitude":79.2875,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL222",
+        "station_name":"Ranipet2_1",
+        "latitude":12.9333,
+        "longitude":79.35,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL473",
+        "station_name":"Arakkonam-Pz",
+        "latitude":13.0917,
+        "longitude":79.6583,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Vellore",
+        "station_code":"VELL474",
+        "station_name":"Vishram_1",
+        "latitude":12.9139,
+        "longitude":79.2917,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"CGWBTN118",
+        "station_name":"Semmanangur EW Ulundurpettaii Villupuram Tamil Nadu_1",
+        "latitude":12.6361,
+        "longitude":79.2333,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"CGWBTN159",
+        "station_name":"Brammadesam MARAKKANAM Villupuram Tamil Nadu",
+        "latitude":12.1958,
+        "longitude":79.7667,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"CGWBTN160",
+        "station_name":"Timmalai THIYAGADURGAM Villupuram Tamil Nadu",
+        "latitude":11.7319,
+        "longitude":79.125,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"CGWBTN161",
+        "station_name":"Andiarpalayam VANUR Villupuram Tamil Nadu",
+        "latitude":12.0472,
+        "longitude":79.7625,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"CGWBTN162",
+        "station_name":"Semmanangur EW Ulundurpettaii Villupuram Tamil Nadu",
+        "latitude":12.2253,
+        "longitude":79.7333,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"TNGW0037",
+        "station_name":"AUROVILLE_1",
+        "latitude":11.9971,
+        "longitude":79.8355,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"TNGW0038",
+        "station_name":"AUROVILLE_2",
+        "latitude":11.9971,
+        "longitude":79.8355,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"TNGW0039",
+        "station_name":"AUROVILLE_3",
+        "latitude":11.9971,
+        "longitude":79.8355,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"TNGW0040",
+        "station_name":"MARAKKANAM_1",
+        "latitude":12.19,
+        "longitude":79.9414,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VELL475",
+        "station_name":"Kunimedu Pz",
+        "latitude":12.0944,
+        "longitude":79.8928,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL223",
+        "station_name":"Chinnasalem_1",
+        "latitude":11.6342,
+        "longitude":78.8764,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL224",
+        "station_name":"Gingee1_1",
+        "latitude":12.25,
+        "longitude":79.4167,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL225",
+        "station_name":"Kallakurichi1_1",
+        "latitude":11.7417,
+        "longitude":78.9667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL226",
+        "station_name":"Tehzbazar_1",
+        "latitude":12.1833,
+        "longitude":79.6667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL227",
+        "station_name":"Mogaiyur PZ_1",
+        "latitude":11.9778,
+        "longitude":79.3181,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL228",
+        "station_name":"Kadambur_3",
+        "latitude":11.9,
+        "longitude":79.05,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL229",
+        "station_name":"Sankarapuram_2",
+        "latitude":11.8833,
+        "longitude":78.9167,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL230",
+        "station_name":"Tyagadurgam_1",
+        "latitude":11.7306,
+        "longitude":79.0917,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL231",
+        "station_name":"Ulundurpet1_1",
+        "latitude":11.6611,
+        "longitude":79.2944,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL232",
+        "station_name":"Vallam_1",
+        "latitude":12.2558,
+        "longitude":79.5072,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Viluppuram",
+        "station_code":"VILL233",
+        "station_name":"Vikravandi_1",
+        "latitude":12.0375,
+        "longitude":79.5625,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"CGWBTN163",
+        "station_name":"Kariyapatti1 KARIAYAPATTI Virudhunagar Tamil Nadu",
+        "latitude":9.6694,
+        "longitude":78.1083,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"CGWBTN164",
+        "station_name":"Kanjannaickenpatti KARIAYAPATTI Virudhunaga r Tamil Nadu",
+        "latitude":9.6097,
+        "longitude":78.1019,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"CGWBTN165",
+        "station_name":"Muntalapuram SATTUR Virudhunaga r Tamil Nadu",
+        "latitude":9.0172,
+        "longitude":77.8894,
+        "well_type":"Bore Well",
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU234",
+        "station_name":"Palavanatham_1",
+        "latitude":9.5667,
+        "longitude":78.075,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU235",
+        "station_name":"Choolapuram_1",
+        "latitude":9.3833,
+        "longitude":77.5583,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU236",
+        "station_name":"Mudukkankulam_1",
+        "latitude":9.6619,
+        "longitude":78.2058,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU237",
+        "station_name":"Sundarapandiyan_2",
+        "latitude":9.6083,
+        "longitude":77.6667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU238",
+        "station_name":"Ammayappapuram (ilandirakondan )",
+        "latitude":9.44,
+        "longitude":77.5369,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU239",
+        "station_name":"Nenmeni1_1",
+        "latitude":9.325,
+        "longitude":78.0083,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU240",
+        "station_name":"Anaiyur_2",
+        "latitude":9.4464,
+        "longitude":77.7667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU241",
+        "station_name":"Srivilliputhur_3",
+        "latitude":9.4992,
+        "longitude":77.6267,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU242",
+        "station_name":"Mullikulam_1",
+        "latitude":9.4986,
+        "longitude":77.7,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU243",
+        "station_name":"Alangulam_2",
+        "latitude":9.3639,
+        "longitude":77.6861,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU244",
+        "station_name":"Vembakkottai-OW_2",
+        "latitude":9.3333,
+        "longitude":77.7667,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU245",
+        "station_name":"Pattampudur OW_1",
+        "latitude":9.4914,
+        "longitude":77.9336,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU246",
+        "station_name":"Sevalpatti_1",
+        "latitude":9.5583,
+        "longitude":77.9583,
+        "well_type":null,
+        "station_status":"Active"
+    },
+    {
+        "state":"Tamil Nadu",
+        "district":"Virudhunagar",
+        "station_code":"VIRU247",
+        "station_name":"Nathampatti OW_1",
+        "latitude":9.6042,
+        "longitude":77.7486,
+        "well_type":null,
+        "station_status":"Active"
+    }
+]
