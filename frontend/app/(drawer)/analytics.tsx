@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   View,
   Text,
@@ -9,12 +9,16 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
+  TextInput,
+  FlatList,
 } from "react-native";
 import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
 import { useTheme } from "@/hooks/useTheme";
 import * as Location from "expo-location";
 import { GoogleGenerativeAI } from "@google/generative-ai"; // Added for Gemini AI
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import MapView, { Marker, Region } from "react-native-maps";
 
 // Define a structured type for insights (no TS errors)
 interface InsightItem {
@@ -55,6 +59,18 @@ export default function Analytics() {
   );
   const [insights, setInsights] = useState<InsightItem[]>([]);
   const [generatingInsights, setGeneratingInsights] = useState(false);
+  const [pickerVisible, setPickerVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<
+    { display_name: string; lat: string; lon: string }[]
+  >([]);
+  const [tempLoc, setTempLoc] = useState<{ lat: number; lon: number } | null>(
+    null
+  );
+  const [mapRegion, setMapRegion] = useState<Region | null>(null);
+  const [userOverride, setUserOverride] = useState(false); // if user manually picked
+  const regionRef = useRef<any>(null);
 
   const fetchCurrentLocation = async () => {
     try {
@@ -366,6 +382,86 @@ ${payloadJson}
     }));
   }, [weatherData]);
 
+  const openPicker = () => {
+    if (location) {
+      setTempLoc({ ...location });
+      regionRef.current = {
+        latitude: location.lat,
+        longitude: location.lon,
+        latitudeDelta: 0.5,
+        longitudeDelta: 0.5,
+      };
+    }
+    setPickerVisible(true);
+  };
+
+  // ========== SEARCH (Nominatim) WITH DEBOUNCE ==========
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!pickerVisible || q.length < 3) {
+      setSearchResults([]);
+      return;
+    }
+    const h = setTimeout(async () => {
+      try {
+        setSearching(true);
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          q
+        )}&limit=8`;
+        const res = await fetch(url, {
+          headers: { "Accept-Language": "en" },
+        });
+        const json = await res.json();
+        setSearchResults(json || []);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 450);
+    return () => clearTimeout(h);
+  }, [searchQuery, pickerVisible]);
+
+  // ========== HANDLE CONFIRM ==========
+  const confirmLocation = async () => {
+    if (tempLoc) {
+      setPickerVisible(false);
+      setUserOverride(true);
+      setLoading(true);
+      setWeatherData(null);
+
+      // Optimistically set location name from search or coordinates
+      if (searchQuery.trim().length >= 3) {
+        setLocationName(searchQuery.split(",")[0]);
+      } else {
+        setLocationName(`${tempLoc.lat.toFixed(2)}, ${tempLoc.lon.toFixed(2)}`);
+      }
+      setLocation(tempLoc);
+
+      // Optionally: refine with reverse geocode (does not block UI)
+      try {
+        const addr = await Location.reverseGeocodeAsync({
+          latitude: tempLoc.lat,
+          longitude: tempLoc.lon,
+        });
+        if (addr.length) {
+          const { city, region, country } = addr[0];
+          setLocationName(
+            `${city || region || "Location"}, ${country || ""}`.trim()
+          );
+        }
+      } catch {}
+    } else {
+      setPickerVisible(false);
+    }
+  };
+
+  // If user has overridden, prevent auto-refresh resetting their choice
+  useEffect(() => {
+    if (userOverride) return;
+    fetchCurrentLocation();
+  }, []); // keep original effect logic but gated
+
   if (loading) {
     return (
       <SafeAreaView
@@ -395,15 +491,38 @@ ${payloadJson}
           <Text style={[styles.title, { color: colors.text }]}>
             Weather Forecast and Analysis of Your Location
           </Text>
-          <TouchableOpacity
-            style={[styles.refreshButton, { backgroundColor: colors.primary }]}
-            onPress={() => {
-              setLoading(true);
-              fetchCurrentLocation();
-            }}
-          >
-            <Text style={styles.refreshButtonText}>Refresh Location</Text>
-          </TouchableOpacity>
+          <View style={{ gap: 6 }}>
+            <TouchableOpacity
+              style={[
+                styles.refreshButton,
+                { backgroundColor: colors.primary },
+              ]}
+              onPress={() => {
+                if (userOverride) setUserOverride(false);
+                setLoading(true);
+                fetchCurrentLocation();
+              }}
+            >
+              <Text style={styles.refreshButtonText}>Use Device</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.refreshButton,
+                {
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.primary,
+                },
+              ]}
+              onPress={openPicker}
+            >
+              <Text
+                style={[styles.refreshButtonText, { color: colors.primary }]}
+              >
+                Change Location
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <Text style={[styles.locationText, { color: colors.textSecondary }]}>
           📍 Location: {locationName}
@@ -680,6 +799,138 @@ ${payloadJson}
             })
           )}
         </View>
+
+        {/* Location Picker Modal */}
+        <Modal
+          visible={pickerVisible}
+          animationType="slide"
+          onRequestClose={() => setPickerVisible(false)}
+        >
+          <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+            <View style={styles.pickerHeader}>
+              <Text style={[styles.pickerTitle, { color: colors.text }]}>
+                Select Location
+              </Text>
+              <TouchableOpacity onPress={() => setPickerVisible(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.searchBar}>
+              <Ionicons name="search" size={18} color={colors.textSecondary} />
+              <TextInput
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search place (min 3 chars)"
+                placeholderTextColor={colors.textSecondary}
+                style={[styles.searchInput, { color: colors.text }]}
+                autoCorrect={false}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery("")}>
+                  <Ionicons
+                    name="close-circle"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {searchResults.length > 0 && (
+              <FlatList
+                data={searchResults}
+                keyExtractor={(item) => item.lat + item.lon}
+                style={styles.resultsList}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.resultRow}
+                    onPress={() => {
+                      const lat = parseFloat(item.lat);
+                      const lon = parseFloat(item.lon);
+                      setTempLoc({ lat, lon });
+                      setMapRegion({
+                        latitude: lat,
+                        longitude: lon,
+                        latitudeDelta: 0.4,
+                        longitudeDelta: 0.4,
+                      });
+                      setSearchResults([]);
+                      setSearchQuery(item.display_name);
+                    }}
+                  >
+                    <Ionicons
+                      name="location"
+                      size={16}
+                      color={colors.primary}
+                    />
+                    <Text
+                      numberOfLines={2}
+                      style={[styles.resultText, { color: colors.text }]}
+                    >
+                      {item.display_name}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+
+            <View style={{ flex: 1 }}>
+              {tempLoc && (
+                <MapView
+                  style={{ flex: 1 }}
+                  initialRegion={
+                    regionRef.current || {
+                      latitude: tempLoc.lat,
+                      longitude: tempLoc.lon,
+                      latitudeDelta: 0.5,
+                      longitudeDelta: 0.5,
+                    }
+                  }
+                  onRegionChangeComplete={(r) => {
+                    regionRef.current = r;
+                    setTempLoc({ lat: r.latitude, lon: r.longitude });
+                  }}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: tempLoc.lat,
+                      longitude: tempLoc.lon,
+                    }}
+                    title="Selected"
+                  />
+                </MapView>
+              )}
+            </View>
+
+            <View style={styles.pickerFooter}>
+              <TouchableOpacity
+                style={[
+                  styles.pickerBtn,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.primary,
+                    borderWidth: 1,
+                  },
+                ]}
+                onPress={() => setPickerVisible(false)}
+              >
+                <Text style={[styles.pickerBtnText, { color: colors.primary }]}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.pickerBtn, { backgroundColor: colors.primary }]}
+                onPress={confirmLocation}
+                disabled={!tempLoc}
+              >
+                <Text style={[styles.pickerBtnText, { color: "#fff" }]}>
+                  Use This
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
@@ -827,5 +1078,67 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     color: "#333",
+  },
+  pickerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 6,
+  },
+  pickerTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    backgroundColor: "#eef2f5",
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingVertical: 2,
+  },
+  resultsList: {
+    maxHeight: 160,
+    marginHorizontal: 16,
+    marginBottom: 4,
+  },
+  resultRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    gap: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "#d3d9de",
+  },
+  resultText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  pickerFooter: {
+    flexDirection: "row",
+    padding: 16,
+    gap: 12,
+  },
+  pickerBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pickerBtnText: {
+    fontSize: 14,
+    fontWeight: "600",
   },
 });
