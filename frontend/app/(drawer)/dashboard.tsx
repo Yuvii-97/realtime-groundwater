@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -21,7 +21,6 @@ interface WellData {
   rechargeStatus: string;
   rechargeValue: number;
   rainfallForecast: number;
-  alert: string;
   trendData: {
     labels: string[];
     datasets: {
@@ -69,7 +68,6 @@ const sampleWellData: WellData = {
   rechargeStatus: "Moderate",
   rechargeValue: 45,
   rainfallForecast: 25,
-  alert: "Some Districts showing critically low levels",
   trendData: {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [
@@ -223,6 +221,18 @@ export default function Dashboard() {
   const [wellData, setWellData] = useState<WellData>(sampleWellData);
 
   const roles: string[] = ["Policymaker", "Researcher", "Farmer"];
+
+  // Scrolling to role-specific section
+  const scrollRef = useRef<ScrollView | null>(null);
+  const [roleAnchorY, setRoleAnchorY] = useState(0);
+
+  const handleRoleSelect = (role: string) => {
+    setSelectedRole(role);
+    requestAnimationFrame(() => {
+      const y = Math.max(roleAnchorY - verticalScale(8), 0);
+      scrollRef.current?.scrollTo({ y, animated: true });
+    });
+  };
 
   // DWLR Stations data for Tamil Nadu
   const dwlrStations = [
@@ -435,29 +445,34 @@ export default function Dashboard() {
     switch (selectedRole) {
       case "Policymaker":
         return (
-          <View style={styles.roleSection}>
-            <Text style={styles.roleTitle}>Policy Metrics & Insights</Text>
+          <View
+            style={[
+              styles.roleSection,
+              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+            ]}
+          >
+            <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Policy Metrics & Insights</Text>
             <View style={styles.metricsRow}>
-              <View style={styles.metricBox}>
-                <Text style={styles.metricLabel}>Groundwater Index</Text>
-                <Text style={styles.metricValue}>
+              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Groundwater Index</Text>
+                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>
                   {policyMetrics.currentYear}%
                 </Text>
-                <Text style={styles.metricSub}>
+                <Text style={[styles.metricSub, { color: theme.colors.primary }]}>
                   Target: {policyMetrics.target}%
                 </Text>
               </View>
-              <View style={styles.metricBox}>
-                <Text style={styles.metricLabel}>Last Year</Text>
-                <Text style={styles.metricValue}>
+              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Last Year</Text>
+                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>
                   {policyMetrics.lastYear}%
                 </Text>
               </View>
             </View>
-            <Text style={styles.roleSubTitle}>Recent Improvements</Text>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Recent Improvements</Text>
             <View style={styles.improvementsList}>
               {policyMetrics.improvements.map((item, idx) => (
-                <Text key={idx} style={styles.improvementItem}>
+                <Text key={idx} style={[styles.improvementItem, { color: theme.colors.text }]}>
                   • {item}
                 </Text>
               ))}
@@ -466,20 +481,25 @@ export default function Dashboard() {
         );
       case "Researcher":
         return (
-          <View style={styles.roleSection}>
-            <Text style={styles.roleTitle}>Data Analysis Tools</Text>
+          <View
+            style={[
+              styles.roleSection,
+              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+            ]}
+          >
+            <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Data Analysis Tools</Text>
             <View style={styles.metricsRow}>
-              <TouchableOpacity style={styles.actionBtn}>
-                <Text style={styles.actionBtnText}>Export Data</Text>
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}>
+                <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Export Data</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn}>
-                <Text style={styles.actionBtnText}>Compare Regions</Text>
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}>
+                <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Compare Regions</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn}>
-                <Text style={styles.actionBtnText}>Generate Report</Text>
+              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}>
+                <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Generate Report</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.roleSubTitle}>Historical Trends</Text>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Historical Trends</Text>
             <LineChart
               data={wellData.trendData}
               width={Dimensions.get("window").width - scale(48)}
@@ -492,32 +512,37 @@ export default function Dashboard() {
         );
       case "Farmer":
         return (
-          <View style={styles.roleSection}>
-            <Text style={styles.roleTitle}>Farm Guidance</Text>
+          <View
+            style={[
+              styles.roleSection,
+              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+            ]}
+          >
+            <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Farm Guidance</Text>
             <View style={styles.metricsRow}>
-              <View style={styles.metricBox}>
-                <Text style={styles.metricLabel}>Water Availability</Text>
-                <Text style={styles.metricValue}>
+              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Water Availability</Text>
+                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>
                   {farmerGuidance.waterAvailability}
                 </Text>
               </View>
-              <View style={styles.metricBox}>
-                <Text style={styles.metricLabel}>Advice</Text>
-                <Text style={styles.metricValue}>{farmerGuidance.advice}</Text>
+              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Advice</Text>
+                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>{farmerGuidance.advice}</Text>
               </View>
             </View>
-            <Text style={styles.roleSubTitle}>Recommended Crops</Text>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Recommended Crops</Text>
             <View style={styles.improvementsList}>
               {farmerGuidance.recommendedCrops.map((crop, idx) => (
-                <Text key={idx} style={styles.improvementItem}>
+                <Text key={idx} style={[styles.improvementItem, { color: theme.colors.text }]}>
                   • {crop}
                 </Text>
               ))}
             </View>
-            <Text style={styles.roleSubTitle}>Weather Alerts</Text>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Weather Alerts</Text>
             <View style={styles.improvementsList}>
               {farmerGuidance.weatherAlerts.map((alert, idx) => (
-                <Text key={idx} style={styles.improvementItem}>
+                <Text key={idx} style={[styles.improvementItem, { color: theme.colors.text }]}>
                   ⚠️ {alert}
                 </Text>
               ))}
@@ -530,10 +555,17 @@ export default function Dashboard() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.surface }]}>
       {/* Role Switcher */}
       <View
-        style={[styles.roleSwitcher, { backgroundColor: theme.colors.surface }]}
+        style={[
+          styles.roleSwitcher,
+          {
+            backgroundColor: theme.colors.surface,
+            marginHorizontal: 0,
+            marginTop: 0,
+          },
+        ]}
       >
         {roles.map((role) => (
           <TouchableOpacity
@@ -545,7 +577,7 @@ export default function Dashboard() {
                 backgroundColor: theme.colors.primary,
               },
             ]}
-            onPress={() => setSelectedRole(role)}
+            onPress={() => handleRoleSelect(role)}
           >
             <Text
               style={[
@@ -561,6 +593,7 @@ export default function Dashboard() {
       </View>
 
       <ScrollView
+        ref={scrollRef}
         style={[
           styles.scrollArea,
           { backgroundColor: theme.colors.background },
@@ -644,31 +677,6 @@ export default function Dashboard() {
               Next 48 hours
             </Text>
           </View>
-        </View>
-
-        {/* Alert */}
-        <View
-          style={[
-            styles.alertSection,
-            {
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
-            },
-          ]}
-        >
-          <Text style={styles.alertIcon}>🚨</Text>
-          <Text style={[styles.alertText, { color: theme.colors.text }]}>
-            {wellData.alert}
-          </Text>
-          <TouchableOpacity
-            style={[styles.alertBtn, { backgroundColor: theme.colors.primary }]}
-          >
-            <Text
-              style={[styles.alertBtnText, { color: theme.colors.surface }]}
-            >
-              View Details
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Region Status Overview */}
@@ -932,7 +940,10 @@ export default function Dashboard() {
           </View>
         </View>
 
-        {/* Role-specific content */}
+  {/* Anchor for role-specific content */}
+  <View onLayout={({ nativeEvent }) => setRoleAnchorY(nativeEvent.layout.y)} />
+
+  {/* Role-specific content */}
         {renderRoleSpecificContent()}
 
         {/* Footer */}
@@ -947,7 +958,7 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f0f4f8" }, // Softer background
+  container: { flex: 1, backgroundColor: "transparent" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -998,10 +1009,10 @@ const styles = StyleSheet.create({
   },
   roleSwitcher: {
     flexDirection: "row",
-    backgroundColor: "#e3f2fd",
+    backgroundColor: "transparent",
     padding: scale(6),
-    marginHorizontal: scale(20),
-    marginTop: verticalScale(15),
+    marginHorizontal: 0,
+    marginTop: 0,
     borderRadius: scale(10),
     gap: scale(6),
     shadowColor: "#000",
@@ -1012,7 +1023,7 @@ const styles = StyleSheet.create({
   },
   roleBtn: {
     flex: 1,
-    paddingVertical: verticalScale(10),
+    paddingVertical: verticalScale(12),
     alignItems: "center",
     borderRadius: scale(8),
     backgroundColor: "transparent",
@@ -1038,6 +1049,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: scale(20),
     paddingTop: verticalScale(15),
+    backgroundColor: "transparent",
   },
   topStatsRow: {
     flexDirection: "row",
@@ -1084,31 +1096,6 @@ const styles = StyleSheet.create({
   },
   positiveTrend: { color: "#28a745" }, // Green for positive
   negativeTrend: { color: "#dc3545" }, // Red for negative
-  alertSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#ffe0b2", // Light orange for alert
-    borderRadius: scale(10),
-    padding: scale(14),
-    marginBottom: verticalScale(15),
-    gap: scale(10),
-    borderWidth: scale(1),
-    borderColor: "#ffb74d",
-  },
-  alertIcon: { fontSize: scale(20), color: "#fb8c00" }, // Orange alert icon
-  alertText: {
-    flex: 1,
-    fontSize: scale(14),
-    color: "#333333",
-    fontWeight: "600",
-  },
-  alertBtn: {
-    backgroundColor: "#1976d2",
-    borderRadius: scale(6),
-    paddingHorizontal: scale(12),
-    paddingVertical: verticalScale(6),
-  },
-  alertBtnText: { color: "#ffffff", fontWeight: "600", fontSize: scale(12) },
   regionOverviewRow: {
     flexDirection: "row",
     gap: scale(12),
@@ -1270,12 +1257,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   roleSection: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "transparent",
     borderRadius: scale(12),
     padding: scale(15),
     marginBottom: verticalScale(15),
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#e0e0e0",
+    borderColor: "transparent",
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: scale(6),
@@ -1296,12 +1283,12 @@ const styles = StyleSheet.create({
   metricBox: {
     flex: 1,
     minWidth: scale(120), // Ensure boxes don't get too small
-    backgroundColor: "#e3f2fd",
+    backgroundColor: "transparent",
     borderRadius: scale(10),
     padding: scale(12),
     alignItems: "center",
     borderWidth: scale(1),
-    borderColor: "#bbdefb",
+    borderColor: "transparent",
   },
   metricLabel: {
     fontSize: scale(12),
@@ -1357,11 +1344,11 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: "center",
     padding: scale(15),
-    backgroundColor: "#e3f2fd",
+    backgroundColor: "transparent",
     borderRadius: scale(12),
     marginTop: verticalScale(15),
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#bbdefb",
+    borderColor: "transparent",
   },
   footerText: {
     color: "#1976d2",
