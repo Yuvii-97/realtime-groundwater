@@ -229,7 +229,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Enhanced real-time notification system with category-specific timing
   useEffect(() => {
-    // Water Level notifications - every 80 seconds
+    // Water Level notifications - every 100 seconds (1m40s)
     const waterLevelInterval = setInterval(() => {
       const notification = generateWaterLevelNotification();
       addNotification({
@@ -239,9 +239,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         location: 'Maharashtra Region',
         source: 'Live DWLR Network'
       });
-    }, 80 * 1000); // 80 seconds
+    }, 100 * 1000); // 100 seconds
 
-    // Tips notifications - every 75 seconds
+    // Tips notifications - every 120 seconds (2 minutes)
     const tipsInterval = setInterval(() => {
       const notification = generateTipNotification();
       addNotification({
@@ -251,7 +251,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         location: 'General',
         source: 'Conservation Guide'
       });
-    }, 75 * 1000); // 75 seconds
+    }, 120 * 1000); // 120 seconds
 
     return () => {
       clearInterval(waterLevelInterval);
