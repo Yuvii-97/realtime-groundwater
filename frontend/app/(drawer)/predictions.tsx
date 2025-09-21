@@ -585,6 +585,43 @@ IMPORTANT FOR SMOOTH CONTINUATION:
         throw new Error("Invalid JSON response from AI");
       }
 
+      // Console log the AI prediction data
+      console.log("🤖 AI Raw Response:", aiResponse);
+      console.log(
+        "📊 AI Predictions Count:",
+        aiResponse.predictions?.length || 0
+      );
+      console.log("🔍 AI Predictions Data:", aiResponse.predictions);
+      console.log("💡 AI Insights:", aiResponse.insights);
+
+      // Extract values and labels as lists
+      if (aiResponse.predictions && Array.isArray(aiResponse.predictions)) {
+        const predictionValues = aiResponse.predictions.map(
+          (pred: any) => pred.predictedLevel
+        );
+        const predictionLabels = aiResponse.predictions.map(
+          (pred: any) => pred.date
+        );
+        const rechargeRates = aiResponse.predictions.map(
+          (pred: any) => pred.rechargeRate
+        );
+        const consumptionRates = aiResponse.predictions.map(
+          (pred: any) => pred.consumptionRate
+        );
+
+        console.log("📈 Prediction Values List:", predictionValues);
+        console.log("🏷️ Prediction Labels List:", predictionLabels);
+        console.log("💧 Recharge Rates List:", rechargeRates);
+        console.log("🚰 Consumption Rates List:", consumptionRates);
+
+        // Update global variables
+        values = predictionValues;
+        labels = predictionLabels;
+
+        console.log("🌍 Global values updated:", values);
+        console.log("🌍 Global labels updated:", labels);
+      }
+
       // Combine historical data with AI predictions
       const combinedData = [
         ...processedHistoricalData,
@@ -975,6 +1012,10 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                 (item) => item.predictedLevel
               );
 
+              console.log("📊 Chart Prediction Labels:", predictionLabels);
+              console.log("📈 Chart Prediction Values:", predictionValues);
+              console.log("📅 Future Data Count:", futureData.length);
+
               setPredictedChartData({
                 labels: predictionLabels,
                 datasets: [
@@ -988,6 +1029,14 @@ IMPORTANT FOR SMOOTH CONTINUATION:
               });
 
               console.log("✅ AI prediction chart data prepared");
+              console.log("📋 Final Chart Data Structure:", {
+                labelsCount: predictionLabels.length,
+                valuesCount: predictionValues.length,
+                dataRange: {
+                  min: Math.min(...predictionValues),
+                  max: Math.max(...predictionValues),
+                },
+              });
             }
           } catch (aiError) {
             console.error("❌ AI prediction failed:", aiError);
@@ -1072,6 +1121,19 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                 (item) => item.predictedLevel
               );
 
+              console.log(
+                "🔄 Regenerated Chart Prediction Labels:",
+                predictionLabels
+              );
+              console.log(
+                "🔄 Regenerated Chart Prediction Values:",
+                predictionValues
+              );
+              console.log(
+                "🔄 Regenerated Future Data Count:",
+                futureData.length
+              );
+
               setPredictedChartData({
                 labels: predictionLabels,
                 datasets: [
@@ -1082,6 +1144,16 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                   },
                 ],
                 legend: ["Predicted Groundwater Depth (m)"],
+              });
+
+              console.log("✅ Regenerated AI prediction chart data prepared");
+              console.log("📋 Regenerated Final Chart Data Structure:", {
+                labelsCount: predictionLabels.length,
+                valuesCount: predictionValues.length,
+                dataRange: {
+                  min: Math.min(...predictionValues),
+                  max: Math.max(...predictionValues),
+                },
               });
             }
           } catch (aiError) {
@@ -1527,7 +1599,7 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                     data={predictedChartData}
                     width={Math.max(
                       Dimensions.get("window").width - 32,
-                      predictedChartData.labels.length * 60
+                      predictedChartData.labels.length * 25
                     )}
                     height={260}
                     chartConfig={{
@@ -1553,7 +1625,7 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                         fontSize: 11,
                       },
                     }}
-                    bezier={true}
+                    bezier={false}
                     yAxisSuffix=" m"
                     fromZero={false}
                     style={styles.chart}
@@ -1805,38 +1877,6 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           </View>
         </View>
       )}
-
-      {/* Alert Card */}
-      {locationPermission && nearestStation && kpis && (
-        <View
-          style={[
-            styles.alertCard,
-            isCritical ? styles.alertCardCritical : styles.alertCardNormal,
-          ]}
-        >
-          <Ionicons
-            name={isCritical ? "alert-circle" : "shield-checkmark"}
-            size={20}
-            color={isCritical ? "#ef4444" : "#16a34a"}
-          />
-          <Text
-            style={[
-              styles.alertText,
-              { color: isCritical ? "#991b1b" : "#065f46" },
-            ]}
-          >
-            {isCritical
-              ? t("predictions.alertCritical", {
-                  current: kpis.current.toFixed(2),
-                  threshold: thresholdCritical,
-                })
-              : t("predictions.alertNormal", {
-                  current: kpis.current.toFixed(2),
-                })}
-          </Text>
-        </View>
-      )}
-
       {/* Insights Card */}
       {locationPermission && nearestStation && insights.length > 0 && (
         <View
