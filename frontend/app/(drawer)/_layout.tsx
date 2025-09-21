@@ -91,10 +91,7 @@ export default function Layout() {
             edges={["top"]}
             style={{ backgroundColor: theme.colors.surface }}
           >
-            <AppHeader
-              onLanguageSwitch={() => console.log("Switch Language")}
-              onNotificationsPress={() => console.log("Notifications")}
-            />
+            <AppHeader onLanguageSwitch={() => console.log("Switch Language")} />
           </SafeAreaView>
         ),
       }}

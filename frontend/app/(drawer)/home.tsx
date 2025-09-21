@@ -21,14 +21,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNotifications } from "../../contexts/NotificationContext";
 
 const { width } = Dimensions.get("window");
-
 // Hero Carousel Component
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(1); // Start at 1 instead of 0
   const scrollX = useRef(new Animated.Value(0)).current;
   const slideRef = useRef<ScrollView>(null);
-  const buttonScale = useRef(new Animated.Value(1)).current;
-  const buttonOpacity = useRef(new Animated.Value(1)).current;
+  const animX = useRef(new Animated.Value(width)).current; // drives smooth auto-scroll
+  // Removed Get Started button state/animations
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -36,22 +35,22 @@ const HeroCarousel = () => {
   const heroSlides = [
     {
       id: 1,
-      image: require("@/assets/images/dwlr.jpeg"),
+      image: require("@/assets/images/dwlr gw.jpg"),
       gradient: ["#06b6d4", "#075a7dff"],
     },
     {
       id: 2,
-      image: require("@/assets/images/file_2025-09-10_15.53.45[1].png"),
+      image: require("@/assets/images/reuse.jpg"),
       gradient: ["#075a7dff", "#0891b2"],
     },
     {
       id: 3,
-      image: require("@/assets/images/india.jpeg"),
+      image: require("@/assets/images/tech.jpg"),
       gradient: ["#0369a1", "#075985"],
     },
     {
       id: 4,
-      image: require("@/assets/images/farmer.webp"), // Replace with your actual image name
+      image: require("@/assets/images/waterpump.jpg"),
       gradient: ["#075985", "#0c4a6e"],
     },
     {
@@ -65,6 +64,8 @@ const HeroCarousel = () => {
       gradient: ["#164e63", "#155e75"],
     },
   ];
+
+  // Slide 2 shows full image using 'contain' with a soft background
 
   // Create infinite slides by adding duplicate slides
   const infiniteSlides = [
@@ -87,25 +88,37 @@ const HeroCarousel = () => {
     }
   }, []);
 
+  // Link animX to the ScrollView position (manual driver for smooth auto-advance)
+  useEffect(() => {
+    const id = animX.addListener(({ value }) => {
+      slideRef.current?.scrollTo({ x: value, y: 0, animated: false });
+    });
+    return () => animX.removeListener(id);
+  }, [animX]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         const nextIndex = prevIndex + 1;
-
-        if (slideRef.current) {
-          slideRef.current.scrollTo({
-            x: nextIndex * width,
-            y: 0,
-            animated: true,
-          });
-        }
-
+        Animated.timing(animX, {
+          toValue: nextIndex * width,
+          duration: 800,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: false,
+        }).start(() => {
+          if (nextIndex === heroSlides.length + 1) {
+            // Jump to real first slide seamlessly
+            slideRef.current?.scrollTo({ x: 1 * width, y: 0, animated: false });
+            animX.setValue(1 * width);
+            setCurrentIndex(1);
+          }
+        });
         return nextIndex;
       });
-    }, 5000);
+    }, 7000);
 
     return () => clearInterval(timer);
-  }, [width]);
+  }, [width, animX, heroSlides.length]);
 
   const handleMomentumScrollEnd = (event: any) => {
     const offsetX = event.nativeEvent.contentOffset.x;
@@ -122,6 +135,7 @@ const HeroCarousel = () => {
             y: 0,
             animated: false,
           });
+          animX.setValue(heroSlides.length * width);
         }, 50);
       }
     } else if (currentSlide === heroSlides.length + 1) {
@@ -134,49 +148,16 @@ const HeroCarousel = () => {
             y: 0,
             animated: false,
           });
+          animX.setValue(1 * width);
         }, 50);
       }
     } else {
       setCurrentIndex(currentSlide);
+      animX.setValue(currentSlide * width);
     }
   };
 
-  // Animation functions for button press
-  const animateButtonPress = () => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(buttonScale, {
-          toValue: 0.95,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(buttonOpacity, {
-          toValue: 0.8,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.parallel([
-        Animated.timing(buttonScale, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(buttonOpacity, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
-  };
-
-  const handleButtonPress = () => {
-    animateButtonPress();
-    setTimeout(() => {
-      router.push("/(drawer)/dashboard");
-    }, 200);
-  };
+  // Removed Get Started button handlers
 
   return (
     <View style={styles.heroContainer}>
@@ -194,31 +175,16 @@ const HeroCarousel = () => {
       >
         {infiniteSlides.map((slide, index) => (
           <View key={slide.key} style={[styles.heroSlide, { width }]}>
-            <Image source={slide.image} style={styles.heroBackgroundImage} />
+            {slide.id === 2 ? (
+              <Image
+                source={slide.image}
+                style={[styles.heroBackgroundImage, styles.heroImageContainBg]}
+                resizeMode="contain"
+              />
+            ) : (
+              <Image source={slide.image} style={styles.heroBackgroundImage} />
+            )}
             <View style={styles.heroButtonOverlay}>
-              <TouchableOpacity onPress={handleButtonPress} activeOpacity={1}>
-                <Animated.View
-                  style={[
-                    styles.getStartedButton,
-                    {
-                      transform: [{ scale: buttonScale }],
-                      opacity: buttonOpacity,
-                    },
-                  ]}
-                >
-                  <Text style={styles.getStartedText}>
-                    {t("home.getStarted")}
-                  </Text>
-                  <Ionicons
-                    name="arrow-forward"
-                    size={scale(14)}
-                    color="#075a7dff"
-                    style={styles.buttonIcon}
-                  />
-                </Animated.View>
-              </TouchableOpacity>
-
-              {/* Dot indicators */}
               <View style={styles.dotContainer}>
                 {heroSlides.map((_, index) => (
                   <View
@@ -228,12 +194,10 @@ const HeroCarousel = () => {
                       {
                         backgroundColor:
                           currentIndex === index + 1 ||
-                          (currentIndex === 0 &&
-                            index === heroSlides.length - 1) ||
-                          (currentIndex === heroSlides.length + 1 &&
-                            index === 0)
-                            ? "#FFFFFF" // Solid white for active dot
-                            : "#888888", // Solid grey for inactive dots
+                          (currentIndex === 0 && index === heroSlides.length - 1) ||
+                          (currentIndex === heroSlides.length + 1 && index === 0)
+                            ? "#FFFFFF"
+                            : "#888888",
                       },
                     ]}
                   />
@@ -2133,45 +2097,26 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderRadius: 0, // Explicitly set to 0
   },
+  heroImageContainBg: {
+    backgroundColor: "#e6f7fb",
+  },
   indiaMapImage: {
     resizeMode: "contain",
     backgroundColor: "#e0f2fe", // Light blue that matches the app's theme
   },
   heroButtonOverlay: {
     position: "absolute",
-    bottom: verticalScale(20), // Moved down from 32 to 20
+    bottom: verticalScale(8),
     left: 0,
     right: 0,
     justifyContent: "center",
     alignItems: "center",
   },
-  getStartedButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.6)", // Slightly more transparent from 0.7 to 0.6
-    paddingVertical: verticalScale(8), // Reduced from 10 to 8
-    paddingHorizontal: scale(20), // Reduced from 24 to 20
-    borderRadius: scale(22), // Slightly reduced from 25 to 22
-    elevation: 3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15, // Reduced shadow opacity from 0.2 to 0.15
-    shadowRadius: 4,
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1.5,
-    borderColor: "rgba(7, 90, 125, 0.7)", // Slightly more transparent border
-  },
-  getStartedText: {
-    color: "#075a7dff",
-    fontSize: scale(14),
-    fontWeight: "bold",
-  },
-  buttonIcon: {
-    marginLeft: scale(8),
-  },
   dotContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: verticalScale(12),
+    marginTop: verticalScale(6),
   },
   dot: {
     width: scale(8),
@@ -2326,29 +2271,31 @@ const styles = StyleSheet.create({
   // Footer
   footer: {
     backgroundColor: "#075a7dff",
-    padding: verticalScale(30),
+    paddingVertical: verticalScale(14),
+    paddingHorizontal: scale(16),
     alignItems: "center",
-    marginTop: verticalScale(20),
+    marginTop: verticalScale(12),
   },
   footerLinks: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
-    marginBottom: verticalScale(20),
+    marginBottom: verticalScale(8),
   },
   footerLink: {
-    padding: verticalScale(10),
+    paddingVertical: verticalScale(6),
+    paddingHorizontal: scale(8),
   },
   footerLinkText: {
     color: "#FFFFFF",
-    fontSize: scale(14),
+    fontSize: scale(13),
     fontWeight: "500",
   },
   footerCredit: {
     color: "#A8E6E6",
-    fontSize: scale(12),
+    fontSize: scale(11),
     textAlign: "center",
-    lineHeight: verticalScale(16),
+    lineHeight: verticalScale(14),
   },
 
   // Feature Card Styles
