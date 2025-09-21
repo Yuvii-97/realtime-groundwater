@@ -181,21 +181,7 @@ const NotificationItem = ({
     }
   };
 
-  const formatTime = (timestamp: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - timestamp.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffMins < 60) {
-      return `${diffMins}m ago`;
-    } else if (diffHours < 24) {
-      return `${diffHours}h ago`;
-    } else {
-      return `${diffDays}d ago`;
-    }
-  };
+  // Compact list: no inline time/message; shown in detail on press
 
   const getNotificationIcon = (category: NotificationCategory, type: string) => {
     switch (category) {
@@ -225,15 +211,17 @@ const NotificationItem = ({
           ? "#FFFFFF"
           : getTypeBackground(notification.type),
         marginHorizontal: scale(20),
-        marginBottom: scale(12),
-        borderRadius: scale(12),
-        padding: scale(16),
+        marginBottom: scale(10),
+        borderRadius: scale(10),
+        paddingVertical: scale(10),
+        paddingHorizontal: scale(14),
         borderLeftWidth: scale(4),
         borderLeftColor: getTypeColor(notification.type),
-        elevation: 2,
+        elevation: 1,
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
+        shadowOpacity: 0.08,
+        shadowRadius: 1.5,
+        minHeight: scale(44),
       }}
     >
       <View
@@ -244,13 +232,7 @@ const NotificationItem = ({
         }}
       >
         <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: scale(4),
-            }}
-          >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Ionicons 
               name={getNotificationIcon(notification.category, notification.type).name as any}
               size={scale(16)} 
@@ -264,6 +246,8 @@ const NotificationItem = ({
                 color: "#333333",
                 flex: 1,
               }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
             >
               {notification.title}
             </Text>
@@ -279,88 +263,6 @@ const NotificationItem = ({
               />
             )}
           </View>
-
-          <Text
-            style={{
-              fontSize: scale(13),
-              color: "#666666",
-              lineHeight: scale(18),
-              marginBottom: scale(8),
-            }}
-          >
-            {notification.message}
-          </Text>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {notification.location && (
-                <View style={{ flexDirection: "row", alignItems: "center", marginRight: scale(12) }}>
-                  <Ionicons 
-                    name="location" 
-                    size={scale(11)} 
-                    color="#999999" 
-                    style={{ marginRight: scale(2) }}
-                  />
-                  <Text
-                    style={{
-                      fontSize: scale(11),
-                      color: "#999999",
-                    }}
-                  >
-                    {notification.location}
-                  </Text>
-                </View>
-              )}
-              <Text
-                style={{
-                  fontSize: scale(11),
-                  color: "#999999",
-                }}
-              >
-                {formatTime(notification.timestamp)}
-              </Text>
-            </View>
-
-            {notification.actionable && (
-              <View
-                style={{
-                  backgroundColor: getTypeColor(notification.type),
-                  paddingHorizontal: scale(8),
-                  paddingVertical: scale(4),
-                  borderRadius: scale(12),
-                }}
-              >
-                <Text
-                  style={{
-                    color: "#FFFFFF",
-                    fontSize: scale(10),
-                    fontWeight: "600",
-                  }}
-                >
-                  ACTION
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {notification.source && (
-            <Text
-              style={{
-                fontSize: scale(10),
-                color: "#AAAAAA",
-                marginTop: scale(4),
-                fontStyle: "italic",
-              }}
-            >
-              Source: {notification.source}
-            </Text>
-          )}
         </View>
 
         <TouchableOpacity
@@ -416,24 +318,17 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
     if (!notification.read) {
       markAsRead(notification.id);
     }
+    const details = [
+      notification.message,
+      notification.location ? `Location: ${notification.location}` : undefined,
+      notification.source ? `Source: ${notification.source}` : undefined,
+    ]
+      .filter(Boolean)
+      .join("\n");
 
-    if (notification.actionable) {
-      Alert.alert(
-        notification.title,
-        `${notification.message}\n\nWhat would you like to do?`,
-        [
-          {
-            text: "View Details",
-            onPress: () => console.log("View details for:", notification.id),
-          },
-          {
-            text: "Take Action",
-            onPress: () => console.log("Take action for:", notification.id),
-          },
-          { text: "Dismiss", style: "cancel" },
-        ]
-      );
-    }
+    const buttons = [{ text: "Close", style: 'cancel' as const }];
+
+    Alert.alert(notification.title, details || "", buttons);
   };
 
   const handleRefresh = () => {
@@ -544,63 +439,37 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
           </View>
 
           {/* Action Buttons */}
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <TouchableOpacity
               onPress={markAllAsRead}
               style={{
                 backgroundColor: "#007AFF",
-                paddingHorizontal: scale(16),
+                paddingHorizontal: scale(12),
                 paddingVertical: scale(8),
                 borderRadius: scale(20),
-                flexDirection: "row",
                 alignItems: "center",
+                justifyContent: "center",
+                minWidth: scale(36),
               }}
+              accessibilityLabel={t("notifications.markAllAsRead")}
             >
-              <Ionicons 
-                name="checkmark-done" 
-                size={scale(13)} 
-                color="#FFFFFF" 
-                style={{ marginRight: scale(4) }}
-              />
-              <Text
-                style={{
-                  color: "#FFFFFF",
-                  fontSize: scale(13),
-                  fontWeight: "600",
-                }}
-              >
-                {t("notifications.markAllAsRead")}
-              </Text>
+              <Ionicons name="checkmark-done" size={scale(16)} color="#FFFFFF" />
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleClearAll}
               style={{
                 backgroundColor: "#FF3B30",
-                paddingHorizontal: scale(16),
+                paddingHorizontal: scale(12),
                 paddingVertical: scale(8),
                 borderRadius: scale(20),
-                flexDirection: "row",
                 alignItems: "center",
+                justifyContent: "center",
+                minWidth: scale(36),
               }}
+              accessibilityLabel={t("notifications.clearAll")}
             >
-              <Ionicons 
-                name="trash" 
-                size={scale(13)} 
-                color="#FFFFFF" 
-                style={{ marginRight: scale(4) }}
-              />
-              <Text
-                style={{
-                  color: "#FFFFFF",
-                  fontSize: scale(13),
-                  fontWeight: "600",
-                }}
-              >
-                {t("notifications.clearAll")}
-              </Text>
+              <Ionicons name="trash" size={scale(16)} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         </View>
