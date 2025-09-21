@@ -133,7 +133,7 @@ export default function Layout() {
       <Drawer.Screen
         name="predictions"
         options={{
-          title: t("Predictions"),
+          title: t("drawer.predictions"),
           drawerIcon: ({ color, size, focused }) => (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <MaterialCommunityIcons

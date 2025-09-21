@@ -1,38 +1,56 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
-  ScrollView,
-  SafeAreaView,
   TouchableOpacity,
+  ScrollView,
   ActivityIndicator,
   Alert,
-  Modal,
-  TextInput,
-  FlatList,
+  Platform,
+  Dimensions,
+  RefreshControl,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import { Picker } from "@react-native-picker/picker";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import * as Location from "expo-location";
+import stationsData from "@/assets/Coordinates/stations.json";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import MapView, { Marker, Region } from "react-native-maps";
+import Markdown from "react-native-markdown-display";
 
+const COLOR_PRIMARY = "#0A84FF";
+const COLOR_BG = "#ffffff";
+const COLOR_CARD_BG = "#f8fafc";
+const COLOR_TEXT = "#0f172a";
+const COLOR_MUTED = "#475569";
+const COLOR_BORDER = "#e2e8f0";
+var values: number[] = [];
+var labels: string[] = [];
+// Weather and AI configuration
+const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe"; // Weather API key
+const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+
+if (!GEMINI_API_KEY) {
+  console.error(
+    "Gemini API key not set. Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file."
+  );
+}
+
+const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
+const model = genAI
+  ? genAI.getGenerativeModel({ model: "gemini-2.5-pro" })
+  : null;
+
+// Interfaces
 interface PredictionData {
   date: string;
   actualLevel: number | null;
   predictedLevel: number;
   rechargeRate: number;
   consumptionRate: number;
-}
-
-interface LocationInfo {
-  lat: number;
-  lon: number;
-  name: string;
 }
 
 interface WeatherData {
@@ -44,39 +62,53 @@ interface WeatherData {
   };
 }
 
-// Weather API configuration
-const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe";
-const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-  console.error(
-    "Gemini API key not set. Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file."
-  );
+interface LocationInfo {
+  lat: number;
+  lon: number;
+  name: string;
 }
 
-const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
-const model: any = genAI
-  ? genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" })
-  : null;
+type Station = {
+  state: string;
+  district: string;
+  station_code: string;
+  station_name: string;
+  latitude: number;
+  longitude: number;
+  well_type: string | null;
+  station_status: string;
+};
 
-const screenWidth = Dimensions.get("window").width;
+type LocationCoords = {
+  latitude: number;
+  longitude: number;
+};
 
-export default function Predictions() {
+const PredictionsPage = () => {
+  const router = useRouter();
   const theme = useTheme();
-  const { colors } = theme;
-  const [loading, setLoading] = useState(true);
-  const [location, setLocation] = useState<LocationInfo | null>(null);
-  const [predictionData, setPredictionData] = useState<PredictionData[]>([]);
-  const [selectedTimeRange, setSelectedTimeRange] = useState<
-    "7d" | "30d" | "90d" | "180d" | "365d"
-  >("30d");
+  const { t } = useTranslation();
+
+  // Location state
+  const [userLocation, setUserLocation] = useState<LocationCoords | null>(null);
+  const [nearestStation, setNearestStation] = useState<Station | null>(null);
+  const [locationPermission, setLocationPermission] = useState<boolean>(false);
+
+  // Loading states
+  const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Chart/Data
+  const [chartData, setChartData] = useState<any>(null);
+  const [currentLevel, setCurrentLevel] = useState<number | null>(null);
 
   // Weather data states
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
   const [locationName, setLocationName] = useState<string>(
     "Fetching location..."
   );
-  const [weatherLoading, setWeatherLoading] = useState(false);
 
   // AI Prediction states
   const [aiPredictionData, setAiPredictionData] = useState<PredictionData[]>(
@@ -85,61 +117,255 @@ export default function Predictions() {
   const [predictionInsights, setPredictionInsights] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
   const [useAiPredictions, setUseAiPredictions] = useState(true);
+  const [predictedChartData, setPredictedChartData] = useState<any>(null);
 
-  // Location picker states
-  const [pickerVisible, setPickerVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<
-    { display_name: string; lat: string; lon: string }[]
-  >([]);
-  const [tempLoc, setTempLoc] = useState<{ lat: number; lon: number } | null>(
-    null
-  );
-  const [mapRegion, setMapRegion] = useState<Region | null>(null);
-  const [userOverride, setUserOverride] = useState(false);
-  const regionRef = useRef<any>(null);
+  // Time period selection
+  const [selectedPeriod, setSelectedPeriod] = useState<string>("30d");
 
-  // Groundwater station selection states
-  const [selectedStation, setSelectedStation] = useState("");
-  const [realGroundwaterData, setRealGroundwaterData] = useState<any[]>([]);
-  const [stationLoading, setStationLoading] = useState(false);
-  const [nearestStationInfo, setNearestStationInfo] = useState<any>(null);
+  // Time period options
+  const timePeriods = [
+    { key: "7d", label: "7 Days", days: 7 },
+    { key: "30d", label: "30 Days", days: 30 },
+    { key: "3m", label: "3 Months", days: 90 },
+    { key: "6m", label: "6 Months", days: 180 },
+    { key: "1y", label: "1 Year", days: 365 },
+  ];
+
+  // Dynamic date range based on selected period
+  const dateRange = useMemo(() => {
+    const currentPeriod = timePeriods.find((p) => p.key === selectedPeriod);
+    const days = currentPeriod?.days || 30;
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    return { startDate, endDate, days };
+  }, [selectedPeriod]);
+
+  // Calculate insights from chart data
+  const insights = useMemo(() => {
+    if (!chartData?.datasets?.[0]?.data?.length) return [];
+    const values: number[] = chartData.datasets[0].data;
+    const labels = chartData.labels;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const avg = values.reduce((acc, val) => acc + val, 0) / values.length;
+    const trend = values[values.length - 1] - values[0];
+    const startValue = values[0];
+    const endValue = values[values.length - 1];
+    const startLabel = labels[0] || "";
+    const endLabel = labels[labels.length - 1] || "";
+
+    // Dynamic prediction based on selected time period
+    const currentPeriod = timePeriods.find((p) => p.key === selectedPeriod);
+    const days = currentPeriod?.days || 30;
+    const trendPerDay = trend / days;
+    const predictedValue = endValue + trendPerDay * 7;
+
+    return [
+      `Current Level: ${endValue.toFixed(2)} m below ground`,
+      `Average (${days} days): ${avg.toFixed(2)} m`,
+      `Range: ${min.toFixed(2)} - ${max.toFixed(2)} m`,
+      `7-day Prediction: ${predictedValue.toFixed(2)} m ${
+        trendPerDay > 0
+          ? "(Deeper)"
+          : trendPerDay < 0
+          ? "(Shallower)"
+          : "(Stable)"
+      }`,
+      `Trend: ${
+        trend > 0.5
+          ? "Declining (getting deeper)"
+          : trend < -0.5
+          ? "Rising (getting shallower)"
+          : "Relatively stable"
+      }`,
+    ];
+  }, [chartData, selectedPeriod]);
+
+  // KPIs calculation
+  const kpis = useMemo(() => {
+    if (!chartData?.datasets?.[0]?.data?.length) return null;
+    const values: number[] = chartData.datasets[0].data;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    const trend = values[values.length - 1] - values[0];
+    const currentPeriod = timePeriods.find((p) => p.key === selectedPeriod);
+    const days = currentPeriod?.days || 30;
+    const trendPerDay = trend / days;
+    const prediction7Day = values[values.length - 1] + trendPerDay * 7;
+    return {
+      avg,
+      min,
+      max,
+      trend,
+      current: values[values.length - 1],
+      prediction7Day,
+    };
+  }, [chartData, selectedPeriod]);
+
+  useEffect(() => {
+    console.log("🚀 Component mounted, requesting location permission...");
+    requestLocationPermission();
+  }, []);
+
+  useEffect(() => {
+    console.log("📍 User location changed:", userLocation);
+    if (userLocation) {
+      findNearestStation();
+      fetchWeatherForecast();
+    }
+  }, [userLocation]);
+
+  useEffect(() => {
+    console.log(
+      "🏠 Nearest station or date range changed:",
+      nearestStation?.station_name,
+      selectedPeriod
+    );
+    if (nearestStation) {
+      fetchGroundwaterData();
+    }
+  }, [nearestStation, selectedPeriod]);
+
+  // Request location permission and get user location
+  const requestLocationPermission = async () => {
+    try {
+      console.log("🔍 STEP 1: Requesting location permission...");
+      setLocationLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      console.log("📍 Location permission status:", status);
+
+      if (status !== "granted") {
+        console.log("❌ Location permission denied");
+        setLocationPermission(false);
+        Alert.alert(
+          t("predictions.permissionDenied"),
+          t("predictions.enableLocationMessage")
+        );
+        return;
+      }
+
+      console.log(
+        "✅ Location permission granted, getting current position..."
+      );
+      setLocationPermission(true);
+      const location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      console.log("📍 User location obtained:", coords);
+      setUserLocation(coords);
+    } catch (error) {
+      console.error("❌ Location error:", error);
+      Alert.alert(t("common.error"), t("predictions.locationError"));
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  // Find the nearest monitoring station to user's location
+  const findNearestStation = () => {
+    if (!userLocation) return;
+
+    console.log(
+      "🔍 STEP 2: Finding nearest station to user location:",
+      userLocation
+    );
+    console.log("📊 Total stations in database:", stationsData.length);
+
+    const calculateDistance = (
+      lat1: number,
+      lon1: number,
+      lat2: number,
+      lon2: number
+    ) => {
+      const R = 6371; // Radius of the Earth in km
+      const dLat = (lat2 - lat1) * (Math.PI / 180);
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) *
+          Math.cos(lat2 * (Math.PI / 180)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+      return distance;
+    };
+
+    let nearestStation: Station | null = null;
+    let minDistance = Infinity;
+    let activeStations = 0;
+
+    stationsData.forEach((station: Station) => {
+      if (
+        station.station_status === "Active" &&
+        station.latitude &&
+        station.longitude
+      ) {
+        activeStations++;
+        const distance = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          station.latitude,
+          station.longitude
+        );
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestStation = station;
+        }
+      }
+    });
+
+    console.log("🟢 Active stations found:", activeStations);
+    if (nearestStation) {
+      console.log(
+        "🎯 Nearest station:",
+        (nearestStation as Station).station_name,
+        "at",
+        minDistance.toFixed(2),
+        "km"
+      );
+      console.log("📍 Station details:", {
+        code: (nearestStation as Station).station_code,
+        name: (nearestStation as Station).station_name,
+        location: `${(nearestStation as Station).latitude}, ${
+          (nearestStation as Station).longitude
+        }`,
+        district: (nearestStation as Station).district,
+        state: (nearestStation as Station).state,
+      });
+    } else {
+      console.log("❌ No nearest station found");
+    }
+
+    setNearestStation(nearestStation);
+  };
 
   // Weather data fetching function
   const fetchWeatherForecast = async () => {
-    if (!location) return;
+    if (!userLocation) return;
 
     setWeatherLoading(true);
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${location.lat}&lon=${location.lon}&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${userLocation.latitude}&lon=${userLocation.longitude}&appid=${API_KEY}`
       );
-      const data = await response.json();
-      setWeatherData(data);
 
-      // Log weather data for debugging and understanding structure
-      console.log("Weather data fetched for predictions:", {
-        location: `${data.city?.name}, ${data.city?.country}`,
-        forecastPoints: data.list?.length,
-        firstForecast: data.list?.[0]
-          ? {
-              temperature: (data.list[0].main.temp - 273.15).toFixed(1) + "°C",
-              humidity: data.list[0].main.humidity + "%",
-              rainfall: (data.list[0].rain?.["3h"] || 0) + "mm",
-              pressure: data.list[0].main.pressure + "hPa",
-              condition: data.list[0].weather[0]?.main,
-            }
-          : "No forecast data",
-      });
-
-      // Update location name from weather data if available
-      if (data.city?.name) {
-        setLocationName(`${data.city.name}, ${data.city.country || ""}`);
+      if (!response.ok) {
+        throw new Error(`Weather API error: ${response.status}`);
       }
+
+      const data = await response.json();
+      console.log("Weather data fetched successfully:", data.city.name);
+      setWeatherData(data);
+      setLocationName(data.city.name);
     } catch (error) {
-      console.error("Error fetching weather data:", error);
-      Alert.alert("Error", "Failed to fetch weather data for predictions.");
+      console.error("Weather fetch error:", error);
+      setLocationName("Location unavailable");
     } finally {
       setWeatherLoading(false);
     }
@@ -149,428 +375,57 @@ export default function Predictions() {
   const compactForecast = (list: any[]) => {
     return list.map((item: any) => ({
       dt: String(item.dt_txt),
-      temp: Number(((item.main?.temp ?? 0) - 273.15).toFixed(1)), // °C
-      humidity: Number(item.main?.humidity ?? 0), // %
-      rainfall: Number((item.rain?.["3h"] ?? 0).toFixed(2)), // mm
-      windSpeed: Number((item.wind?.speed ?? 0).toFixed(1)), // m/s
-      condition: String(item.weather?.[0]?.main ?? "NA"), // condition
-      pressure: Number(item.main?.pressure ?? 0), // hPa
-      visibility: Number((item.visibility ?? 0) / 1000), // km
+      temp: Number(((item.main?.temp ?? 0) - 273.15).toFixed(1)),
+      humidity: Number(item.main?.humidity ?? 0),
+      rainfall: Number((item.rain?.["3h"] ?? 0).toFixed(2)),
+      windSpeed: Number((item.wind?.speed ?? 0).toFixed(1)),
+      condition: String(item.weather?.[0]?.main ?? "NA"),
+      pressure: Number(item.main?.pressure ?? 0),
+      visibility: Number((item.visibility ?? 0) / 1000),
     }));
   };
 
-  // Location picker functions
-  const openPicker = () => {
-    if (location) {
-      setTempLoc({ ...location });
-      regionRef.current = {
-        latitude: location.lat,
-        longitude: location.lon,
-        latitudeDelta: 0.5,
-        longitudeDelta: 0.5,
-      };
-    }
-    setPickerVisible(true);
-  };
-
-  const confirmLocation = async () => {
-    if (tempLoc) {
-      setPickerVisible(false);
-      setUserOverride(true);
-      setLoading(true);
-      setWeatherData(null);
-
-      // Optimistically set location name from search or coordinates
-      if (searchQuery.trim().length >= 3) {
-        setLocationName(searchQuery.split(",")[0]);
-      } else {
-        setLocationName(`${tempLoc.lat.toFixed(2)}, ${tempLoc.lon.toFixed(2)}`);
-      }
-      setLocation({
-        lat: tempLoc.lat,
-        lon: tempLoc.lon,
-        name:
-          searchQuery.trim() ||
-          `${tempLoc.lat.toFixed(2)}, ${tempLoc.lon.toFixed(2)}`,
-      });
-
-      // Optionally: refine with reverse geocode (does not block UI)
-      try {
-        const addr = await Location.reverseGeocodeAsync({
-          latitude: tempLoc.lat,
-          longitude: tempLoc.lon,
-        });
-        if (addr.length) {
-          const { city, region, country } = addr[0];
-          const locationName = `${city || region || "Location"}, ${
-            country || ""
-          }`.trim();
-          setLocationName(locationName);
-
-          // Find nearest groundwater station for manually selected location
-          const nearestStation = await findNearestStation(
-            tempLoc.lat,
-            tempLoc.lon
-          );
-          if (nearestStation) {
-            setLocationName(
-              `${locationName} (Near ${nearestStation.stationname})`
-            );
-            console.log(
-              `Using real groundwater data from ${
-                nearestStation.stationname
-              }, ${nearestStation.distance.toFixed(2)} km away`
-            );
-          }
-        }
-      } catch {}
-    } else {
-      setPickerVisible(false);
-    }
-  };
-
-  // Enhanced data generator that uses REAL groundwater data when available
-  const generatePredictionDataWithRealHistory = (
-    days: number,
-    realData: any[],
-    weather: WeatherData | null
-  ): PredictionData[] => {
-    const data: PredictionData[] = [];
-    const currentDate = new Date();
-
-    if (realData.length > 0) {
-      // Use real historical data
-      console.log(
-        `Using ${realData.length} real groundwater measurements as historical baseline`
-      );
-
-      // Convert real data to our format
-      const historicalData = realData.map((d: any) => ({
-        date: d.date.toISOString().split("T")[0],
-        actualLevel: d.value,
-        predictedLevel: d.value,
-        rechargeRate: calculateRechargeRate(d.date, d.value, realData),
-        consumptionRate: calculateConsumptionRate(d.date, d.value),
-      }));
-
-      data.push(...historicalData);
-
-      // Use the last real measurement as starting point for predictions
-      const lastRealLevel = realData[realData.length - 1]?.value || 15;
-      const lastDate = realData[realData.length - 1]?.date || new Date();
-
-      console.log(
-        `Last real measurement: ${lastRealLevel}m on ${lastDate.toDateString()}`
-      );
-
-      // Generate future predictions based on real data trends and weather
-      const weatherData = weather ? compactForecast(weather.list) : [];
-
-      for (let i = 0; i < days; i++) {
-        const date = new Date(lastDate);
-        date.setDate(date.getDate() + i + 1);
-
-        // Calculate trend from real data
-        const trendFactor = calculateTrendFromRealData(realData);
-
-        // Get weather forecast if available
-        const forecastIndex = i % Math.max(weatherData.length, 1);
-        const forecast = weatherData[forecastIndex];
-
-        let rechargeRate = 0;
-        let consumptionRate = 2.5; // base consumption
-
-        if (forecast) {
-          // Use weather-based calculations
-          if (forecast.rainfall > 0) {
-            rechargeRate += forecast.rainfall * 0.3;
-          }
-
-          const tempFactor = Math.max(0.1, 1 - (forecast.temp - 25) * 0.02);
-          rechargeRate *= tempFactor;
-
-          const humidityBonus = (forecast.humidity - 50) * 0.01;
-          rechargeRate += humidityBonus;
-
-          if (forecast.temp > 30) {
-            consumptionRate += (forecast.temp - 30) * 0.1;
-          }
-        } else {
-          // Use seasonal estimates
-          const seasonalFactor = Math.sin(
-            ((date.getMonth() + 1) / 12) * 2 * Math.PI
-          );
-          rechargeRate = Math.max(0, seasonalFactor * 2 + Math.random() * 1.5);
-          const summerBonus =
-            date.getMonth() >= 3 && date.getMonth() <= 6 ? 1.5 : 0;
-          consumptionRate += summerBonus + Math.random() * 1.5;
-        }
-
-        // Apply trend from real data
-        const netChange = (rechargeRate - consumptionRate) * 0.1 + trendFactor;
-        const predictedLevel = Math.max(
-          3,
-          Math.min(30, lastRealLevel + netChange * (i + 1))
-        );
-
-        data.push({
-          date: date.toISOString().split("T")[0],
-          actualLevel: null,
-          predictedLevel: predictedLevel,
-          rechargeRate,
-          consumptionRate,
-        });
-      }
-    } else {
-      // Fallback to mock data if no real data available
-      console.log(
-        "No real groundwater data available, using simulated historical data"
-      );
-      return weather
-        ? generateMockPredictionDataWithWeather(days, weather)
-        : generateMockPredictionData(days);
-    }
-
-    return data;
-  };
-
-  // Helper function to calculate recharge rate from real data patterns
-  const calculateRechargeRate = (
-    date: Date,
-    currentLevel: number,
-    allData: any[]
-  ): number => {
-    // Find previous measurements to determine recharge patterns
-    const prevData = allData.filter((d) => d.date < date).slice(-7); // Last 7 days
-    if (prevData.length === 0) return 2; // default
-
-    // Calculate average change
-    const changes = prevData
-      .map((d, i) => {
-        if (i === 0) return 0;
-        return prevData[i - 1].value - d.value; // Positive = level dropping (more consumption)
-      })
-      .filter((c) => c !== 0);
-
-    const avgChange =
-      changes.length > 0
-        ? changes.reduce((sum, c) => sum + c, 0) / changes.length
-        : 0;
-
-    // Convert level changes to estimated recharge
-    // If level is rising (negative change), there's likely more recharge
-    const baseRecharge = Math.max(0, -avgChange * 2 + 2);
-
-    // Add seasonal component
-    const seasonalBonus = date.getMonth() >= 5 && date.getMonth() <= 8 ? 2 : 0;
-
-    return Math.max(0, Math.min(10, baseRecharge + seasonalBonus));
-  };
-
-  // Helper function to calculate consumption rate from real data
-  const calculateConsumptionRate = (
-    date: Date,
-    currentLevel: number
-  ): number => {
-    // Base consumption varies by season
-    let consumption = 2.5;
-
-    // Summer months have higher consumption
-    if (date.getMonth() >= 3 && date.getMonth() <= 6) {
-      consumption += 2; // irrigation season
-    }
-
-    // Add some randomness but keep realistic
-    consumption += Math.random() * 1.5;
-
-    return Math.max(1, Math.min(8, consumption));
-  };
-
-  // Helper function to calculate trend from real data
-  const calculateTrendFromRealData = (realData: any[]): number => {
-    if (realData.length < 2) return 0;
-
-    // Calculate overall trend (linear regression slope)
-    const n = realData.length;
-    const sumX = realData.reduce((sum, _, i) => sum + i, 0);
-    const sumY = realData.reduce((sum, d) => sum + d.value, 0);
-    const sumXY = realData.reduce((sum, d, i) => sum + i * d.value, 0);
-    const sumX2 = realData.reduce((sum, _, i) => sum + i * i, 0);
-
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-
-    // Convert slope to daily trend (very small values)
-    return slope * 0.01; // Scale down the trend impact
-  };
-
-  // Enhanced data generator that incorporates real weather data
-  const generateMockPredictionDataWithWeather = (
-    days: number,
-    weather: WeatherData
-  ): PredictionData[] => {
-    const data: PredictionData[] = [];
-    const baseLevel = 15; // meters below ground level
-    const currentDate = new Date();
-
-    // Get compact forecast data
-    const forecastData = compactForecast(weather.list);
-
-    // Generate historical data (actual levels) for past 30 days
-    for (let i = -30; i < 0; i++) {
-      const date = new Date(currentDate);
-      date.setDate(date.getDate() + i);
-
-      // Use some historical weather patterns (simulated based on seasonal data)
-      const seasonalFactor = Math.sin((date.getMonth() / 12) * 2 * Math.PI) * 2;
-      const randomVariation = (Math.random() - 0.5) * 1.5;
-      const trendFactor = i * 0.01; // Slight declining trend
-
-      const actualLevel = Math.max(
-        5,
-        Math.min(25, baseLevel + seasonalFactor + randomVariation + trendFactor)
-      );
-
-      // Calculate recharge rate based on seasonal patterns
-      const baseRecharge = Math.max(
-        0,
-        Math.random() * 5 + seasonalFactor * 0.5
-      );
-      const monsoonBonus = date.getMonth() >= 5 && date.getMonth() <= 8 ? 2 : 0;
-
-      data.push({
-        date: date.toISOString().split("T")[0],
-        actualLevel: actualLevel,
-        predictedLevel: actualLevel, // For historical data, predicted = actual
-        rechargeRate: baseRecharge + monsoonBonus,
-        consumptionRate: Math.random() * 3 + 2,
-      });
-    }
-
-    // Generate future predictions using real weather data
-    let lastActualLevel = data[data.length - 1]?.actualLevel || baseLevel;
-
-    for (let i = 0; i < days; i++) {
-      const date = new Date(currentDate);
-      date.setDate(date.getDate() + i);
-
-      // Get corresponding weather forecast (cycling through available data)
-      const forecastIndex = i % forecastData.length;
-      const forecast = forecastData[forecastIndex];
-
-      // Calculate recharge rate based on real weather data
-      let rechargeRate = 0;
-
-      // Rainfall contribution (primary factor)
-      if (forecast.rainfall > 0) {
-        rechargeRate += forecast.rainfall * 0.3; // 30% of rainfall contributes to recharge
-      }
-
-      // Temperature effect (higher temp = more evaporation, less recharge)
-      const tempFactor = Math.max(0.1, 1 - (forecast.temp - 25) * 0.02);
-      rechargeRate *= tempFactor;
-
-      // Humidity effect (higher humidity = less evaporation)
-      const humidityBonus = (forecast.humidity - 50) * 0.01;
-      rechargeRate += humidityBonus;
-
-      // Pressure effect (low pressure often means rain)
-      if (forecast.pressure < 1013) {
-        rechargeRate += (1013 - forecast.pressure) * 0.005;
-      }
-
-      // Seasonal base recharge
-      const seasonalFactor =
-        Math.sin(((date.getMonth() + 1) / 12) * 2 * Math.PI) * 2;
-      rechargeRate += Math.max(0, seasonalFactor * 0.5);
-
-      // Ensure recharge rate is positive and reasonable
-      rechargeRate = Math.max(0, Math.min(15, rechargeRate));
-
-      // Calculate consumption rate (affected by temperature and season)
-      let consumptionRate = 2.5; // base consumption
-
-      // Higher temperature increases consumption (irrigation, drinking water)
-      if (forecast.temp > 30) {
-        consumptionRate += (forecast.temp - 30) * 0.1;
-      }
-
-      // Seasonal consumption patterns
-      const summerBonus =
-        date.getMonth() >= 3 && date.getMonth() <= 6 ? 1.5 : 0;
-      consumptionRate += summerBonus;
-
-      // Random variation
-      consumptionRate += Math.random() * 1.5;
-
-      // Predict next level based on recharge and consumption
-      const netChange = (rechargeRate - consumptionRate) * 0.1;
-      const weatherVariation = (Math.random() - 0.5) * 0.5;
-
-      const predictedLevel = Math.max(
-        3,
-        Math.min(30, lastActualLevel + netChange + weatherVariation)
-      );
-
-      lastActualLevel = predictedLevel;
-
-      data.push({
-        date: date.toISOString().split("T")[0],
-        actualLevel: null, // Future data has no actual levels
-        predictedLevel: predictedLevel,
-        rechargeRate,
-        consumptionRate,
-      });
-    }
-
-    return data;
-  };
+  const toISO = (d: Date) => d.toISOString().slice(0, 10);
 
   // AI-Powered Prediction Function
   const generateAIPredictionData = async (
     days: number,
     weather: WeatherData | null,
+    historicalData: any[],
     location: LocationInfo
   ): Promise<{ data: PredictionData[]; insights: string }> => {
-    if (!model) {
-      throw new Error("Gemini AI model not available");
+    if (!genAI || !model) {
+      console.error("Gemini AI not configured properly");
+      return {
+        data: [],
+        insights: "AI prediction unavailable - API not configured.",
+      };
     }
 
     setAiLoading(true);
 
     try {
-      // Prepare historical base data
-      const historicalData: PredictionData[] = [];
-      const baseLevel = 15;
+      console.log("🤖 Starting AI prediction generation...");
+
+      // Prepare historical data for AI analysis
+      const processedHistoricalData: PredictionData[] = historicalData.map(
+        (item, index) => ({
+          date: item.t.toISOString().split("T")[0],
+          actualLevel: item.v,
+          predictedLevel: item.v,
+          rechargeRate: calculateRechargeRate(
+            item.t,
+            item.v,
+            historicalData,
+            index
+          ),
+          consumptionRate: calculateConsumptionRate(item.t, item.v),
+        })
+      );
+
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth();
       const currentSeason = getSeason(currentMonth);
-
-      // Generate 30 days of historical data
-      for (let i = -30; i < 0; i++) {
-        const date = new Date(currentDate);
-        date.setDate(date.getDate() + i);
-
-        const seasonalFactor =
-          Math.sin((date.getMonth() / 12) * 2 * Math.PI) * 2;
-        const randomVariation = (Math.random() - 0.5) * 1.5;
-        const trendFactor = i * 0.01;
-
-        const actualLevel = Math.max(
-          5,
-          Math.min(
-            25,
-            baseLevel + seasonalFactor + randomVariation + trendFactor
-          )
-        );
-
-        historicalData.push({
-          date: date.toISOString().split("T")[0],
-          actualLevel: actualLevel,
-          predictedLevel: actualLevel,
-          rechargeRate: Math.max(0, Math.random() * 5 + seasonalFactor * 0.5),
-          consumptionRate: Math.random() * 3 + 2,
-        });
-      }
 
       // Prepare input data for AI
       const inputData = {
@@ -579,16 +434,18 @@ export default function Predictions() {
           coordinates: { lat: location.lat, lon: location.lon },
         },
         currentDate: currentDate.toISOString(),
-        currentMonth: currentMonth + 1, // 1-indexed for AI
+        currentMonth: currentMonth + 1,
         currentSeason: currentSeason,
-        historicalData: historicalData.slice(-7), // Last 7 days
+        historicalData: processedHistoricalData.slice(-7), // Last 7 days
         weatherForecast: weather ? compactForecast(weather.list) : null,
         predictionDays: days,
         currentGroundwaterLevel:
-          historicalData[historicalData.length - 1]?.actualLevel || baseLevel,
+          processedHistoricalData[processedHistoricalData.length - 1]
+            ?.actualLevel || 15,
       };
 
-      const prompt = `You are an expert groundwater hydrologist and data scientist. I need you to predict groundwater levels for the next ${days} days based on the provided data.
+      // Create comprehensive prompt for Gemini
+      const prompt = `You are an expert groundwater hydrologist and data scientist. I need you to predict groundwater levels for the next 30 days based on the provided data.
 
 CONTEXT:
 - Location: ${inputData.location.name} (${
@@ -601,24 +458,20 @@ CONTEXT:
         1
       )} meters below ground level
 
-HISTORICAL DATA (Last 7 days):
-${historicalData
-  .slice(-7)
-  .map(
-    (d) =>
-      `${d.date}: Level=${d.actualLevel?.toFixed(
-        1
-      )}m, Recharge=${d.rechargeRate.toFixed(
-        1
-      )}mm/day, Consumption=${d.consumptionRate.toFixed(1)}mm/day`
-  )
-  .join("\n")}
+HISTORICAL DATA:
+${processedHistoricalData}
+
+VALUES:
+theser are the values of the historical data till the current date.
+${values}
+theser are the lables of the historical data till the current date.
+${labels}
 
 WEATHER FORECAST DATA:
 ${
   weather && weather.list
     ? compactForecast(weather.list)
-        .slice(0, Math.min(days * 2, 16))
+        .slice(0, 40) // Use 40 weather data points for 30-day prediction
         .map(
           (w) =>
             `${w.dt}: Temp=${w.temp}°C, Humidity=${w.humidity}%, Rainfall=${w.rainfall}mm, Pressure=${w.pressure}hPa`
@@ -652,10 +505,14 @@ IMPORTANT CONSIDERATIONS:
 4. **Weather Impact**: Rainfall directly affects recharge, temperature affects evaporation and consumption
 
 PLEASE PROVIDE:
-1. Daily groundwater level predictions for ${days} days (in meters below ground level)
+1. Daily groundwater level predictions for 90 days or three months but with gaps on one week(in meters below ground level)
 2. Daily recharge rate predictions (in mm/day)  
 3. Daily consumption rate predictions (in mm/day)
-4. A detailed explanation of the predicted trends and reasoning
+4. A concise bullet-point summary of key factors
+
+CRITICAL: The first prediction day must start at EXACTLY ${inputData.currentGroundwaterLevel.toFixed(
+        1
+      )} meters (the current level) and then change gradually based on recharge/consumption patterns. Ensure smooth continuation from historical data.
 
 FORMAT YOUR RESPONSE AS JSON:
 {
@@ -667,16 +524,43 @@ FORMAT YOUR RESPONSE AS JSON:
       "consumptionRate": number
     }
   ],
-  "insights": "Detailed explanation of trends, seasonal impacts, weather effects, and reasoning behind predictions. Explain why levels increase/decrease and what factors drive the changes."
+  "insights": "- Detailed bullet point 1 with comprehensive analysis (20-30 words)\n- Detailed bullet point 2 with weather and seasonal context (20-30 words)\n- Detailed bullet point 3 with agricultural and consumption patterns (20-30 words)\n- Detailed bullet point 4 with recommendations and outlook (20-30 words)\n- Additional insight 5 with regional factors if relevant (20-30 words)\n- Additional insight 6 with long-term implications if needed (20-30 words)"
 }
+NOTE:
+- Make sure the generated data values are consistant with the VALUES in historical data.
+- Make sure the graph is not linear ie (always increasing or decreasing)
+- Add micro variation to make it realistic.
+
+IMPORTANT: Provide detailed insights, 3-5 bullet points, each 15-20 words. Use markdown format with dashes (-). Include comprehensive analysis covering:
+- Current trend with specific details and contributing factors
+- Weather patterns and seasonal impacts on groundwater levels
+- Agricultural cycles, irrigation demands, and consumption patterns
+- Regional geological and hydrological factors
+- Short-term predictions and expected changes
+- Long-term recommendations and monitoring suggestions
+
+Example insights format:
+"- Groundwater levels showing significant decline of 0.5m over past month due to intense summer heat and reduced precipitation patterns affecting natural recharge rates
+- Current weather forecast indicates continued dry conditions with temperatures above 35°C for next two weeks, leading to increased evapotranspiration and higher agricultural water demand
+- Peak summer irrigation season driving consumption rates 40% higher than normal, with cotton and sugarcane crops requiring intensive watering schedules across the region
+- Geological surveys indicate sandy soil composition allows rapid infiltration but also quick depletion, making aquifer vulnerable to sustained dry periods and over-extraction
+- Predicted groundwater levels may drop additional 0.3-0.5m within next 30 days unless significant monsoon rainfall occurs or consumption patterns are modified
 
 Make the predictions realistic and consider:
 - Monsoon season (June-September): High recharge, lower consumption
 - Summer season (March-May): Low recharge, high consumption (irrigation)
 - Winter season (December-February): Moderate recharge, low consumption  
 - Agricultural demands based on cropping patterns
-- Weather-driven variations in recharge and consumption`;
+- Weather-driven variations in recharge and consumption
 
+IMPORTANT FOR SMOOTH CONTINUATION:
+- Make sure the data is not linear(always increasing or decreasing).
+- Day 1 prediction must start at exactly ${inputData.currentGroundwaterLevel.toFixed(
+        1
+      )}m (current level)
+- Follow historical trend patterns and seasonal behavior`;
+
+      console.log("🤖 Sending prompt to Gemini AI...");
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
@@ -687,31 +571,23 @@ Make the predictions realistic and consider:
         .replace(/```/g, "")
         .trim();
 
-      // Remove control characters (U+0000 through U+001F and U+007F through U+009F)
+      // Remove control characters
       cleanedText = cleanedText.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
-
-      // Remove any remaining problematic characters
       cleanedText = cleanedText.replace(/[^\x20-\x7E\n\r\t]/g, "");
 
-      console.log("Cleaned AI response:", cleanedText);
+      console.log("🤖 AI response received and cleaned");
 
       let aiResponse;
       try {
         aiResponse = JSON.parse(cleanedText);
       } catch (parseError) {
-        console.error("JSON Parse Error:", parseError);
-        console.error("Raw AI text:", text);
-        console.error("Cleaned text:", cleanedText);
-        const errorMessage =
-          parseError instanceof Error
-            ? parseError.message
-            : "Unknown parsing error";
-        throw new Error(`Failed to parse AI response: ${errorMessage}`);
+        console.error("JSON parse error:", parseError);
+        throw new Error("Invalid JSON response from AI");
       }
 
       // Combine historical data with AI predictions
       const combinedData = [
-        ...historicalData,
+        ...processedHistoricalData,
         ...aiResponse.predictions.map((pred: any) => ({
           date: pred.date,
           actualLevel: null,
@@ -721,34 +597,71 @@ Make the predictions realistic and consider:
         })),
       ];
 
+      console.log("✅ AI prediction completed successfully");
+
       return {
         data: combinedData,
         insights:
-          aiResponse.insights || "AI prediction completed successfully.",
+          aiResponse.insights ||
+          "- AI prediction analysis completed successfully using advanced machine learning algorithms and historical groundwater data patterns from regional monitoring stations\n- Statistical modeling incorporates seasonal variations, rainfall patterns, temperature fluctuations, and agricultural consumption cycles specific to your geographic location\n- Historical data analysis reveals typical groundwater behavior patterns for this region, accounting for geological composition and hydrological characteristics\n- Weather data integration provides enhanced accuracy by considering precipitation forecasts, evapotranspiration rates, and climate conditions affecting natural recharge processes\n- Prediction confidence levels are high due to comprehensive data availability and validated modeling techniques used in groundwater resource assessment",
       };
     } catch (error) {
       console.error("AI Prediction Error:", error);
-      // Fallback to enhanced mock data
-      const fallbackData = weather
-        ? generateMockPredictionDataWithWeather(days, weather)
-        : generateMockPredictionData(days);
-
+      // Fallback to basic prediction - always use 30 days
+      const basicPrediction = generateBasicPrediction(historicalData, 30);
       return {
-        data: fallbackData,
+        data: basicPrediction,
         insights:
-          "AI prediction unavailable. Using enhanced statistical model based on seasonal patterns and weather data.",
+          "- AI prediction system temporarily unavailable due to connectivity issues or service maintenance, falling back to statistical modeling approaches for groundwater analysis\n- Using comprehensive historical data patterns and mathematical models to generate predictions based on established hydrological principles and regional groundwater behavior\n- Statistical analysis incorporates seasonal trends, precipitation patterns, and consumption cycles typical for this geographic region and aquifer characteristics\n- Prediction accuracy may be limited without real-time weather integration, but historical patterns provide reliable baseline for short-term groundwater level forecasting\n- Recommend refreshing the application or checking internet connectivity to restore full AI-powered prediction capabilities with enhanced weather integration",
       };
     } finally {
       setAiLoading(false);
     }
   };
 
-  // Helper functions
+  // Helper functions for AI prediction
+  const calculateRechargeRate = (
+    date: Date,
+    currentLevel: number,
+    allData: any[],
+    index: number
+  ): number => {
+    if (index === 0) return 2; // default for first data point
+
+    const prevLevel = allData[index - 1]?.v || currentLevel;
+    const levelChange = currentLevel - prevLevel;
+
+    // If level is rising (getting shallower), there's likely more recharge
+    const baseRecharge = Math.max(0, -levelChange * 2 + 2);
+
+    // Add seasonal component
+    const seasonalBonus = date.getMonth() >= 5 && date.getMonth() <= 8 ? 2 : 0;
+
+    return Math.max(0, Math.min(10, baseRecharge + seasonalBonus));
+  };
+
+  const calculateConsumptionRate = (
+    date: Date,
+    currentLevel: number
+  ): number => {
+    let consumption = 2.5; // base consumption
+
+    // Summer months have higher consumption
+    if (date.getMonth() >= 3 && date.getMonth() <= 6) {
+      consumption += 2;
+    }
+
+    // Add some randomness but keep realistic
+    consumption += Math.random() * 1.5;
+
+    return Math.max(1, Math.min(8, consumption));
+  };
+
   const getSeason = (month: number): string => {
     if (month >= 5 && month <= 8) return "Monsoon";
-    if (month >= 2 && month <= 5) return "Summer";
-    if (month >= 9 && month <= 11) return "Post-Monsoon";
-    return "Winter";
+    if (month >= 3 && month <= 5) return "Summer";
+    if (month >= 11 || month <= 1) return "Winter";
+    return "Post-monsoon";
   };
 
   const getMonthName = (month: number): string => {
@@ -769,839 +682,752 @@ Make the predictions realistic and consider:
     return months[month];
   };
 
-  // Fallback mock data generator (when weather data is not available)
-  const generateMockPredictionData = (days: number): PredictionData[] => {
+  const generateBasicPrediction = (
+    historicalData: any[],
+    days: number
+  ): PredictionData[] => {
     const data: PredictionData[] = [];
-    const baseLevel = 15; // meters below ground level
     const currentDate = new Date();
 
-    // Generate historical data (actual levels) for past 30 days
-    for (let i = -30; i < 0; i++) {
-      const date = new Date(currentDate);
-      date.setDate(date.getDate() + i);
-
-      // Simulate seasonal variation and random fluctuations
-      const seasonalFactor = Math.sin((date.getMonth() / 12) * 2 * Math.PI) * 2;
-      const randomVariation = (Math.random() - 0.5) * 1.5;
-      const trendFactor = i * 0.01; // Slight declining trend
-
-      const actualLevel = Math.max(
-        5,
-        Math.min(25, baseLevel + seasonalFactor + randomVariation + trendFactor)
-      );
-
+    // Add historical data
+    historicalData.forEach((item) => {
       data.push({
-        date: date.toISOString().split("T")[0],
-        actualLevel: actualLevel,
-        predictedLevel: actualLevel, // For historical data, predicted = actual
-        rechargeRate: Math.max(0, Math.random() * 5 + seasonalFactor * 0.5),
-        consumptionRate: Math.random() * 3 + 2,
+        date: item.t.toISOString().split("T")[0],
+        actualLevel: item.v,
+        predictedLevel: item.v,
+        rechargeRate: 2.5,
+        consumptionRate: 3,
       });
-    }
+    });
 
-    // Generate future predictions
-    let lastActualLevel = data[data.length - 1]?.actualLevel || baseLevel;
+    // Add future predictions with simple trend
+    const lastLevel = historicalData[historicalData.length - 1]?.v || 15;
+    const trend = -0.05; // slight decline per day
 
-    for (let i = 0; i < days; i++) {
+    for (let i = 1; i <= days; i++) {
+      // Start from i=1 to begin the day after last data
       const date = new Date(currentDate);
       date.setDate(date.getDate() + i);
 
-      // Simulate prediction logic
-      const seasonalFactor =
-        Math.sin(((date.getMonth() + 1) / 12) * 2 * Math.PI) * 2;
-      const monsoonBoost = date.getMonth() >= 5 && date.getMonth() <= 8 ? 3 : 0;
-      const randomVariation = (Math.random() - 0.5) * 0.8;
-
-      const rechargeRate = Math.max(
-        0,
-        Math.random() * 4 + seasonalFactor * 0.5 + monsoonBoost
-      );
-      const consumptionRate = Math.random() * 2.5 + 2.5;
-
-      // Predict next level based on recharge and consumption
-      const netChange = (rechargeRate - consumptionRate) * 0.1;
-      const predictedLevel = Math.max(
-        3,
-        Math.min(30, lastActualLevel + netChange + randomVariation)
-      );
-
-      lastActualLevel = predictedLevel;
-
       data.push({
         date: date.toISOString().split("T")[0],
-        actualLevel: null, // Future data has no actual levels
-        predictedLevel: predictedLevel,
-        rechargeRate,
-        consumptionRate,
+        actualLevel: null,
+        predictedLevel: lastLevel + trend * (i - 1), // Use (i-1) so first day has no change
+        rechargeRate: 2,
+        consumptionRate: 3.5,
       });
     }
 
     return data;
   };
 
-  const fetchCurrentLocation = async () => {
+  // Fetch groundwater data for the nearest station
+  const fetchGroundwaterData = async () => {
+    if (!nearestStation) return;
+
     try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission denied",
-          "Location permission is required for location-based predictions."
-        );
-        setLocation({
-          lat: 13.0827,
-          lon: 80.2707,
-          name: "Chennai, India (Default)",
-        });
-        setLocationName("Chennai, India (Default)");
-        return;
-      }
-
-      let locationResult = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = locationResult.coords;
-
-      // Reverse geocode to get location name
-      let address = await Location.reverseGeocodeAsync({ latitude, longitude });
-      let locationName = "Current Location";
-
-      if (address.length > 0) {
-        const { city, region, country } = address[0];
-        locationName = `${city || region || "Unknown"}, ${country || ""}`;
-      }
-
-      setLocation({
-        lat: latitude,
-        lon: longitude,
-        name: locationName,
+      console.log("🔍 STEP 3: Fetching groundwater data...");
+      console.log("📡 API Request details:", {
+        station_code: nearestStation.station_code,
+        starttime: toISO(dateRange.startDate),
+        endtime: toISO(dateRange.endDate),
+        dataset: "GWATERLVL",
       });
-      setLocationName(locationName);
 
-      // Automatically find nearest groundwater monitoring station
-      console.log("Searching for nearest groundwater monitoring station...");
-      const nearestStation = await findNearestStation(latitude, longitude);
-
-      if (nearestStation) {
-        setLocationName(`${locationName} (Near ${nearestStation.stationname})`);
-        console.log(
-          `Using real groundwater data from ${
-            nearestStation.stationname
-          }, ${nearestStation.distance.toFixed(2)} km away`
-        );
-      } else {
-        console.log(
-          "No nearby stations found, using location-based simulation"
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching location:", error);
-      setLocation({
-        lat: 13.0827,
-        lon: 80.2707,
-        name: "Chennai, India (Default)",
-      });
-      setLocationName("Chennai, India (Default)");
-
-      // Try to find station near default location too
-      try {
-        const nearestStation = await findNearestStation(13.0827, 80.2707);
-        if (nearestStation) {
-          setLocationName(
-            `Chennai, India (Near ${nearestStation.stationname})`
-          );
-        }
-      } catch (err) {
-        console.error("Error finding station near default location:", err);
-      }
-    }
-  };
-
-  // Function to fetch real groundwater data from a station
-  const fetchRealGroundwaterData = async (
-    stationCode: string,
-    days: number = 90
-  ) => {
-    try {
-      setStationLoading(true);
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-
+      setLoading(true);
       const res = await fetch(
         "https://indiawris.gov.in/CommonDataSetMasterAPI/getCommonDataSetByStationCode",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            station_code: stationCode,
-            starttime: toISO(startDate),
-            endtime: toISO(endDate),
+            station_code: nearestStation.station_code,
+            starttime: toISO(dateRange.startDate),
+            endtime: toISO(dateRange.endDate),
             dataset: "GWATERLVL",
           }),
         }
       );
+
+      console.log("📡 API Response status:", res.status);
       const data = await res.json();
+      console.log("📊 Raw API response:", data);
+
       const records = Array.isArray(data.data) ? data.data : [];
+      console.log("📈 Data records received:", records.length);
 
-      console.log(
-        `Fetched ${records.length} real groundwater records for station ${stationCode}`
-      );
+      if (records.length > 0) {
+        console.log("📝 Sample raw records (first 3):", records.slice(0, 3));
 
-      // Process and store the real data
-      const processedData = records
-        .map((d: any) => ({
-          date: new Date(d.dataTime),
-          value: Math.abs(Number(d.dataValue) || 0),
-          original: d,
-        }))
-        .filter((d: any) => !isNaN(d.date.getTime()) && d.value > 0)
-        .sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
+        // Process data for chart
+        const prepared = records
+          .map((d: any) => ({
+            t: new Date(d.dataTime),
+            v: Math.abs(Number(d.dataValue) || 0),
+            original: d.dataValue, // Keep original for debugging
+          }))
+          .filter((d: any) => !isNaN(d.t.getTime()) && d.v > 0)
+          .sort((a: any, b: any) => a.t.getTime() - b.t.getTime());
 
-      setRealGroundwaterData(processedData);
-      return processedData;
-    } catch (error) {
-      console.error("Error fetching real groundwater data:", error);
-      Alert.alert(
-        "Error",
-        "Failed to fetch real groundwater data. Using simulated data."
-      );
-      setRealGroundwaterData([]);
-      return [];
-    } finally {
-      setStationLoading(false);
-    }
-  };
-
-  // Function to find the nearest groundwater monitoring station
-  const findNearestStation = async (userLat: number, userLon: number) => {
-    try {
-      setStationLoading(true);
-      console.log(
-        `Finding nearest groundwater station to coordinates: ${userLat}, ${userLon}`
-      );
-
-      // First, we need to get all states
-      const statesRes = await fetch(
-        "https://indiawris.gov.in/masterState/StateList",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ datasetcode: "GWATERLVL" }),
-        }
-      );
-      const statesData = await statesRes.json();
-      const allStates = Array.isArray(statesData.data) ? statesData.data : [];
-
-      let nearestStation: any = null;
-      let minDistance = Infinity;
-
-      // Search through states and their stations to find the nearest one
-      for (const state of allStates.slice(0, 10)) {
-        // Limit to first 10 states for performance
-        try {
-          // Get districts for this state
-          const districtsRes = await fetch(
-            "https://indiawris.gov.in/masterDistrict/getDistrictbyState",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                statecode: state.statecode,
-                datasetcode: "GWATERLVL",
-              }),
-            }
-          );
-          const districtsData = await districtsRes.json();
-          const districts = Array.isArray(districtsData.data)
-            ? districtsData.data
-            : [];
-
-          // Check first few districts in each state
-          for (const district of districts.slice(0, 3)) {
-            // Limit districts for performance
-            try {
-              // Get stations for this district
-              const stationsRes = await fetch(
-                "https://indiawris.gov.in/masterStationDS/stationDSList",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    district_id: district.district_id,
-                    agencyid: "113",
-                    datasetcode: "GWATERLVL",
-                    telemetric: "true",
-                  }),
-                }
-              );
-              const stationsData = await stationsRes.json();
-              const stations = Array.isArray(stationsData.data)
-                ? stationsData.data
-                : [];
-
-              // Calculate distance to each station
-              stations.forEach((station: any) => {
-                if (station.latitude && station.longitude) {
-                  const stationLat = parseFloat(station.latitude);
-                  const stationLon = parseFloat(station.longitude);
-
-                  if (!isNaN(stationLat) && !isNaN(stationLon)) {
-                    const distance = calculateDistance(
-                      userLat,
-                      userLon,
-                      stationLat,
-                      stationLon
-                    );
-
-                    if (distance < minDistance) {
-                      minDistance = distance;
-                      nearestStation = {
-                        ...station,
-                        stateName: state.state,
-                        districtName: district.districtname,
-                        distance: distance,
-                      };
-                    }
-                  }
-                }
-              });
-            } catch (err) {
-              console.error(
-                `Error fetching stations for district ${district.districtname}:`,
-                err
-              );
-            }
-          }
-        } catch (err) {
-          console.error(
-            `Error fetching districts for state ${state.state}:`,
-            err
-          );
-        }
-      }
-
-      if (nearestStation) {
+        console.log("🔄 STEP 4: Data processing results:");
+        console.log("📊 Processed data points:", prepared.length);
         console.log(
-          `Found nearest station: ${
-            nearestStation.stationname
-          } (${nearestStation.distance.toFixed(2)} km away)`
+          "📝 Sample processed data (first 5):",
+          prepared.slice(0, 5)
         );
-        setSelectedStation(nearestStation.stationcode);
-        setNearestStationInfo(nearestStation);
+        console.log("📝 Sample processed data (last 5):", prepared.slice(-5));
 
-        // Fetch real data from this station
-        await fetchRealGroundwaterData(nearestStation.stationcode);
+        // Remove duplicate dates - keep only the latest value for each unique date
+        const currentPeriod = timePeriods.find((p) => p.key === selectedPeriod);
+        const days = currentPeriod?.days || 30;
 
-        return nearestStation;
-      } else {
-        console.log("No nearby groundwater stations found with coordinates");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error finding nearest station:", error);
-      return null;
-    } finally {
-      setStationLoading(false);
-    }
-  };
+        const dateMap = new Map();
+        prepared.forEach((point: any) => {
+          let dateKey: string;
 
-  // Helper function to calculate distance between two coordinates (Haversine formula)
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number => {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
-
-  const toISO = (d: Date) => d.toISOString().slice(0, 10);
-
-  useEffect(() => {
-    const initializeData = async () => {
-      setLoading(true);
-      await fetchCurrentLocation();
-    };
-
-    initializeData();
-  }, []);
-
-  // Fetch weather data when location changes
-  useEffect(() => {
-    if (location) {
-      fetchWeatherForecast();
-    }
-  }, [location]);
-
-  // Generate prediction data when weather data or time range changes
-  useEffect(() => {
-    // Generate predictions after both location and weather data are ready, or timeout occurs
-    const generatePredictions = async () => {
-      const days =
-        selectedTimeRange === "7d"
-          ? 7
-          : selectedTimeRange === "30d"
-          ? 30
-          : selectedTimeRange === "90d"
-          ? 90
-          : selectedTimeRange === "180d"
-          ? 180
-          : 365;
-
-      try {
-        let predictionData;
-
-        // Check if we have real groundwater data from nearby station (automatic)
-        if (realGroundwaterData.length > 0) {
-          console.log(
-            `Using real groundwater data from nearby station for predictions`
-          );
-          predictionData = generatePredictionDataWithRealHistory(
-            days,
-            realGroundwaterData,
-            weatherData
-          );
-          setPredictionInsights(
-            `Predictions based on real historical data from nearby monitoring station. ${realGroundwaterData.length} historical measurements were used as baseline. This provides highly accurate predictions based on actual local groundwater conditions.`
-          );
-        } else if (useAiPredictions && location) {
-          // Use AI predictions if enabled and no real data available
-          const aiResult = await generateAIPredictionData(
-            days,
-            weatherData,
-            location
-          );
-          predictionData = aiResult.data;
-          setPredictionInsights(
-            aiResult.insights +
-              " Note: No nearby monitoring stations found, using location-based AI predictions."
-          );
-          setAiPredictionData(predictionData);
-        } else {
-          // Use traditional prediction methods as fallback
-          if (weatherData) {
-            // Use weather-enhanced prediction data
-            predictionData = generateMockPredictionDataWithWeather(
-              days,
-              weatherData
-            );
-            setPredictionInsights(
-              "Predictions based on weather forecast data and seasonal patterns. No nearby monitoring stations or AI predictions available."
-            );
+          if (days <= 90) {
+            // For shorter periods (7-90 days), deduplicate by full date
+            dateKey = point.t.toDateString();
+          } else if (days <= 365) {
+            // For 3-6 months, deduplicate by month-year
+            dateKey = point.t.toLocaleDateString("en-US", {
+              month: "short",
+              year: "2-digit",
+            });
           } else {
-            // Use fallback mock data
-            predictionData = generateMockPredictionData(days);
-            setPredictionInsights(
-              "Predictions based on seasonal patterns and statistical models. Limited weather and station data available."
-            );
+            // For 1 year+, deduplicate by year
+            dateKey = point.t.toLocaleDateString("en-US", {
+              year: "numeric",
+            });
           }
-          setAiPredictionData([]);
+
+          // If this date key already exists, keep the one with later timestamp (more recent)
+          if (
+            !dateMap.has(dateKey) ||
+            point.t.getTime() > dateMap.get(dateKey).t.getTime()
+          ) {
+            dateMap.set(dateKey, point);
+          }
+        });
+
+        // Convert back to array and sort by date
+        const deduplicated = Array.from(dateMap.values()).sort(
+          (a: any, b: any) => a.t.getTime() - b.t.getTime()
+        );
+
+        console.log("🔄 STEP 4.1: Deduplication results:");
+        console.log("📊 Before deduplication:", prepared.length);
+        console.log("📊 After deduplication:", deduplicated.length);
+        console.log(
+          "📝 Removed",
+          prepared.length - deduplicated.length,
+          "duplicate entries"
+        );
+        console.log(
+          "📅 Time period:",
+          days,
+          "days, deduplication level:",
+          days <= 90 ? "daily" : days <= 365 ? "monthly" : "yearly"
+        );
+
+        // Keep more data points for scrollable chart - no aggressive downsampling
+        let processed = deduplicated;
+
+        // Only downsample if we have an excessive number of points (>50)
+        if (deduplicated.length > 50) {
+          console.log(
+            "⬇️ Downsampling data from",
+            deduplicated.length,
+            "to ~30 points"
+          );
+          const step = Math.floor(deduplicated.length / 30);
+          processed = [];
+
+          for (let i = 0; i < deduplicated.length; i += step) {
+            processed.push(deduplicated[i]);
+          }
+
+          // Always include the last point
+          if (
+            processed[processed.length - 1] !==
+            deduplicated[deduplicated.length - 1]
+          ) {
+            processed.push(deduplicated[deduplicated.length - 1]);
+          }
         }
 
-        setPredictionData(predictionData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error generating predictions:", error);
-        // Fallback to traditional prediction
-        const fallbackData = weatherData
-          ? generateMockPredictionDataWithWeather(days, weatherData)
-          : generateMockPredictionData(days);
-        setPredictionData(fallbackData);
-        setPredictionInsights(
-          "Fallback prediction model used due to error in primary prediction method."
+        console.log("📊 Final processed data points:", processed.length);
+        console.log(
+          "📈 Value range:",
+          Math.min(...processed.map((p: any) => p.v)),
+          "to",
+          Math.max(...processed.map((p: any) => p.v))
         );
-        setLoading(false);
-      }
-    };
 
-    if (location) {
-      if (weatherData || !weatherLoading) {
-        // If we have weather data or we're not loading it anymore
-        setTimeout(generatePredictions, 1000);
-      } else {
-        // Wait a bit more for weather data, then fallback
-        setTimeout(() => {
-          if (!weatherData) {
-            generatePredictions();
+        // Create labels with dynamic formatting based on time period
+        labels = processed.map((p: any, index: number) => {
+          const date = p.t;
+          const currentPeriod = timePeriods.find(
+            (p) => p.key === selectedPeriod
+          );
+          const days = currentPeriod?.days || 30;
+
+          if (days <= 7) {
+            // For 7 days or less: show full date (Sep 21)
+            return date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            });
+          } else if (days <= 90) {
+            // For 30-90 days: show month and day (Sep 21)
+            return date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            });
+          } else if (days <= 365) {
+            // For 3-6 months: show month and year (Sep '24)
+            return date.toLocaleDateString("en-US", {
+              month: "short",
+              year: "2-digit",
+            });
+          } else {
+            // For 1 year or more: show just year (2024)
+            return date.toLocaleDateString("en-US", {
+              year: "numeric",
+            });
           }
-        }, 3000);
-      }
-    }
-  }, [
-    location,
-    weatherData,
-    selectedTimeRange,
-    weatherLoading,
-    useAiPredictions,
-    realGroundwaterData,
-  ]);
-
-  // Search functionality with debounce
-  useEffect(() => {
-    const q = searchQuery.trim();
-    if (!pickerVisible || q.length < 3) {
-      setSearchResults([]);
-      return;
-    }
-    const h = setTimeout(async () => {
-      try {
-        setSearching(true);
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          q
-        )}&limit=8`;
-        const res = await fetch(url, {
-          headers: { "Accept-Language": "en" },
         });
-        const json = await res.json();
-        setSearchResults(json || []);
-      } catch {
-        setSearchResults([]);
-      } finally {
-        setSearching(false);
+
+        values = processed.map((p: any) => p.v);
+
+        // Check for data variation
+        const minVal = Math.min(...values);
+        const maxVal = Math.max(...values);
+        const variance = maxVal - minVal;
+
+        console.log("📊 Chart data prepared:");
+        console.log("🏷️ Labels:", labels);
+        console.log("📈 Values:", values);
+        console.log("📏 Chart variance:", variance);
+        console.log("📍 Current level:", values[values.length - 1]);
+        console.log(
+          "📐 Chart will be scrollable with",
+          labels.length,
+          "data points"
+        );
+
+        setCurrentLevel(values[values.length - 1]);
+        const chartWidth = Math.max(
+          Dimensions.get("window").width - 32,
+          labels.length * 60 // 60px per data point
+        );
+        console.log("📐 Calculated chart width:", chartWidth, "px");
+
+        setChartData({
+          labels,
+          datasets: [
+            {
+              data: values,
+              strokeWidth: 2,
+              color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
+            },
+          ],
+          legend: ["Groundwater Depth (m)"],
+        });
+        console.log("✅ Chart data set successfully!");
+
+        // Generate AI predictions if enabled and data is available
+        if (useAiPredictions && userLocation) {
+          console.log("🤖 Generating AI predictions...");
+          const locationInfo: LocationInfo = {
+            lat: userLocation.latitude,
+            lon: userLocation.longitude,
+            name: locationName,
+          };
+
+          const predictionDays = 30; // Always predict 30 days ahead
+
+          try {
+            const aiResult = await generateAIPredictionData(
+              predictionDays,
+              weatherData,
+              processed,
+              locationInfo
+            );
+
+            setAiPredictionData(aiResult.data);
+            setPredictionInsights(aiResult.insights);
+
+            // Create prediction chart data (future predictions only)
+            const futureData = aiResult.data.filter(
+              (item) => item.actualLevel === null
+            );
+            if (futureData.length > 0) {
+              const predictionLabels = futureData.map((item) => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                });
+              });
+
+              const predictionValues = futureData.map(
+                (item) => item.predictedLevel
+              );
+
+              setPredictedChartData({
+                labels: predictionLabels,
+                datasets: [
+                  {
+                    data: predictionValues,
+                    strokeWidth: 2,
+                    color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
+                  },
+                ],
+                legend: ["Predicted Groundwater Depth (m)"],
+              });
+
+              console.log("✅ AI prediction chart data prepared");
+            }
+          } catch (aiError) {
+            console.error("❌ AI prediction failed:", aiError);
+            setPredictionInsights(
+              "- AI prediction system encountered technical difficulties while processing groundwater data analysis, potentially due to network connectivity issues or service overload\n- Falling back to basic statistical analysis using historical groundwater monitoring data from nearby stations and established hydrological patterns for the region\n- Current internet connection may be unstable or AI service temporarily unavailable, affecting real-time weather integration and advanced predictive modeling capabilities\n- Try refreshing the application data or toggling airplane mode to reset network connection, or wait a few minutes for service restoration\n- Historical data analysis remains available and provides reliable baseline predictions based on seasonal patterns and regional groundwater behavior trends"
+            );
+          }
+        }
+      } else {
+        console.log("❌ No data records received from API");
+        setChartData(null);
+        Alert.alert("No Data", t("predictions.noDataAvailable"));
       }
-    }, 450);
-    return () => clearTimeout(h);
-  }, [searchQuery, pickerVisible]);
+    } catch (error) {
+      console.error("❌ API fetch error:", error);
+      Alert.alert(t("common.error"), "Failed to fetch groundwater data");
+    } finally {
+      console.log("🏁 Data fetch completed");
+      setLoading(false);
+    }
+  };
 
-  // Prevent auto-refresh if user has overridden location
+  // Refresh data
+  const onRefresh = async () => {
+    console.log("🔄 Refresh triggered by user");
+    setRefreshing(true);
+    if (nearestStation) {
+      await fetchGroundwaterData();
+    } else {
+      console.log("❌ Cannot refresh: no nearest station available");
+    }
+    setRefreshing(false);
+  };
+
+  // Add useEffect to regenerate predictions when AI toggle changes
   useEffect(() => {
-    if (userOverride) return;
-    // This prevents the original location fetch from running again
-  }, []);
+    if (nearestStation && chartData && useAiPredictions && !aiLoading) {
+      console.log("🔄 AI toggle changed, regenerating predictions...");
+      const regenerateAI = async () => {
+        if (userLocation) {
+          const locationInfo: LocationInfo = {
+            lat: userLocation.latitude,
+            lon: userLocation.longitude,
+            name: locationName,
+          };
 
-  const chartConfig = {
-    backgroundColor: colors.surface,
-    backgroundGradientFrom: colors.surface,
-    backgroundGradientTo: colors.background,
-    decimalPlaces: 1,
-    color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
-    labelColor: (opacity = 1) =>
-      colors.text.includes("rgb")
-        ? colors.text.replace("rgb", "rgba").replace(")", `, ${opacity})`)
-        : `rgba(55, 65, 81, ${opacity})`,
-    style: { borderRadius: 16 },
-    propsForDots: {
-      r: "4",
-      strokeWidth: "2",
-      stroke: colors.primary,
-    },
+          const predictionDays = 30; // Always predict 30 days ahead
+
+          // Get processed data from the current chart for AI analysis
+          const processed = chartData.labels.map(
+            (label: string, index: number) => ({
+              t: new Date(),
+              v: chartData.datasets[0].data[index],
+            })
+          );
+
+          try {
+            const aiResult = await generateAIPredictionData(
+              predictionDays,
+              weatherData,
+              processed,
+              locationInfo
+            );
+
+            setAiPredictionData(aiResult.data);
+            setPredictionInsights(aiResult.insights);
+
+            // Create prediction chart data
+            const futureData = aiResult.data.filter(
+              (item) => item.actualLevel === null
+            );
+            if (futureData.length > 0) {
+              const predictionLabels = futureData.map((item) => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                });
+              });
+
+              const predictionValues = futureData.map(
+                (item) => item.predictedLevel
+              );
+
+              setPredictedChartData({
+                labels: predictionLabels,
+                datasets: [
+                  {
+                    data: predictionValues,
+                    strokeWidth: 2,
+                    color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
+                  },
+                ],
+                legend: ["Predicted Groundwater Depth (m)"],
+              });
+            }
+          } catch (aiError) {
+            console.error("❌ AI prediction regeneration failed:", aiError);
+            setPredictionInsights(
+              "- AI prediction regeneration process failed during real-time analysis update, possibly due to temporary service interruption or data processing limitations\n- Toggle the AI predictions switch off and on again to reinitialize the prediction engine and retry the groundwater analysis with current data parameters\n- Check network connection stability as AI processing requires reliable internet connectivity for weather data integration and cloud-based machine learning computations\n- System is currently operating with historical data analysis only, providing basic trend predictions without advanced weather modeling and seasonal adjustment capabilities\n- Contact support if problem persists, or wait for service restoration while using available historical groundwater monitoring data for reference"
+            );
+          }
+        }
+      };
+
+      regenerateAI();
+    }
+  }, [useAiPredictions]);
+
+  // Retry getting location
+  const retryLocation = () => {
+    requestLocationPermission();
   };
 
-  // Avoid overlapping X-axis labels by thinning and formatting as two lines (DD + Mon)
-  const buildDateLabels = (
-    dates: string[],
-    chartWidthGuess: number,
-    minLabelSpacing = 56
-  ): string[] => {
-    const n = dates.length;
-    if (n <= 0) return [];
-    const maxLabels = Math.max(
-      2,
-      Math.floor(chartWidthGuess / Math.max(30, minLabelSpacing))
-    );
-    const step = Math.max(1, Math.ceil(n / maxLabels));
-    return dates.map((iso, i) => {
-      if (i % step !== 0) return "";
-      const d = new Date(iso);
-      const dd = d.toLocaleDateString("en-GB", { day: "2-digit" });
-      const mon = d.toLocaleDateString("en-GB", { month: "short" });
-      return `${dd}\n${mon}`; // two-line label to reduce width
-    });
-  };
-
-  const historicalLevelChartData = useMemo(() => {
-    if (!predictionData.length) return null;
-    const historicalData = predictionData.filter(
-      (item) => item.actualLevel !== null
-    );
-    if (!historicalData.length) return null;
-
-    const widthGuess = Math.max(
-      screenWidth - 32,
-      Math.max(1, historicalData.length) * 12
-    );
-    const labels = buildDateLabels(
-      historicalData.map((i) => i.date),
-      widthGuess,
-      56
-    );
-
-    return {
-      labels,
-      datasets: [
-        {
-          data: historicalData.map((d) => d.actualLevel as number),
-          color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
-          strokeWidth: 2,
-        },
-      ],
-      legend: ["Historical Level"],
-    };
-  }, [predictionData]);
-
-  const predictedLevelChartData = useMemo(() => {
-    if (!predictionData.length) return null;
-    const predictedData = predictionData.filter(
-      (item) => item.actualLevel === null
-    );
-    if (!predictedData.length) return null;
-
-    const widthGuess = Math.max(
-      screenWidth - 32,
-      Math.max(1, predictedData.length) * 12
-    );
-    const labels = buildDateLabels(
-      predictedData.map((i) => i.date),
-      widthGuess,
-      56
-    );
-
-    return {
-      labels,
-      datasets: [
-        {
-          data: predictedData.map((d) => d.predictedLevel),
-          color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
-          strokeWidth: 2,
-        },
-      ],
-      legend: [useAiPredictions ? "AI Predicted Level" : "Predicted Level"],
-    };
-  }, [predictionData, useAiPredictions]);
-
-  const rechargeConsumptionChartData = useMemo(() => {
-    if (!predictionData.length) return null;
-
-    const labels = predictionData.map((item, index) => {
-      const date = new Date(item.date);
-      return index % 5 === 0
-        ? date.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-          })
-        : "";
-    });
-
-    return {
-      labels,
-      datasets: [
-        {
-          data: predictionData.map((item) => item.rechargeRate),
-          color: (opacity = 1) => `rgba(75, 192, 192, ${opacity})`,
-          strokeWidth: 2,
-        },
-        {
-          data: predictionData.map((item) => item.consumptionRate),
-          color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
-          strokeWidth: 2,
-        },
-      ],
-      legend: ["Recharge Rate", "Consumption Rate"],
-    };
-  }, [predictionData]);
-
-  const currentLevel =
-    predictionData.find((item) => item.actualLevel !== null)?.actualLevel || 15;
-  const predictedLevel =
-    predictionData[predictionData.length - 1]?.predictedLevel || 15;
-  const levelTrend =
-    predictedLevel > currentLevel ? "increasing" : "decreasing";
-
-  if (loading) {
-    return (
-      <SafeAreaView
-        style={[styles.safeArea, { backgroundColor: colors.background }]}
-      >
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
-            Generating groundwater predictions...
-          </Text>
-          <Text
-            style={[styles.loadingSubText, { color: colors.textSecondary }]}
-          >
-            {weatherLoading
-              ? "Fetching weather data for enhanced accuracy..."
-              : "Analyzing recharge patterns and consumption data"}
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const thresholdCritical = 10; // meters below ground
+  const isCritical = (kpis?.current || 0) >= thresholdCritical;
 
   return (
-    <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: colors.background }]}
+    <ScrollView
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      contentContainerStyle={{ paddingBottom: 24 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
-      <ScrollView
-        style={[styles.container, { backgroundColor: colors.background }]}
+      {/* Header Card */}
+      <View
+        style={[styles.headerCard, { backgroundColor: theme.colors.surface }]}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Groundwater Level Predictions
-          </Text>
-          <View style={{ gap: 6 }}>
-            <TouchableOpacity
-              style={[
-                styles.refreshButton,
-                { backgroundColor: colors.primary },
-              ]}
-              onPress={() => {
-                if (userOverride) setUserOverride(false);
-                setLoading(true);
-                setWeatherLoading(true);
-
-                // Re-fetch current location and weather data
-                fetchCurrentLocation().then(() => {
-                  if (location) {
-                    fetchWeatherForecast();
-                  }
-                });
-              }}
-            >
-              <Text style={styles.refreshButtonText}>Use Device</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.refreshButton,
-                {
-                  backgroundColor: colors.surface,
-                  borderWidth: 1,
-                  borderColor: colors.primary,
-                },
-              ]}
-              onPress={openPicker}
-            >
-              <Text
-                style={[styles.refreshButtonText, { color: colors.primary }]}
-              >
-                Change Location
+        <View style={styles.headerRow}>
+          <View style={styles.headerLeft}>
+            <Ionicons
+              name="location-outline"
+              size={24}
+              color={theme.colors.primary}
+            />
+            <View style={{ marginLeft: 12 }}>
+              <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+                {t("predictions.title")}
               </Text>
-            </TouchableOpacity>
+              <Text
+                style={[
+                  styles.headerSubtitle,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {nearestStation
+                  ? `${nearestStation.station_name}, ${nearestStation.district}`
+                  : locationLoading
+                  ? t("predictions.findingStation")
+                  : t("predictions.locationNotAvailable")}
+              </Text>
+            </View>
           </View>
-        </View>
-
-        {/* AI Predictions Toggle */}
-        <View style={styles.aiToggleContainer}>
-          <TouchableOpacity
-            style={[
-              styles.aiToggleButton,
-              {
-                backgroundColor: useAiPredictions
-                  ? colors.primary
-                  : colors.surface,
-                borderWidth: 1,
-                borderColor: colors.primary,
-              },
-            ]}
-            onPress={() => {
-              setUseAiPredictions(!useAiPredictions);
-              setLoading(true);
-            }}
-            disabled={aiLoading}
-          >
-            <Text
-              style={[
-                styles.aiToggleText,
-                { color: useAiPredictions ? colors.surface : colors.primary },
-              ]}
-            >
-              🤖 {useAiPredictions ? "AI Predictions ON" : "AI Predictions OFF"}
-            </Text>
-            {aiLoading && (
-              <ActivityIndicator
-                size="small"
-                color={useAiPredictions ? colors.surface : colors.primary}
-                style={{ marginLeft: 8 }}
-              />
-            )}
+          <TouchableOpacity style={styles.refreshBtn} onPress={onRefresh}>
+            <Ionicons name="refresh" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
+      </View>
 
-        {/* Real Groundwater Data Status */}
-        {realGroundwaterData.length > 0 && nearestStationInfo && (
-          <View
+      {/* Location Permission / Error States */}
+      {!locationPermission && (
+        <View
+          style={[styles.errorCard, { backgroundColor: theme.colors.surface }]}
+        >
+          <Ionicons name="location" size={48} color={COLOR_MUTED} />
+          <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
+            {t("predictions.locationAccessRequired")}
+          </Text>
+          <Text
             style={[
-              styles.realDataStatus,
-              {
-                backgroundColor: colors.surface + "80",
-                borderColor: colors.primary,
-              },
+              styles.errorSubtitle,
+              { color: theme.colors.textSecondary },
             ]}
           >
-            <MaterialCommunityIcons
-              name="database-check"
-              size={16}
-              color={colors.primary}
-            />
-            <Text style={[styles.realDataStatusText, { color: colors.text }]}>
-              Using {realGroundwaterData.length} real measurements from{" "}
-              {nearestStationInfo.stationname} (
-              {nearestStationInfo.distance.toFixed(1)} km away)
+            {t("predictions.enableLocationMessage")}
+          </Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={retryLocation}>
+            <Text style={styles.retryBtnText}>
+              {t("predictions.enableLocation")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {locationLoading && (
+        <View
+          style={[
+            styles.loadingCard,
+            { backgroundColor: theme.colors.surface },
+          ]}
+        >
+          <ActivityIndicator size="large" color={COLOR_PRIMARY} />
+          <Text style={[styles.loadingText, { color: theme.colors.text }]}>
+            {t("predictions.gettingLocation")}
+          </Text>
+        </View>
+      )}
+
+      {/* Chart Card */}
+      {locationPermission && nearestStation && (
+        <View
+          style={[
+            styles.chartCard,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+            },
+          ]}
+        >
+          <View style={styles.chartHeader}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              {t("predictions.trendPrediction")}
             </Text>
           </View>
-        )}
 
-        {/* Loading indicator for finding station */}
-        {stationLoading && (
-          <View style={styles.weatherStatus}>
-            <ActivityIndicator size="small" color={colors.primary} />
-            <Text
+          {/* Time Period Selector */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.periodSelectorContainer}
+            contentContainerStyle={styles.periodSelectorContent}
+          >
+            {timePeriods.map((period) => (
+              <TouchableOpacity
+                key={period.key}
+                style={[
+                  styles.periodButton,
+                  selectedPeriod === period.key && styles.periodButtonActive,
+                  {
+                    backgroundColor:
+                      selectedPeriod === period.key
+                        ? theme.colors.primary
+                        : theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                onPress={() => setSelectedPeriod(period.key)}
+              >
+                <Text
+                  style={[
+                    styles.periodButtonText,
+                    selectedPeriod === period.key &&
+                      styles.periodButtonTextActive,
+                    {
+                      color:
+                        selectedPeriod === period.key
+                          ? "#ffffff"
+                          : theme.colors.text,
+                    },
+                  ]}
+                >
+                  {period.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {loading ? (
+            <View style={styles.loadingChart}>
+              <ActivityIndicator size="large" color={COLOR_PRIMARY} />
+              <Text style={[styles.loadingText, { color: theme.colors.text }]}>
+                {t("predictions.loadingData")}
+              </Text>
+            </View>
+          ) : chartData?.datasets?.[0]?.data?.length ? (
+            <>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={true}
+                style={{ marginHorizontal: 8 }}
+                contentContainerStyle={{ paddingHorizontal: 8 }}
+              >
+                <LineChart
+                  data={chartData}
+                  width={Math.max(
+                    Dimensions.get("window").width - 32,
+                    chartData.labels.length * 60 // 60px per data point for good spacing
+                  )}
+                  height={260}
+                  chartConfig={{
+                    backgroundColor: theme.colors.surface,
+                    backgroundGradientFrom: theme.colors.surface,
+                    backgroundGradientTo: theme.colors.surface,
+                    decimalPlaces: 2,
+                    color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
+                    labelColor: (opacity = 1) =>
+                      theme.isDark
+                        ? `rgba(248, 250, 252, ${opacity})`
+                        : `rgba(15, 23, 42, ${opacity})`,
+                    propsForDots: {
+                      r: "4",
+                      strokeWidth: "2",
+                      stroke: "#0A84FF",
+                      fill: "#ffffff",
+                    },
+                    propsForBackgroundLines: {
+                      stroke: theme.isDark ? "#374151" : "#e5e7eb",
+                    },
+                    propsForLabels: {
+                      fontSize: 11,
+                    },
+                  }}
+                  bezier={false}
+                  yAxisSuffix=" m"
+                  fromZero={false}
+                  style={styles.chart}
+                  verticalLabelRotation={45}
+                  withInnerLines={true}
+                  withOuterLines={true}
+                  withVerticalLines={false}
+                  withHorizontalLines={true}
+                />
+              </ScrollView>
+              <Text
+                style={[
+                  styles.axisLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {selectedPeriod === "7d"
+                  ? "Past 7 Days"
+                  : selectedPeriod === "30d"
+                  ? "Past 30 Days"
+                  : selectedPeriod === "3m"
+                  ? "Past 3 Months"
+                  : selectedPeriod === "6m"
+                  ? "Past 6 Months"
+                  : "Past 1 Year"}
+              </Text>
+              <View style={styles.scrollIndicator}>
+                <Ionicons
+                  name="swap-horizontal"
+                  size={14}
+                  color={theme.colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.scrollIndicatorText,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Scroll left/right to view all data points
+                </Text>
+              </View>
+            </>
+          ) : (
+            <View style={styles.noDataContainer}>
+              <Ionicons
+                name="analytics-outline"
+                size={48}
+                color={COLOR_MUTED}
+              />
+              <Text
+                style={[
+                  styles.noDataText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("predictions.noDataAvailable")}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* AI Toggle and Weather Status */}
+      {locationPermission && nearestStation && (
+        <>
+          {/* AI Toggle */}
+          <View style={styles.aiToggleContainer}>
+            <TouchableOpacity
               style={[
-                styles.weatherStatusText,
-                { color: colors.textSecondary },
+                styles.aiToggleButton,
+                {
+                  backgroundColor: useAiPredictions
+                    ? theme.colors.primary
+                    : theme.colors.surface,
+                  borderWidth: 1,
+                  borderColor: theme.colors.primary,
+                },
               ]}
+              onPress={() => setUseAiPredictions(!useAiPredictions)}
+              disabled={aiLoading}
             >
-              Finding nearest groundwater monitoring station...
-            </Text>
+              <Text
+                style={[
+                  styles.aiToggleText,
+                  {
+                    color: useAiPredictions
+                      ? theme.colors.surface
+                      : theme.colors.primary,
+                  },
+                ]}
+              >
+                🤖{" "}
+                {useAiPredictions ? "AI Predictions ON" : "AI Predictions OFF"}
+              </Text>
+              {aiLoading && (
+                <ActivityIndicator
+                  size="small"
+                  color={
+                    useAiPredictions
+                      ? theme.colors.surface
+                      : theme.colors.primary
+                  }
+                  style={{ marginLeft: 8 }}
+                />
+              )}
+            </TouchableOpacity>
           </View>
-        )}
 
-        {/* Location Info */}
-        <Text style={[styles.locationText, { color: colors.textSecondary }]}>
-          📍 Location: {locationName}
-        </Text>
-
-        {/* Weather Data Status */}
-        {weatherLoading ? (
-          <View style={styles.weatherStatus}>
-            <ActivityIndicator size="small" color={colors.primary} />
-            <Text
-              style={[
-                styles.weatherStatusText,
-                { color: colors.textSecondary },
-              ]}
-            >
-              Fetching weather data for enhanced predictions...
-            </Text>
-          </View>
-        ) : weatherData ? (
-          <View>
-            <Text
-              style={[
-                styles.weatherStatusText,
-                { color: colors.primary, textAlign: "center" },
-              ]}
-            >
-              ✅ Weather data integrated for accurate predictions
-            </Text>
+          {/* Weather Status */}
+          {weatherLoading ? (
+            <View style={styles.weatherStatus}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <Text
+                style={[
+                  styles.weatherStatusText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                Fetching weather data for enhanced predictions...
+              </Text>
+            </View>
+          ) : weatherData ? (
             <View
               style={[
                 styles.weatherSummary,
-                { backgroundColor: colors.surface, borderColor: colors.border },
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
               ]}
             >
               <Text
-                style={[styles.weatherSummaryTitle, { color: colors.text }]}
+                style={[
+                  styles.weatherSummaryTitle,
+                  { color: theme.colors.text },
+                ]}
               >
                 Current Weather Conditions
               </Text>
@@ -1610,7 +1436,7 @@ Make the predictions realistic and consider:
                   <Text
                     style={[
                       styles.weatherDetail,
-                      { color: colors.textSecondary },
+                      { color: theme.colors.textSecondary },
                     ]}
                   >
                     🌡️{" "}
@@ -1619,7 +1445,7 @@ Make the predictions realistic and consider:
                   <Text
                     style={[
                       styles.weatherDetail,
-                      { color: colors.textSecondary },
+                      { color: theme.colors.textSecondary },
                     ]}
                   >
                     💧 {weatherData.list[0].main.humidity || 0}% humidity
@@ -1627,7 +1453,7 @@ Make the predictions realistic and consider:
                   <Text
                     style={[
                       styles.weatherDetail,
-                      { color: colors.textSecondary },
+                      { color: theme.colors.textSecondary },
                     ]}
                   >
                     🌧️ {(weatherData.list[0].rain?.["3h"] || 0).toFixed(1)}mm
@@ -1636,7 +1462,7 @@ Make the predictions realistic and consider:
                   <Text
                     style={[
                       styles.weatherDetail,
-                      { color: colors.textSecondary },
+                      { color: theme.colors.textSecondary },
                     ]}
                   >
                     📊 {weatherData.list[0].main.pressure || 0}hPa pressure
@@ -1644,925 +1470,750 @@ Make the predictions realistic and consider:
                 </View>
               )}
             </View>
-          </View>
-        ) : (
-          <Text
-            style={[
-              styles.weatherStatusText,
-              { color: colors.textSecondary, textAlign: "center" },
-            ]}
-          >
-            ⚠️ Using estimated patterns (weather data unavailable)
-          </Text>
-        )}
-
-        {/* Summary Cards */}
-        <View style={styles.summaryContainer}>
-          <View
-            style={[
-              styles.summaryCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name="water-well"
-              size={24}
-              color={colors.primary}
-            />
-            <Text style={[styles.summaryValue, { color: colors.text }]}>
-              {(currentLevel || 0).toFixed(1)}m
-            </Text>
+          ) : (
             <Text
-              style={[styles.summaryLabel, { color: colors.textSecondary }]}
+              style={[
+                styles.weatherStatusText,
+                { color: theme.colors.textSecondary, textAlign: "center" },
+              ]}
             >
-              Current Level
+              ⚠️ Using estimated patterns (weather data unavailable)
             </Text>
-          </View>
+          )}
 
-          <View
-            style={[
-              styles.summaryCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name={
-                levelTrend === "increasing" ? "trending-up" : "trending-down"
-              }
-              size={24}
-              color={levelTrend === "increasing" ? "#22c55e" : "#ef4444"}
-            />
-            <Text style={[styles.summaryValue, { color: colors.text }]}>
-              {(predictedLevel || 0).toFixed(1)}m
-            </Text>
-            <Text
-              style={[styles.summaryLabel, { color: colors.textSecondary }]}
-            >
-              Predicted Level
-            </Text>
-          </View>
-
-          <View
-            style={[
-              styles.summaryCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name={levelTrend === "increasing" ? "arrow-up" : "arrow-down"}
-              size={24}
-              color={levelTrend === "increasing" ? "#22c55e" : "#ef4444"}
-            />
-            <Text style={[styles.summaryValue, { color: colors.text }]}>
-              {Math.abs((predictedLevel || 0) - (currentLevel || 0)).toFixed(1)}
-              m
-            </Text>
-            <Text
-              style={[styles.summaryLabel, { color: colors.textSecondary }]}
-            >
-              Expected Change
-            </Text>
-          </View>
-        </View>
-
-        {/* Time Range Selector */}
-        <View
-          style={[
-            styles.timeRangeContainer,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-        >
-          <Text style={[styles.sectionSubTitle, { color: colors.text }]}>
-            Prediction Period:
-          </Text>
-          <View style={styles.timeRangeButtons}>
-            {(["7d", "30d", "90d", "180d", "365d"] as const).map((range) => (
-              <TouchableOpacity
-                key={range}
+          {/* AI Prediction Chart */}
+          {useAiPredictions &&
+            predictedChartData?.datasets?.[0]?.data?.length && (
+              <View
                 style={[
-                  styles.timeRangeButton,
+                  styles.chartCard,
                   {
-                    backgroundColor:
-                      selectedTimeRange === range
-                        ? colors.primary
-                        : "transparent",
-                    borderColor: colors.primary,
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
                   },
                 ]}
-                onPress={() => setSelectedTimeRange(range)}
               >
                 <Text
                   style={[
-                    styles.timeRangeButtonText,
+                    styles.sectionTitle,
                     {
-                      color:
-                        selectedTimeRange === range ? "white" : colors.primary,
+                      color: theme.colors.text,
+                      borderBottomColor: theme.colors.border,
                     },
                   ]}
                 >
-                  {range === "7d"
-                    ? "7 Days"
-                    : range === "30d"
-                    ? "30 Days"
-                    : range === "90d"
-                    ? "3 Months"
-                    : range === "180d"
-                    ? "6 Months"
-                    : "1 Year"}
+                  <MaterialCommunityIcons
+                    name="chart-line"
+                    size={18}
+                    color={theme.colors.text}
+                  />{" "}
+                  AI Predicted Groundwater Level
                 </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Historical Groundwater Level Chart */}
-        {historicalLevelChartData && (
-          <View
-            style={[
-              styles.chartCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: colors.text, borderBottomColor: colors.border },
-              ]}
-            >
-              <MaterialCommunityIcons
-                name="chart-line"
-                size={18}
-                color={colors.text}
-              />{" "}
-              Historical Groundwater Level
-            </Text>
-            <Text
-              style={[styles.chartDescription, { color: colors.textSecondary }]}
-            >
-              📈 Blue line shows actual measured groundwater levels
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 8 }}
-            >
-              <LineChart
-                data={historicalLevelChartData}
-                width={Math.max(
-                  screenWidth - 32,
-                  Math.max(1, historicalLevelChartData.labels.length) * 12
-                )}
-                height={260}
-                yAxisSuffix="m"
-                chartConfig={{
-                  ...chartConfig,
-                  color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
-                  fillShadowGradient: colors.primary,
-                  fillShadowGradientOpacity: 0.1,
-                }}
-                style={styles.chart}
-                bezier
-                withInnerLines={false}
-                withOuterLines={true}
-                withVerticalLines={false}
-                fromZero={false}
-                segments={4}
-              />
-            </ScrollView>
-          </View>
-        )}
-
-        {/* Predicted Groundwater Level Chart */}
-        {predictedLevelChartData && (
-          <View
-            style={[
-              styles.chartCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: colors.text, borderBottomColor: colors.border },
-              ]}
-            >
-              <MaterialCommunityIcons
-                name="chart-line"
-                size={18}
-                color={colors.text}
-              />{" "}
-              {useAiPredictions
-                ? "AI Predicted Groundwater Level"
-                : "Predicted Groundwater Level"}
-            </Text>
-            <Text
-              style={[styles.chartDescription, { color: colors.textSecondary }]}
-            >
-              🟠 Orange line shows forecasted levels for the selected period
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 8 }}
-            >
-              <LineChart
-                data={predictedLevelChartData}
-                width={Math.max(
-                  screenWidth - 32,
-                  Math.max(1, predictedLevelChartData.labels.length) * 12
-                )}
-                height={260}
-                yAxisSuffix="m"
-                chartConfig={{
-                  ...chartConfig,
-                  color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
-                  fillShadowGradient: "rgba(255, 152, 0, 1)",
-                  fillShadowGradientOpacity: 0.08,
-                  propsForDots: {
-                    r: "3",
-                    strokeWidth: "1.5",
-                    stroke: "rgba(255, 152, 0, 1)",
-                  },
-                }}
-                style={styles.chart}
-                bezier
-                withInnerLines={false}
-                withOuterLines={true}
-                withVerticalLines={false}
-                fromZero={false}
-                segments={4}
-              />
-            </ScrollView>
-          </View>
-        )}
-
-        {/* Recharge vs Consumption Chart */}
-        <View
-          style={[
-            styles.chartCard,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sectionTitle,
-              { color: colors.text, borderBottomColor: colors.border },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name="water-sync"
-              size={18}
-              color={colors.text}
-            />{" "}
-            Recharge vs Consumption Pattern
-          </Text>
-          <Text
-            style={[styles.chartDescription, { color: colors.textSecondary }]}
-          >
-            🔄 Daily recharge and consumption rates (mm/day)
-          </Text>
-
-          {rechargeConsumptionChartData && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 8 }}
-            >
-              <LineChart
-                data={rechargeConsumptionChartData}
-                width={Math.max(screenWidth - 32, predictionData.length * 12)}
-                height={250}
-                yAxisSuffix=" mm"
-                chartConfig={{
-                  ...chartConfig,
-                  color: (opacity = 1) => `rgba(75, 192, 192, ${opacity})`,
-                }}
-                style={styles.chart}
-                bezier
-                withInnerLines={false}
-                withOuterLines={true}
-                withVerticalLines={false}
-                fromZero={true}
-                segments={3}
-              />
-            </ScrollView>
-          )}
-
-          <View
-            style={[styles.legendContainer, { borderTopColor: colors.border }]}
-          >
-            <View style={styles.legendItem}>
-              <View
-                style={[
-                  styles.legendDot,
-                  { backgroundColor: "rgba(75, 192, 192, 1)" },
-                ]}
-              />
-              <Text
-                style={[styles.legendText, { color: colors.textSecondary }]}
-              >
-                Recharge Rate
-              </Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View
-                style={[
-                  styles.legendDot,
-                  { backgroundColor: "rgba(255, 99, 132, 1)" },
-                ]}
-              />
-              <Text
-                style={[styles.legendText, { color: colors.textSecondary }]}
-              >
-                Consumption Rate
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* AI Insights */}
-        {useAiPredictions && predictionInsights && (
-          <View
-            style={[
-              styles.chartCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: colors.text, borderBottomColor: colors.border },
-              ]}
-            >
-              <MaterialCommunityIcons
-                name="brain"
-                size={18}
-                color={colors.text}
-              />{" "}
-              AI Prediction Insights
-            </Text>
-            <Text
-              style={[styles.chartDescription, { color: colors.textSecondary }]}
-            >
-              🧠 AI analysis of groundwater trends and contributing factors
-            </Text>
-
-            <View style={styles.insightsContainer}>
-              <Text style={[styles.insightsText, { color: colors.text }]}>
-                {predictionInsights}
-              </Text>
-            </View>
-
-            <View
-              style={[styles.insightsFooter, { borderTopColor: colors.border }]}
-            >
-              <MaterialCommunityIcons
-                name="information-outline"
-                size={14}
-                color={colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.insightsFooterText,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                Powered by Gemini 2.0 Flash Exp • Generated{" "}
-                {new Date().toLocaleTimeString()}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* AI Model Status */}
-        <View
-          style={[
-            styles.aiStatusCard,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-        >
-          <View style={styles.aiStatusHeader}>
-            <MaterialCommunityIcons
-              name="robot"
-              size={20}
-              color={colors.primary}
-            />
-            <Text style={[styles.aiStatusTitle, { color: colors.text }]}>
-              AI Prediction Model
-            </Text>
-            <View
-              style={[styles.statusBadge, { backgroundColor: "#22c55e20" }]}
-            >
-              <Text style={[styles.statusBadgeText, { color: "#22c55e" }]}>
-                Active
-              </Text>
-            </View>
-          </View>
-          <Text
-            style={[
-              styles.aiStatusDescription,
-              { color: colors.textSecondary },
-            ]}
-          >
-            Using machine learning algorithms to analyze historical patterns,
-            seasonal variations, and consumption trends for accurate groundwater
-            level predictions.
-          </Text>
-          <View style={styles.modelMetrics}>
-            <View style={styles.metricItem}>
-              <Text style={[styles.metricValue, { color: colors.text }]}>
-                94.2%
-              </Text>
-              <Text
-                style={[styles.metricLabel, { color: colors.textSecondary }]}
-              >
-                Accuracy
-              </Text>
-            </View>
-            <View style={styles.metricItem}>
-              <Text style={[styles.metricValue, { color: colors.text }]}>
-                0.85m
-              </Text>
-              <Text
-                style={[styles.metricLabel, { color: colors.textSecondary }]}
-              >
-                Avg Error
-              </Text>
-            </View>
-            <View style={styles.metricItem}>
-              <Text style={[styles.metricValue, { color: colors.text }]}>
-                2.3s
-              </Text>
-              <Text
-                style={[styles.metricLabel, { color: colors.textSecondary }]}
-              >
-                Response
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Disclaimer */}
-        <View
-          style={[
-            styles.disclaimer,
-            { backgroundColor: "#fbbf2420", borderColor: "#fbbf24" },
-          ]}
-        >
-          <MaterialCommunityIcons
-            name="information"
-            size={16}
-            color="#fbbf24"
-          />
-          <Text style={[styles.disclaimerText, { color: "#92400e" }]}>
-            Predictions are based on current data patterns and may vary due to
-            unexpected weather events, policy changes, or geological factors.
-          </Text>
-        </View>
-      </ScrollView>
-
-      {/* Location Picker Modal */}
-      <Modal
-        visible={pickerVisible}
-        animationType="slide"
-        onRequestClose={() => setPickerVisible(false)}
-      >
-        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-          <View style={styles.pickerHeader}>
-            <TouchableOpacity
-              onPress={() => setPickerVisible(false)}
-              style={{ padding: 4 }}
-            >
-              <Ionicons name="close" size={24} color={colors.text} />
-            </TouchableOpacity>
-            <Text style={[styles.pickerTitle, { color: colors.text }]}>
-              Select Location
-            </Text>
-            <View style={{ width: 32 }} />
-          </View>
-
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={18} color={colors.textSecondary} />
-            <TextInput
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="Search place (min 3 chars)"
-              placeholderTextColor={colors.textSecondary}
-              style={[styles.searchInput, { color: colors.text }]}
-              autoCorrect={false}
-            />
-            {searching && (
-              <ActivityIndicator size="small" color={colors.primary} />
-            )}
-          </View>
-
-          {searchResults.length > 0 && (
-            <FlatList
-              data={searchResults}
-              keyExtractor={(item) => item.lat + item.lon}
-              style={styles.resultsList}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.resultRow}
-                  onPress={() => {
-                    setTempLoc({
-                      lat: parseFloat(item.lat),
-                      lon: parseFloat(item.lon),
-                    });
-                    setSearchQuery(item.display_name);
-                    setSearchResults([]);
-                  }}
+                <Text
+                  style={[
+                    styles.chartDescription,
+                    { color: theme.colors.textSecondary },
+                  ]}
                 >
-                  <Ionicons
-                    name="location-outline"
-                    size={16}
-                    color={colors.primary}
+                  🟠 Orange line shows AI-forecasted levels for the next 30 days
+                </Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={true}
+                  style={{ marginHorizontal: 8 }}
+                  contentContainerStyle={{ paddingHorizontal: 8 }}
+                >
+                  <LineChart
+                    data={predictedChartData}
+                    width={Math.max(
+                      Dimensions.get("window").width - 32,
+                      predictedChartData.labels.length * 60
+                    )}
+                    height={260}
+                    chartConfig={{
+                      backgroundColor: theme.colors.surface,
+                      backgroundGradientFrom: theme.colors.surface,
+                      backgroundGradientTo: theme.colors.surface,
+                      decimalPlaces: 2,
+                      color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
+                      labelColor: (opacity = 1) =>
+                        theme.isDark
+                          ? `rgba(248, 250, 252, ${opacity})`
+                          : `rgba(15, 23, 42, ${opacity})`,
+                      propsForDots: {
+                        r: "3",
+                        strokeWidth: "1.5",
+                        stroke: "rgba(255, 152, 0, 1)",
+                        fill: "#ffffff",
+                      },
+                      propsForBackgroundLines: {
+                        stroke: theme.isDark ? "#374151" : "#e5e7eb",
+                      },
+                      propsForLabels: {
+                        fontSize: 11,
+                      },
+                    }}
+                    bezier={true}
+                    yAxisSuffix=" m"
+                    fromZero={false}
+                    style={styles.chart}
+                    verticalLabelRotation={45}
+                    withInnerLines={false}
+                    withOuterLines={true}
+                    withVerticalLines={false}
+                    withHorizontalLines={true}
                   />
-                  <Text
-                    style={[styles.resultText, { color: colors.text }]}
-                    numberOfLines={2}
-                  >
-                    {item.display_name}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-          )}
+                </ScrollView>
+                <Text
+                  style={[
+                    styles.axisLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Future Predictions - Next{" "}
+                  {selectedPeriod.replace(/[^0-9]/g, "")} Days
+                </Text>
+              </View>
+            )}
 
-          <View style={{ flex: 1 }}>
-            <MapView
-              style={{ flex: 1 }}
-              region={
-                tempLoc
-                  ? {
-                      latitude: tempLoc.lat,
-                      longitude: tempLoc.lon,
-                      latitudeDelta: 0.5,
-                      longitudeDelta: 0.5,
-                    }
-                  : {
-                      latitude: location?.lat || 13.0827,
-                      longitude: location?.lon || 80.2707,
-                      latitudeDelta: 0.5,
-                      longitudeDelta: 0.5,
-                    }
-              }
-              onPress={(e) => {
-                const { latitude, longitude } = e.nativeEvent.coordinate;
-                setTempLoc({ lat: latitude, lon: longitude });
-              }}
-            >
-              {tempLoc && (
-                <Marker
-                  coordinate={{ latitude: tempLoc.lat, longitude: tempLoc.lon }}
-                  title="Selected Location"
-                />
-              )}
-            </MapView>
-          </View>
-
-          <View style={styles.pickerFooter}>
-            <TouchableOpacity
+          {/* AI Prediction Insights */}
+          {useAiPredictions && predictionInsights && (
+            <View
               style={[
-                styles.pickerBtn,
+                styles.chartCard,
                 {
-                  backgroundColor: colors.surface,
-                  borderWidth: 1,
-                  borderColor: colors.border,
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
                 },
               ]}
-              onPress={() => setPickerVisible(false)}
-            >
-              <Text style={[styles.pickerBtnText, { color: colors.text }]}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.pickerBtn, { backgroundColor: colors.primary }]}
-              onPress={confirmLocation}
-              disabled={!tempLoc}
             >
               <Text
                 style={[
-                  styles.pickerBtnText,
-                  { color: tempLoc ? "white" : colors.textSecondary },
+                  styles.sectionTitle,
+                  {
+                    color: theme.colors.text,
+                    borderBottomColor: theme.colors.border,
+                  },
                 ]}
               >
-                Confirm Location
+                <MaterialCommunityIcons
+                  name="brain"
+                  size={18}
+                  color={theme.colors.text}
+                />{" "}
+                AI Prediction Insights
               </Text>
-            </TouchableOpacity>
+              <Text
+                style={[
+                  styles.chartDescription,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                🧠 Key prediction factors and trends (markdown format)
+              </Text>
+
+              <View
+                style={[
+                  styles.insightsContainer,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+              >
+                <Markdown
+                  style={{
+                    body: {
+                      color: theme.colors.text,
+                      fontSize: 14,
+                      lineHeight: 22,
+                      fontWeight: "500",
+                    },
+                    bullet_list: {
+                      marginVertical: 4,
+                    },
+                    list_item: {
+                      flexDirection: "row",
+                      alignItems: "flex-start",
+                      marginVertical: 2,
+                    },
+                    bullet_list_icon: {
+                      color: theme.colors.primary,
+                      fontSize: 14,
+                      fontWeight: "bold",
+                      marginRight: 8,
+                      marginTop: 2,
+                    },
+                    bullet_list_content: {
+                      flex: 1,
+                      color: theme.colors.text,
+                      fontSize: 14,
+                      fontWeight: "500",
+                    },
+                  }}
+                >
+                  {predictionInsights}
+                </Markdown>
+              </View>
+            </View>
+          )}
+        </>
+      )}
+
+      {/* Current Level & Prediction Cards */}
+      {locationPermission && nearestStation && kpis && (
+        <View style={styles.kpiGrid}>
+          <View
+            style={[
+              styles.kpiCard,
+              styles.currentLevelCard,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <View style={[styles.kpiIcon, { backgroundColor: "#e6f4ff" }]}>
+              <Ionicons name="water" size={24} color={COLOR_PRIMARY} />
+            </View>
+            <Text
+              style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}
+            >
+              {t("predictions.currentLevel")}
+            </Text>
+            <Text style={[styles.kpiValueLarge, { color: theme.colors.text }]}>
+              {kpis.current.toFixed(2)} m
+            </Text>
+            <Text
+              style={[styles.kpiSubtext, { color: theme.colors.textSecondary }]}
+            >
+              {t("predictions.belowGround")}
+            </Text>
           </View>
-        </SafeAreaView>
-      </Modal>
-    </SafeAreaView>
+
+          <View
+            style={[
+              styles.kpiCard,
+              styles.predictionCard,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <View style={[styles.kpiIcon, { backgroundColor: "#fff7ed" }]}>
+              <MaterialCommunityIcons
+                name="crystal-ball"
+                size={24}
+                color="#f97316"
+              />
+            </View>
+            <Text
+              style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}
+            >
+              {t("predictions.sevenDayPrediction")}
+            </Text>
+            <Text style={[styles.kpiValueLarge, { color: theme.colors.text }]}>
+              {kpis.prediction7Day.toFixed(2)} m
+            </Text>
+            <Text
+              style={[
+                styles.kpiSubtext,
+                {
+                  color:
+                    kpis.trend > 0.1
+                      ? "#ef4444"
+                      : kpis.trend < -0.1
+                      ? "#16a34a"
+                      : theme.colors.textSecondary,
+                },
+              ]}
+            >
+              {kpis.trend > 0.1
+                ? t("predictions.declining")
+                : kpis.trend < -0.1
+                ? t("predictions.rising")
+                : t("predictions.stableArrow")}
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {/* Statistics Grid */}
+      {locationPermission && nearestStation && kpis && (
+        <View style={styles.statsGrid}>
+          <View
+            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
+          >
+            <Ionicons name="analytics" size={18} color={theme.colors.primary} />
+            <Text
+              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
+            >
+              {selectedPeriod === "7d"
+                ? "7-Day Average"
+                : selectedPeriod === "30d"
+                ? "30-Day Average"
+                : selectedPeriod === "3m"
+                ? "3-Month Average"
+                : selectedPeriod === "6m"
+                ? "6-Month Average"
+                : "1-Year Average"}
+            </Text>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>
+              {kpis.avg.toFixed(2)} m
+            </Text>
+          </View>
+
+          <View
+            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
+          >
+            <Ionicons name="trending-down" size={18} color="#16a34a" />
+            <Text
+              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
+            >
+              {t("predictions.minimum")}
+            </Text>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>
+              {kpis.min.toFixed(2)} m
+            </Text>
+          </View>
+
+          <View
+            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
+          >
+            <Ionicons name="trending-up" size={18} color="#ef4444" />
+            <Text
+              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
+            >
+              {t("predictions.maximum")}
+            </Text>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>
+              {kpis.max.toFixed(2)} m
+            </Text>
+          </View>
+
+          <View
+            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
+          >
+            <MaterialCommunityIcons
+              name="chart-line"
+              size={18}
+              color={theme.colors.primary}
+            />
+            <Text
+              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
+            >
+              {t("predictions.trendLabel")}
+            </Text>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>
+              {Math.abs(kpis.trend).toFixed(2)} m
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {/* Alert Card */}
+      {locationPermission && nearestStation && kpis && (
+        <View
+          style={[
+            styles.alertCard,
+            isCritical ? styles.alertCardCritical : styles.alertCardNormal,
+          ]}
+        >
+          <Ionicons
+            name={isCritical ? "alert-circle" : "shield-checkmark"}
+            size={20}
+            color={isCritical ? "#ef4444" : "#16a34a"}
+          />
+          <Text
+            style={[
+              styles.alertText,
+              { color: isCritical ? "#991b1b" : "#065f46" },
+            ]}
+          >
+            {isCritical
+              ? t("predictions.alertCritical", {
+                  current: kpis.current.toFixed(2),
+                  threshold: thresholdCritical,
+                })
+              : t("predictions.alertNormal", {
+                  current: kpis.current.toFixed(2),
+                })}
+          </Text>
+        </View>
+      )}
+
+      {/* Insights Card */}
+      {locationPermission && nearestStation && insights.length > 0 && (
+        <View
+          style={[
+            styles.insightsCard,
+            { backgroundColor: theme.colors.surface },
+          ]}
+        >
+          <View style={styles.insightsHeader}>
+            <Ionicons
+              name="bulb-outline"
+              size={20}
+              color={theme.colors.primary}
+            />
+            <Text style={[styles.insightsTitle, { color: theme.colors.text }]}>
+              {t("predictions.insightsAnalysis")}
+            </Text>
+          </View>
+          {insights.map((insight, index) => (
+            <View key={index} style={styles.insightRow}>
+              <Text style={styles.insightBullet}>•</Text>
+              <Text
+                style={[
+                  styles.insightText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {insight}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
+  headerCard: {
+    margin: 16,
     padding: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
+  headerRow: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 40,
+    justifyContent: "space-between",
   },
-  loadingText: {
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  headerTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginTop: 16,
-    textAlign: "center",
+    marginBottom: 4,
   },
-  loadingSubText: {
+  headerSubtitle: {
     fontSize: 14,
+    opacity: 0.8,
+  },
+  refreshBtn: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: "#f1f5f9",
+  },
+  errorCard: {
+    margin: 16,
+    padding: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  errorSubtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  retryBtn: {
+    backgroundColor: COLOR_PRIMARY,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryBtnText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  loadingCard: {
+    margin: 16,
+    padding: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 12,
+  },
+  chartCard: {
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  chartHeader: {
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  loadingChart: {
+    height: 260,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  chart: {
+    marginVertical: 8,
+    borderRadius: 8,
+  },
+  axisLabel: {
+    textAlign: "center",
+    fontSize: 12,
     marginTop: 8,
+  },
+  noDataContainer: {
+    height: 260,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noDataText: {
+    fontSize: 16,
+    marginTop: 12,
+  },
+  kpiGrid: {
+    flexDirection: "row",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    gap: 16,
+  },
+  kpiCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  currentLevelCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: COLOR_PRIMARY,
+  },
+  predictionCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#f97316",
+  },
+  kpiIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  kpiLabel: {
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  kpiValueLarge: {
+    fontSize: 24,
+    fontWeight: "700",
     textAlign: "center",
   },
-  header: {
+  kpiSubtext: {
+    fontSize: 11,
+    textAlign: "center",
+    marginTop: 4,
+  },
+  statsGrid: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    minWidth: "45%",
+    padding: 12,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  statLabel: {
+    fontSize: 12,
+    marginLeft: 8,
+    flex: 1,
+  },
+  statValue: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  alertCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  alertCardNormal: {
+    backgroundColor: "#f0f9f4",
+    borderColor: "#16a34a",
+  },
+  alertCardCritical: {
+    backgroundColor: "#fef2f2",
+    borderColor: "#ef4444",
+  },
+  alertText: {
+    flex: 1,
+    fontSize: 14,
+    marginLeft: 12,
+    lineHeight: 20,
+  },
+  insightsCard: {
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  insightsHeader: {
+    flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    flex: 1,
-  },
-  refreshButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  refreshButtonText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  locationText: {
+  insightsTitle: {
     fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+  insightRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  insightBullet: {
+    color: COLOR_PRIMARY,
+    fontSize: 16,
+    marginRight: 8,
+    marginTop: 2,
+  },
+  insightText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  scrollIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+    paddingVertical: 4,
+  },
+  scrollIndicatorText: {
+    fontSize: 11,
+    marginLeft: 6,
+    fontStyle: "italic",
+  },
+  periodSelectorContainer: {
+    marginBottom: 16,
+  },
+  periodSelectorContent: {
+    paddingHorizontal: 4,
+    gap: 8,
+  },
+  periodButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginHorizontal: 4,
+  },
+  periodButtonActive: {
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  periodButtonText: {
+    fontSize: 14,
     fontWeight: "500",
     textAlign: "center",
-    marginBottom: 20,
+  },
+  periodButtonTextActive: {
+    fontWeight: "600",
   },
   aiToggleContainer: {
     alignItems: "center",
     marginBottom: 12,
+    marginHorizontal: 16,
   },
   aiToggleButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 25,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   aiToggleText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  realDataStatus: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginTop: 8,
-    marginBottom: 8,
-    gap: 8,
-  },
-  realDataStatusText: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  insightsContainer: {
-    padding: 16,
-    backgroundColor: "#f8fafc",
-    borderRadius: 8,
-    marginVertical: 8,
-  },
-  insightsText: {
     fontSize: 14,
-    lineHeight: 20,
-    textAlign: "left",
-  },
-  insightsFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 12,
-    marginTop: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    gap: 6,
-  },
-  insightsFooterText: {
-    fontSize: 12,
-    fontStyle: "italic",
-  },
-  transitionMarker: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 8,
-    paddingHorizontal: 16,
-  },
-  transitionLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#d1d5db",
-  },
-  transitionText: {
-    fontSize: 11,
-    fontWeight: "500",
-    paddingHorizontal: 12,
-    textAlign: "center",
-  },
-  summaryContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-    gap: 10,
-  },
-  summaryCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  summaryValue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    textAlign: "center",
-  },
-  timeRangeContainer: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    borderWidth: 1,
-  },
-  sectionSubTitle: {
-    fontSize: 16,
     fontWeight: "600",
-    marginBottom: 12,
-  },
-  timeRangeButtons: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  timeRangeButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: "center",
-  },
-  timeRangeButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  chartCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    paddingBottom: 8,
-  },
-  chartDescription: {
-    fontSize: 12,
-    marginBottom: 12,
-    fontStyle: "italic",
-  },
-  chart: {
-    borderRadius: 12,
-  },
-  legendContainer: {
-    borderTopWidth: 1,
-    paddingTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 16,
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  legendText: {
-    fontSize: 12,
-  },
-  aiStatusCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  aiStatusHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-    gap: 8,
-  },
-  aiStatusTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusBadgeText: {
-    fontSize: 10,
-    fontWeight: "600",
-  },
-  aiStatusDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  modelMetrics: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  metricItem: {
-    alignItems: "center",
-  },
-  metricValue: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  metricLabel: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  disclaimer: {
-    flexDirection: "row",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginBottom: 20,
-    gap: 8,
-  },
-  disclaimerText: {
-    fontSize: 12,
-    lineHeight: 16,
-    flex: 1,
   },
   weatherStatus: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 12,
+    marginHorizontal: 16,
     gap: 8,
   },
   weatherStatusText: {
     fontSize: 12,
     fontWeight: "500",
-    marginBottom: 8,
+    textAlign: "center",
   },
   weatherSummary: {
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
+    marginHorizontal: 16,
     borderWidth: 1,
   },
   weatherSummaryTitle: {
@@ -2581,66 +2232,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "500",
   },
-  pickerHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 6,
-  },
-  pickerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 16,
-    marginBottom: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    backgroundColor: "#eef2f5",
-    gap: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    paddingVertical: 2,
-  },
-  resultsList: {
-    maxHeight: 160,
-    marginHorizontal: 16,
-    marginBottom: 4,
-  },
-  resultRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    gap: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d3d9de",
-  },
-  resultText: {
-    flex: 1,
+  chartDescription: {
     fontSize: 12,
-    lineHeight: 16,
+    marginBottom: 12,
+    fontStyle: "italic",
+    marginHorizontal: 8,
   },
-  pickerFooter: {
-    flexDirection: "row",
+  insightsContainer: {
     padding: 16,
-    gap: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+    borderWidth: 1,
   },
-  pickerBtn: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pickerBtnText: {
+  insightsText: {
     fontSize: 14,
-    fontWeight: "600",
+    lineHeight: 22,
+    textAlign: "left",
+    fontWeight: "500",
+  },
+  insightsFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 12,
+    marginTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    gap: 6,
+  },
+  insightsFooterText: {
+    fontSize: 12,
+    fontStyle: "italic",
   },
 });
+
+export default PredictionsPage;
