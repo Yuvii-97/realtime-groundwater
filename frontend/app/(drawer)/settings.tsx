@@ -15,6 +15,7 @@ import { useSettings } from "../../contexts/SettingsContext";
 import { useTranslation } from "react-i18next"; // Changed from useLanguage
 import { useTheme } from "../../hooks/useTheme";
 import LanguageSelector from "../../components/LanguageSelector";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface LanguageOption {
   code: string;
@@ -45,7 +46,7 @@ const refreshIntervalOptions = [
 
 export default function Settings() {
   const settings = useSettings();
-  const { t } = useTranslation(); // Changed from useLanguage
+  const { t, i18n } = useTranslation(); // Access i18n instance
   const theme = useTheme();
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [intervalModalVisible, setIntervalModalVisible] = useState(false);
@@ -212,7 +213,18 @@ export default function Settings() {
       </SettingSection>
 
       {/* Language Selector */}
-      <LanguageSelector />
+      <LanguageSelector
+        currentLanguage={i18n.language}
+        onLanguageSelected={async (code) => {
+          try {
+            await i18n.changeLanguage(code);
+            await AsyncStorage.setItem("language", code);
+            settings.setLanguage(code);
+          } catch (e) {
+            console.warn("Failed to change language", e);
+          }
+        }}
+      />
 
       {/* Notifications */}
       <SettingSection title={t("settings.notifications")}>
@@ -414,7 +426,7 @@ export default function Settings() {
         <SettingItem
           icon="information-circle"
           title={t("settings.appVersion")}
-          subtitle="1.0.0"
+          subtitle="1.5.0"
         />
         <SettingItem
           icon="document-text"

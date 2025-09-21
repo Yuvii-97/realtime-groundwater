@@ -11,6 +11,7 @@ import {
   Platform,
   UIManager,
   ActivityIndicator,
+  Animated, // <-- add
 } from "react-native";
 import MapView, {
   Marker,
@@ -43,7 +44,10 @@ interface Station {
   latitude: number;
   longitude: number;
   well_type: string | null;
-  station_status: string; // keep broad if mixed values
+  station_status: string;
+  latest_depth?: number | null;
+  latest_status?: LevelStatus;
+  latest_data_time?: string;
 }
 
 const rawStations: any[] = Array.isArray(stationsData)
@@ -113,6 +117,11 @@ function buildStations(list: any[]): {
       continue;
     }
 
+    // normalize latest fields
+    const dRaw = toNum(raw.latest_depth);
+    const latest_depth: number | null = dRaw !== null ? Math.abs(dRaw) : null;
+    const latest_status = normalizeStatus(raw.latest_status, latest_depth);
+
     if (seen.has(code)) {
       // Keep duplicates by suffix to avoid “missing” stations (optional)
       duplicateCodes++;
@@ -127,6 +136,10 @@ function buildStations(list: any[]): {
         longitude: lon!,
         well_type: raw.well_type ?? null,
         station_status: raw.station_status ?? raw.status ?? "Active",
+        // keep latest fields
+        latest_depth,
+        latest_status,
+        latest_data_time: raw.latest_data_time ?? null,
       });
       continue;
     }
@@ -141,6 +154,10 @@ function buildStations(list: any[]): {
       longitude: lon!,
       well_type: raw.well_type ?? null,
       station_status: raw.station_status ?? raw.status ?? "Active",
+      // keep latest fields
+      latest_depth,
+      latest_status,
+      latest_data_time: raw.latest_data_time ?? null,
     });
   }
 
@@ -154,6 +171,22 @@ function buildStations(list: any[]): {
       duplicateCodes,
     },
   };
+}
+
+// Add helper to coerce status or classify by depth
+function normalizeStatus(s: any, depth: number | null): LevelStatus {
+  const u = typeof s === "string" ? s.toUpperCase() : "";
+  if (
+    u === "SAFE" ||
+    u === "WARNING" ||
+    u === "CRITICAL" ||
+    u === "DANGEROUS" ||
+    u === "NO_DATA" ||
+    u === "ERROR"
+  ) {
+    return u as LevelStatus;
+  }
+  return classifyDepth(depth);
 }
 
 const { stations, stats } = buildStations(rawStations);
@@ -233,6 +266,10 @@ export default function MapsScreen() {
   const [search, setSearch] = useState("");
   const debouncedQuery = useDebounce(search, 300);
   const [panelOpen, setPanelOpen] = useState(true);
+
+  // Animate panel progress: 1 = open, 0 = collapsed
+  const panelAnim = useRef(new Animated.Value(1)).current;
+
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [isLoadingMap, setIsLoadingMap] = useState(true); // New loading state
   const [userLoc, setUserLoc] = useState<{
@@ -242,14 +279,20 @@ export default function MapsScreen() {
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  const [levels, setLevels] = useState<Record<string, StationLevel>>({});
-  const [levelsProgress, setLevelsProgress] = useState({
-    done: 0,
-    total: stations.length,
+  // Build levels from stations that now include latest_* fields
+  const [levels] = useState<Record<string, StationLevel>>(() => {
+    const map: Record<string, StationLevel> = {};
+    stations.forEach((s) => {
+      const depth =
+        typeof s.latest_depth === "number"
+          ? s.latest_depth
+          : s.latest_depth ?? null;
+      const status = (s.latest_status as LevelStatus) || classifyDepth(depth);
+      map[s.station_code] = { depth, status, fetchedAt: Date.now() };
+    });
+    return map;
   });
-  const [levelsLoading, setLevelsLoading] = useState(true);
-
-  const [mapVersion, setMapVersion] = useState(0); // New state for map version
+  const levelsLoading = false;
 
   const [firstVisibleCode, setFirstVisibleCode] = useState<string | null>(null);
 
@@ -271,6 +314,11 @@ export default function MapsScreen() {
     return base;
   }, [filter, debouncedQuery, levels]);
 
+  const visibleCodes = useMemo(() => {
+    // Same subset used in FlatList (search + category)
+    return new Set(filtered.map((s) => s.station_code));
+  }, [filtered]);
+
   // Memo focusStation to satisfy exhaustive-deps + keep stable reference
   const focusStation = useCallback((st: Station) => {
     if (!st || !isValidLatLon(st.latitude, st.longitude)) return;
@@ -286,9 +334,21 @@ export default function MapsScreen() {
   }, []); // No dependencies as it's stable
 
   const togglePanel = () => {
+    const next = !panelOpen;
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPanelOpen((o) => !o);
+    setPanelOpen(next);
+    Animated.timing(panelAnim, {
+      toValue: next ? 1 : 0,
+      duration: 220,
+      useNativeDriver: false,
+    }).start();
   };
+
+  // Interpolate bottom offset of recenter button from panelAnim
+  const recenterBottom = panelAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [62 + 16, PANEL_HEIGHT + 16], // collapsed => open
+  });
 
   const handleStationPress = useCallback(
     (st: Station) => {
@@ -446,122 +506,14 @@ export default function MapsScreen() {
     };
   }, []);
 
-  // SIMPLE in-memory cache (module scope)
-  const levelCache: Record<string, StationLevel> = {};
-
-  // ADD fetch helper (outside component)
-  async function fetchLatestLevel(stationCode: string): Promise<StationLevel> {
-    // Cache hit
-    const cached = levelCache[stationCode];
-    if (cached && Date.now() - cached.fetchedAt < LEVEL_CACHE_TTL_MS) {
-      return cached;
-    }
-
-    const end = new Date();
-    const start = new Date();
-    start.setDate(end.getDate() - LEVEL_LOOKBACK_DAYS);
-    const toISO = (d: Date) => d.toISOString().slice(0, 10);
-
-    try {
-      const res = await fetch(
-        "https://indiawris.gov.in/CommonDataSetMasterAPI/getCommonDataSetByStationCode",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            station_code: stationCode,
-            starttime: toISO(start),
-            endtime: toISO(end),
-            dataset: "GWATERLVL",
-          }),
-        }
-      );
-      if (!res.ok) {
-        return (levelCache[stationCode] = {
-          depth: null,
-          fetchedAt: Date.now(),
-          status: "ERROR",
-        });
-      }
-      const json = await res.json();
-      const rows: any[] = Array.isArray(json?.data) ? json.data : [];
-      if (!rows.length) {
-        return (levelCache[stationCode] = {
-          depth: null,
-          fetchedAt: Date.now(),
-          status: "NO_DATA",
-        });
-      }
-      // Take the most recent by dataTime
-      rows.sort(
-        (a, b) =>
-          new Date(a.dataTime).getTime() - new Date(b.dataTime).getTime()
-      );
-      const latest = rows[rows.length - 1];
-      const depth = Number(latest.dataValue);
-      const status = classifyDepth(isFinite(depth) ? depth : null);
-      return (levelCache[stationCode] = {
-        depth: isFinite(depth) ? depth : null,
-        fetchedAt: Date.now(),
-        status,
-      });
-    } catch {
-      return (levelCache[stationCode] = {
-        depth: null,
-        fetchedAt: Date.now(),
-        status: "ERROR",
-      });
-    }
-  }
-
-  // ADD effect AFTER other useEffects (e.g. after location effect)
-  useEffect(() => {
-    let cancelled = false;
-    if (!stations.length) return;
-
-    async function runQueue() {
-      setLevelsLoading(true);
-      const total = stations.length;
-      setLevelsProgress({ done: 0, total });
-
-      const tempLevels: Record<string, StationLevel> = {};
-      let index = 0;
-
-      const next = async () => {
-        while (index < total && !cancelled) {
-          const i = index++;
-          const code = stations[i].station_code;
-          const lvl = await fetchLatestLevel(code);
-          if (cancelled) return;
-          tempLevels[code] = lvl; // store locally (no state update yet)
-          setLevelsProgress((p) => ({ done: p.done + 1, total }));
-        }
-      };
-
-      await Promise.all(
-        Array.from({ length: Math.min(MAX_CONCURRENT_FETCH, total) }, next)
-      );
-
-      if (!cancelled) {
-        setLevels(tempLevels); // single state update
-        setLevelsLoading(false);
-        setMapVersion((v) => v + 1); // trigger one map refresh
-      }
-    }
-
-    runQueue();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // ADD marker helper (inside MapsScreen OR above StaticStationsMap)
+  // Use status from levels, or fallback to station.latest_status/depth
   const markerPinColor = useCallback(
-    (st: Station, _isNearby: boolean) => {
-      const lvl = levels[st.station_code];
-      if (lvl) return levelColor(lvl.status);
-      // While loading show neutral gray; once loaded they are filtered out above
-      return "#6b7280";
+    (st: Station, _isNearby?: boolean) => {
+      const status =
+        levels[st.station_code]?.status ??
+        (st.latest_status as LevelStatus) ??
+        classifyDepth(st.latest_depth ?? null);
+      return levelColor(status as LevelStatus);
     },
     [levels]
   );
@@ -592,10 +544,10 @@ export default function MapsScreen() {
   return (
     <View style={styles.container}>
       <StaticStationsMap
-        key={mapVersion} // re-mounts once after data ready
         ref={mapRef}
         userLoc={userLoc}
         nearbyCodes={nearbyCodes}
+        visibleCodes={visibleCodes}
         onMapReady={() => setIsLoadingMap(false)}
         onStationPress={handleStationPress}
         markerPinColor={markerPinColor}
@@ -770,33 +722,27 @@ export default function MapsScreen() {
         )}
       </View>
 
-      {levelsLoading && (
-        <View style={styles.levelsBadge}>
-          <ActivityIndicator size="small" color="#fff" />
-          <Text style={styles.levelsBadgeText}>
-            {`Levels ${levelsProgress.done}/${levelsProgress.total}`}
-          </Text>
-        </View>
-      )}
-
+      {/* Replace the recenter button block */}
       {userLoc && (
-        <TouchableOpacity
-          style={styles.recenterBtn}
-          onPress={() => {
-            mapRef.current?.animateToRegion(
-              {
-                latitude: userLoc.latitude,
-                longitude: userLoc.longitude,
-                latitudeDelta: 0.25,
-                longitudeDelta: 0.25,
-              },
-              600
-            );
-          }}
-          activeOpacity={0.75}
-        >
-          <Ionicons name="locate" size={20} color="#075a7dff" />
-        </TouchableOpacity>
+        <Animated.View style={[styles.recenterBtn, { bottom: recenterBottom }]}>
+          <TouchableOpacity
+            style={styles.recenterBtnInner}
+            onPress={() => {
+              mapRef.current?.animateToRegion(
+                {
+                  latitude: userLoc.latitude,
+                  longitude: userLoc.longitude,
+                  latitudeDelta: 0.25,
+                  longitudeDelta: 0.25,
+                },
+                600
+              );
+            }}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="locate" size={20} color="#075a7dff" />
+          </TouchableOpacity>
+        </Animated.View>
       )}
     </View>
   );
@@ -808,6 +754,7 @@ interface StaticStationsMapProps {
   onStationPress: (st: Station) => void;
   userLoc: { latitude: number; longitude: number } | null;
   nearbyCodes: Set<string>;
+  visibleCodes: Set<string>;
   markerPinColor: (st: Station, isNearby: boolean) => string;
   levels: Record<string, StationLevel>;
   levelsLoading: boolean;
@@ -820,6 +767,7 @@ const StaticStationsMap = React.memo(
       onStationPress,
       userLoc,
       nearbyCodes,
+      visibleCodes,
       markerPinColor,
       levels,
       levelsLoading,
@@ -853,7 +801,8 @@ const StaticStationsMap = React.memo(
         initialRegion={initialRegion}
         showsCompass
         showsScale
-        showsUserLocation={!!userLoc} // native blue dot (if desired)
+        showsUserLocation={!!userLoc}
+        showsMyLocationButton={false} // hide default auto-locate button
         onMapReady={onMapReady}
         toolbarEnabled={false}
         moveOnMarkerPress={false}
@@ -876,26 +825,21 @@ const StaticStationsMap = React.memo(
             />
           </>
         )}
-
         {stations.map((st) => {
+          // Only show if in current filtered set
+          if (!visibleCodes.has(st.station_code)) return null;
+
           const isNearby = nearbyCodes.has(st.station_code);
-          const lvl = levels[st.station_code];
+          const lvl = levels[st.station_code]; // This gets the level object
 
-          // After data loaded: skip markers with NO_DATA or ERROR
-          if (
-            !levelsLoading &&
-            (!lvl || lvl.status === "NO_DATA" || lvl.status === "ERROR")
-          ) {
-            return null;
-          }
-
+          // Optional: still hide NO_DATA / ERROR unless "all"
           return (
             <Marker
               key={`station-${st.station_code}`}
               coordinate={{ latitude: st.latitude, longitude: st.longitude }}
               title={st.station_name}
               description={`Code: ${st.station_code} • ${st.district}`}
-              pinColor={markerPinColor(st, isNearby)}
+              pinColor={markerPinColor(st, isNearby)} // <-- This is where the color is set
               onPress={() => onStationPress(st)}
             />
           );
@@ -1107,81 +1051,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#e2e8f0",
   },
-  levelsBadge: {
-    position: "absolute",
-    top: 60,
-    right: 10,
-    backgroundColor: "rgba(0,0,0,0.55)",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    zIndex: 50,
-  },
-  levelsBadgeText: { color: "#fff", fontSize: 11, fontWeight: "500" },
-  legendBox: {
-    position: "absolute",
-    top: 60,
-    left: 10,
-    backgroundColor: "rgba(255,255,255,0.92)",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 10,
-    zIndex: 40,
-  },
-  legendTitle: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#111",
-    marginBottom: 4,
-  },
-  legendRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 2,
-    gap: 6,
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  legendLbl: { fontSize: 10, color: "#222", marginRight: 6 },
-  depthBadge: {
-    position: "absolute",
-    top: 52,
-    left: 10,
-    backgroundColor: "#fff",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    zIndex: 60,
-    maxWidth: width * 0.65,
-  },
-  depthBadgeText: {
-    fontSize: 11,
-    color: "#334155",
-    fontWeight: "600",
-  },
-  depthBadgeValue: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#0f172a",
-    marginTop: 2,
-  },
-  depthBadgeStatus: {
-    fontSize: 11,
-    fontWeight: "600",
-    marginTop: 2,
-  },
   recenterBtn: {
     position: "absolute",
     right: 14,
-    bottom: PANEL_HEIGHT + 16,
+    zIndex: 70,
+  },
+  // Button visuals moved here
+  recenterBtnInner: {
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -1192,7 +1068,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 6,
-    zIndex: 70,
   },
 
   // New styles for depth info bar
@@ -1246,15 +1121,11 @@ type LevelStatus =
   | "NO_DATA"
   | "ERROR";
 
-// ADD constants (top-level)
 const LEVEL_THRESHOLDS = {
-  SAFE_MAX: 10,
-  WARNING_MAX: 20,
-  CRITICAL_MAX: 40,
+  SAFE_MAX: 10, // 0 - 10  => SAFE
+  WARNING_MAX: 20, // 10 - 20 => WARNING
+  CRITICAL_MAX: 40, // 20 - 40 => CRITICAL
 };
-const LEVEL_LOOKBACK_DAYS = 45; // fetch window
-const MAX_CONCURRENT_FETCH = 6; // tune to avoid throttling
-const LEVEL_CACHE_TTL_MS = 1000 * 60 * 60; // 1h cache (in-memory)
 
 // ADD helper classify depth (top-level, before component)
 function classifyDepth(depth: number | null): LevelStatus {
@@ -1269,19 +1140,19 @@ function classifyDepth(depth: number | null): LevelStatus {
 function levelColor(status: LevelStatus): string {
   switch (status) {
     case "SAFE":
-      return "#16a34a"; // green
+      return "green";
     case "WARNING":
-      return "#f59e0b"; // amber
+      return "orange";
     case "CRITICAL":
-      return "#dc2626"; // red
+      return "red";
     case "DANGEROUS":
-      return "#7e22ce"; // deep purple
+      return "purple";
     case "NO_DATA":
-      return "#6b7280"; // gray
+      return "gray";
     case "ERROR":
-      return "#000000"; // black
+      return "black";
     default:
-      return "#6b7280";
+      return "gray";
   }
 }
 
