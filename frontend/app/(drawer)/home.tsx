@@ -405,24 +405,24 @@ const MultilingualFeatureCard = ({
     color: theme.colors.textSecondary,
   };
 
-  // Language options
-  const languages = [
-    { code: "en-US", name: "English", nativeName: "English", flag: "🇺🇸" },
-    { code: "hi-IN", name: "Hindi", nativeName: "हिंदी", flag: "🇮🇳" },
-    { code: "ta-IN", name: "Tamil", nativeName: "தமிழ்", flag: "🇮🇳" },
-    { code: "gu-IN", name: "Gujarati", nativeName: "ગુજરાતી", flag: "🇮🇳" },
-    { code: "te-IN", name: "Telugu", nativeName: "తెలుగు", flag: "🇮🇳" },
-    { code: "ml-IN", name: "Malayalam", nativeName: "മലയാളം", flag: "🇮🇳" },
-     { code: "ur-IN", name: "Urdu", nativeName: "اردو", flag: "🇮🇳" },
-    { code: "do-IN", name: "Dogri", nativeName: "डोगरी", flag: "🇮🇳" },
-    { code: "ss-IN", name: "Sanskrit", nativeName: "संस्कृतम्", flag: "🇮🇳" },
-    { code: "mn-IN", name: "Manipuri", nativeName: "মৈতৈলোন্", flag: "🇮🇳" },
-    { code: "as-IN", name: "Assamese", nativeName: "অসমীয়া", flag: "🇮🇳" },
-    { code: "mr-IN", name: "Marathi", nativeName: "मराठी", flag: "🇮🇳" },
-    { code: "pn-IN", name: "Punjabi", nativeName: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
-    { code: "bn-IN", name: "Bengali", nativeName: "বাংলা", flag: "🇮🇳" },
-    { code: "kn-IN", name: "Kannada", nativeName: "ಕನ್ನಡ", flag: "🇮🇳" },
-  ];
+  // // Language options
+  // const languages = [
+  //   { code: "en-US", name: "English", nativeName: "English", flag: "🇺🇸" },
+  //   { code: "hi-IN", name: "Hindi", nativeName: "हिंदी", flag: "🇮🇳" },
+  //   { code: "ta-IN", name: "Tamil", nativeName: "தமிழ்", flag: "🇮🇳" },
+  //   { code: "gu-IN", name: "Gujarati", nativeName: "ગુજરાતી", flag: "🇮🇳" },
+  //   { code: "te-IN", name: "Telugu", nativeName: "తెలుగు", flag: "🇮🇳" },
+  //   { code: "ml-IN", name: "Malayalam", nativeName: "മലയാളം", flag: "🇮🇳" },
+  //    { code: "ur-IN", name: "Urdu", nativeName: "اردو", flag: "🇮🇳" },
+  //   { code: "do-IN", name: "Dogri", nativeName: "डोगरी", flag: "🇮🇳" },
+  //   { code: "ss-IN", name: "Sanskrit", nativeName: "संस्कृतम्", flag: "🇮🇳" },
+  //   { code: "mn-IN", name: "Manipuri", nativeName: "মৈতৈলোন্", flag: "🇮🇳" },
+  //   { code: "as-IN", name: "Assamese", nativeName: "অসমীয়া", flag: "🇮🇳" },
+  //   { code: "mr-IN", name: "Marathi", nativeName: "मराठी", flag: "🇮🇳" },
+  //   { code: "pn-IN", name: "Punjabi", nativeName: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
+  //   { code: "bn-IN", name: "Bengali", nativeName: "বাংলা", flag: "🇮🇳" },
+  //   { code: "kn-IN", name: "Kannada", nativeName: "ಕನ್ನಡ", flag: "🇮🇳" },
+  // ];
 
   return (
     <View style={styles.compactCardContainer}>
@@ -538,7 +538,7 @@ const MultilingualFeatureCard = ({
               Select Language
             </Text>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            {/* <ScrollView showsVerticalScrollIndicator={false}>
               {languages.map((language) => (
                 <TouchableOpacity
                   key={language.code}
@@ -588,7 +588,7 @@ const MultilingualFeatureCard = ({
                   )}
                 </TouchableOpacity>
               ))}
-            </ScrollView>
+            </ScrollView> */}
 
             <TouchableOpacity
               style={{

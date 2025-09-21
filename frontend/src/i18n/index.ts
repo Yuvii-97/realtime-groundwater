@@ -9,6 +9,16 @@ import translationTa from "./locales/ta-IN/translation.json";
 import translationHi from "./locales/hi-IN/translation.json";
 import translationTe from "./locales/te-IN/translation.json";
 import translationMl from "./locales/ml-IN/translation.json";
+// Add imports for new languages
+import translationUr from "./locales/ur-IN/translation.json";
+import translationDo from "./locales/do-IN/translation.json";
+import translationSs from "./locales/ss-IN/translation.json";
+import translationMn from "./locales/mn-IN/translation.json";
+import translationAs from "./locales/as-IN/translation.json";
+import translationMr from "./locales/mr-IN/translation.json";
+import translationPn from "./locales/pn-IN/translation.json"
+import translationBn from "./locales/bn-IN/translation.json";
+import translationKn from "./locales/kn-IN/translation.json";
 
 const resources = {
   "en-US": { translation: translationEn },
@@ -17,6 +27,15 @@ const resources = {
   "hi-IN": { translation: translationHi },
   "te-IN": { translation: translationTe },
   "ml-IN": { translation: translationMl },
+  "ur-IN": { translation: translationUr },
+  "do-IN": { translation: translationDo },
+  "ss-IN": { translation: translationSs },
+  "mn-IN": { translation: translationMn },
+  "as-IN": { translation: translationAs },
+  "mr-IN": { translation: translationMr },
+  "pn-IN": { translation: translationPn },
+  "bn-IN": { translation: translationBn },
+  "kn-IN": { translation: translationKn },
 };
 
 const initI18n = async () => {
