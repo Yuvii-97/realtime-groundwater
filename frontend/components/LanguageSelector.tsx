@@ -36,6 +36,15 @@ export default function LanguageSelector({
     { code: "gu-IN", name: "Gujarati", nativeName: "ગુજરાતી", flag: "🇮🇳" },
     { code: "te-IN", name: "Telugu", nativeName: "తెలుగు", flag: "🇮🇳" },
     { code: "ml-IN", name: "Malayalam", nativeName: "മലയാളം", flag: "🇮🇳" },
+     { code: "ur-IN", name: "Urdu", nativeName: "اردو", flag: "🇮🇳" },
+    { code: "do-IN", name: "Dogri", nativeName: "डोगरी", flag: "🇮🇳" },
+    { code: "ss-IN", name: "Sanskrit", nativeName: "संस्कृतम्", flag: "🇮🇳" },
+    { code: "mn-IN", name: "Manipuri", nativeName: "মৈতৈলোন্", flag: "🇮🇳" },
+    { code: "as-IN", name: "Assamese", nativeName: "অসমীয়া", flag: "🇮🇳" },
+    { code: "mr-IN", name: "Marathi", nativeName: "मराठी", flag: "🇮🇳" },
+    { code: "pn-IN", name: "Punjabi", nativeName: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
+    { code: "bn-IN", name: "Bengali", nativeName: "বাংলা", flag: "🇮🇳" },
+    { code: "kn-IN", name: "Kannada", nativeName: "ಕನ್ನಡ", flag: "🇮🇳" },
   ];
 
   // Find current language object
