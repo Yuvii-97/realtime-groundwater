@@ -10,6 +10,7 @@ import {
   Platform,
   Dimensions,
   RefreshControl,
+  Modal,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,6 +21,7 @@ import * as Location from "expo-location";
 import stationsData from "@/assets/Coordinates/stations.json";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Markdown from "react-native-markdown-display";
+import MapView, { Marker, Region } from "react-native-maps";
 
 const COLOR_PRIMARY = "#0A84FF";
 const COLOR_BG = "#ffffff";
@@ -91,6 +93,11 @@ const PredictionsPage = () => {
 
   // Location state
   const [userLocation, setUserLocation] = useState<LocationCoords | null>(null);
+  const [customLocation, setCustomLocation] = useState<LocationCoords | null>(
+    null
+  );
+  const [useCurrentLocation, setUseCurrentLocation] = useState<boolean>(true);
+  const [showLocationModal, setShowLocationModal] = useState<boolean>(false);
   const [nearestStation, setNearestStation] = useState<Station | null>(null);
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
 
@@ -210,12 +217,20 @@ const PredictionsPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log("📍 User location changed:", userLocation);
-    if (userLocation) {
-      findNearestStation();
-      fetchWeatherForecast();
+    console.log(
+      "📍 Location changed:",
+      useCurrentLocation ? userLocation : customLocation
+    );
+    const currentCoords = useCurrentLocation ? userLocation : customLocation;
+    if (currentCoords) {
+      findNearestStation(currentCoords);
+      if (useCurrentLocation && userLocation) {
+        fetchWeatherForecast();
+      } else if (!useCurrentLocation && customLocation) {
+        fetchWeatherForecast();
+      }
     }
-  }, [userLocation]);
+  }, [userLocation, customLocation, useCurrentLocation]);
 
   useEffect(() => {
     console.log(
@@ -266,12 +281,14 @@ const PredictionsPage = () => {
   };
 
   // Find the nearest monitoring station to user's location
-  const findNearestStation = () => {
-    if (!userLocation) return;
+  const findNearestStation = (coords?: LocationCoords) => {
+    const locationToUse =
+      coords || (useCurrentLocation ? userLocation : customLocation);
+    if (!locationToUse) return;
 
     console.log(
-      "🔍 STEP 2: Finding nearest station to user location:",
-      userLocation
+      "🔍 STEP 2: Finding nearest station to location:",
+      locationToUse
     );
     console.log("📊 Total stations in database:", stationsData.length);
 
@@ -307,8 +324,8 @@ const PredictionsPage = () => {
       ) {
         activeStations++;
         const distance = calculateDistance(
-          userLocation.latitude,
-          userLocation.longitude,
+          locationToUse.latitude,
+          locationToUse.longitude,
           station.latitude,
           station.longitude
         );
@@ -347,12 +364,13 @@ const PredictionsPage = () => {
 
   // Weather data fetching function
   const fetchWeatherForecast = async () => {
-    if (!userLocation) return;
+    const currentCoords = useCurrentLocation ? userLocation : customLocation;
+    if (!currentCoords) return;
 
     setWeatherLoading(true);
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${userLocation.latitude}&lon=${userLocation.longitude}&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${currentCoords.latitude}&lon=${currentCoords.longitude}&appid=${API_KEY}`
       );
 
       if (!response.ok) {
@@ -1212,16 +1230,41 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                   ? t("predictions.findingStation")
                   : t("predictions.locationNotAvailable")}
               </Text>
+              <Text
+                style={[
+                  styles.locationModeText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {useCurrentLocation
+                  ? "📍 Current Location"
+                  : "🗺️ Custom Location"}
+              </Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.refreshBtn} onPress={onRefresh}>
-            <Ionicons name="refresh" size={20} color={theme.colors.primary} />
-          </TouchableOpacity>
+          <View style={styles.headerControls}>
+            <TouchableOpacity
+              style={[
+                styles.locationToggleBtn,
+                { backgroundColor: theme.colors.primary },
+              ]}
+              onPress={() => setShowLocationModal(true)}
+            >
+              <Ionicons
+                name={useCurrentLocation ? "map-outline" : "location-outline"}
+                size={16}
+                color="#ffffff"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.refreshBtn} onPress={onRefresh}>
+              <Ionicons name="refresh" size={20} color={theme.colors.primary} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
       {/* Location Permission / Error States */}
-      {!locationPermission && (
+      {!locationPermission && useCurrentLocation && (
         <View
           style={[styles.errorCard, { backgroundColor: theme.colors.surface }]}
         >
@@ -1237,11 +1280,32 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           >
             {t("predictions.enableLocationMessage")}
           </Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={retryLocation}>
-            <Text style={styles.retryBtnText}>
-              {t("predictions.enableLocation")}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.permissionActions}>
+            <TouchableOpacity style={styles.retryBtn} onPress={retryLocation}>
+              <Text style={styles.retryBtnText}>
+                {t("predictions.enableLocation")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.customLocationBtn,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.primary,
+                },
+              ]}
+              onPress={() => setShowLocationModal(true)}
+            >
+              <Text
+                style={[
+                  styles.customLocationBtnText,
+                  { color: theme.colors.primary },
+                ]}
+              >
+                Select Custom Location
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
 
@@ -1260,302 +1324,406 @@ IMPORTANT FOR SMOOTH CONTINUATION:
       )}
 
       {/* Chart Card */}
-      {locationPermission && nearestStation && (
-        <View
-          style={[
-            styles.chartCard,
-            {
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
-            },
-          ]}
-        >
-          <View style={styles.chartHeader}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              {t("predictions.trendPrediction")}
-            </Text>
-          </View>
-
-          {/* Time Period Selector */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.periodSelectorContainer}
-            contentContainerStyle={styles.periodSelectorContent}
+      {((locationPermission && useCurrentLocation) ||
+        (!useCurrentLocation && customLocation)) &&
+        nearestStation && (
+          <View
+            style={[
+              styles.chartCard,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
           >
-            {timePeriods.map((period) => (
-              <TouchableOpacity
-                key={period.key}
-                style={[
-                  styles.periodButton,
-                  selectedPeriod === period.key && styles.periodButtonActive,
-                  {
-                    backgroundColor:
-                      selectedPeriod === period.key
-                        ? theme.colors.primary
-                        : theme.colors.surface,
-                    borderColor: theme.colors.border,
-                  },
-                ]}
-                onPress={() => setSelectedPeriod(period.key)}
-              >
-                <Text
-                  style={[
-                    styles.periodButtonText,
-                    selectedPeriod === period.key &&
-                      styles.periodButtonTextActive,
-                    {
-                      color:
-                        selectedPeriod === period.key
-                          ? "#ffffff"
-                          : theme.colors.text,
-                    },
-                  ]}
-                >
-                  {period.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {loading ? (
-            <View style={styles.loadingChart}>
-              <ActivityIndicator size="large" color={COLOR_PRIMARY} />
-              <Text style={[styles.loadingText, { color: theme.colors.text }]}>
-                {t("predictions.loadingData")}
+            <View style={styles.chartHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                {t("predictions.trendPrediction")}
               </Text>
             </View>
-          ) : chartData?.datasets?.[0]?.data?.length ? (
-            <>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={true}
-                style={{ marginHorizontal: 8 }}
-                contentContainerStyle={{ paddingHorizontal: 8 }}
-              >
-                <LineChart
-                  data={chartData}
-                  width={Math.max(
-                    Dimensions.get("window").width - 32,
-                    chartData.labels.length * 60 // 60px per data point for good spacing
-                  )}
-                  height={260}
-                  chartConfig={{
-                    backgroundColor: theme.colors.surface,
-                    backgroundGradientFrom: theme.colors.surface,
-                    backgroundGradientTo: theme.colors.surface,
-                    decimalPlaces: 2,
-                    color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
-                    labelColor: (opacity = 1) =>
-                      theme.isDark
-                        ? `rgba(248, 250, 252, ${opacity})`
-                        : `rgba(15, 23, 42, ${opacity})`,
-                    propsForDots: {
-                      r: "4",
-                      strokeWidth: "2",
-                      stroke: "#0A84FF",
-                      fill: "#ffffff",
+
+            {/* Time Period Selector */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.periodSelectorContainer}
+              contentContainerStyle={styles.periodSelectorContent}
+            >
+              {timePeriods.map((period) => (
+                <TouchableOpacity
+                  key={period.key}
+                  style={[
+                    styles.periodButton,
+                    selectedPeriod === period.key && styles.periodButtonActive,
+                    {
+                      backgroundColor:
+                        selectedPeriod === period.key
+                          ? theme.colors.primary
+                          : theme.colors.surface,
+                      borderColor: theme.colors.border,
                     },
-                    propsForBackgroundLines: {
-                      stroke: theme.isDark ? "#374151" : "#e5e7eb",
-                    },
-                    propsForLabels: {
-                      fontSize: 11,
-                    },
-                  }}
-                  bezier={false}
-                  yAxisSuffix=" m"
-                  fromZero={false}
-                  style={styles.chart}
-                  verticalLabelRotation={45}
-                  withInnerLines={true}
-                  withOuterLines={true}
-                  withVerticalLines={false}
-                  withHorizontalLines={true}
-                />
-              </ScrollView>
-              <Text
-                style={[
-                  styles.axisLabel,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                {selectedPeriod === "7d"
-                  ? "Past 7 Days"
-                  : selectedPeriod === "30d"
-                  ? "Past 30 Days"
-                  : selectedPeriod === "3m"
-                  ? "Past 3 Months"
-                  : selectedPeriod === "6m"
-                  ? "Past 6 Months"
-                  : "Past 1 Year"}
-              </Text>
-              <View style={styles.scrollIndicator}>
-                <Ionicons
-                  name="swap-horizontal"
-                  size={14}
-                  color={theme.colors.textSecondary}
-                />
+                  ]}
+                  onPress={() => setSelectedPeriod(period.key)}
+                >
+                  <Text
+                    style={[
+                      styles.periodButtonText,
+                      selectedPeriod === period.key &&
+                        styles.periodButtonTextActive,
+                      {
+                        color:
+                          selectedPeriod === period.key
+                            ? "#ffffff"
+                            : theme.colors.text,
+                      },
+                    ]}
+                  >
+                    {period.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            {loading ? (
+              <View style={styles.loadingChart}>
+                <ActivityIndicator size="large" color={COLOR_PRIMARY} />
+                <Text
+                  style={[styles.loadingText, { color: theme.colors.text }]}
+                >
+                  {t("predictions.loadingData")}
+                </Text>
+              </View>
+            ) : chartData?.datasets?.[0]?.data?.length ? (
+              <>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={true}
+                  style={{ marginHorizontal: 8 }}
+                  contentContainerStyle={{ paddingHorizontal: 8 }}
+                >
+                  <LineChart
+                    data={chartData}
+                    width={Math.max(
+                      Dimensions.get("window").width - 32,
+                      chartData.labels.length * 60 // 60px per data point for good spacing
+                    )}
+                    height={260}
+                    chartConfig={{
+                      backgroundColor: theme.colors.surface,
+                      backgroundGradientFrom: theme.colors.surface,
+                      backgroundGradientTo: theme.colors.surface,
+                      decimalPlaces: 2,
+                      color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`,
+                      labelColor: (opacity = 1) =>
+                        theme.isDark
+                          ? `rgba(248, 250, 252, ${opacity})`
+                          : `rgba(15, 23, 42, ${opacity})`,
+                      propsForDots: {
+                        r: "4",
+                        strokeWidth: "2",
+                        stroke: "#0A84FF",
+                        fill: "#ffffff",
+                      },
+                      propsForBackgroundLines: {
+                        stroke: theme.isDark ? "#374151" : "#e5e7eb",
+                      },
+                      propsForLabels: {
+                        fontSize: 11,
+                      },
+                    }}
+                    bezier={false}
+                    yAxisSuffix=" m"
+                    fromZero={false}
+                    style={styles.chart}
+                    verticalLabelRotation={45}
+                    withInnerLines={true}
+                    withOuterLines={true}
+                    withVerticalLines={false}
+                    withHorizontalLines={true}
+                  />
+                </ScrollView>
                 <Text
                   style={[
-                    styles.scrollIndicatorText,
+                    styles.axisLabel,
                     { color: theme.colors.textSecondary },
                   ]}
                 >
-                  Scroll left/right to view all data points
+                  {selectedPeriod === "7d"
+                    ? "Past 7 Days"
+                    : selectedPeriod === "30d"
+                    ? "Past 30 Days"
+                    : selectedPeriod === "3m"
+                    ? "Past 3 Months"
+                    : selectedPeriod === "6m"
+                    ? "Past 6 Months"
+                    : "Past 1 Year"}
+                </Text>
+                <View style={styles.scrollIndicator}>
+                  <Ionicons
+                    name="swap-horizontal"
+                    size={14}
+                    color={theme.colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.scrollIndicatorText,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Scroll left/right to view all data points
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <View style={styles.noDataContainer}>
+                <Ionicons
+                  name="analytics-outline"
+                  size={48}
+                  color={COLOR_MUTED}
+                />
+                <Text
+                  style={[
+                    styles.noDataText,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  {t("predictions.noDataAvailable")}
                 </Text>
               </View>
-            </>
-          ) : (
-            <View style={styles.noDataContainer}>
-              <Ionicons
-                name="analytics-outline"
-                size={48}
-                color={COLOR_MUTED}
-              />
-              <Text
-                style={[
-                  styles.noDataText,
-                  { color: theme.colors.textSecondary },
-                ]}
-              >
-                {t("predictions.noDataAvailable")}
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
+            )}
+          </View>
+        )}
 
       {/* AI Toggle and Weather Status */}
-      {locationPermission && nearestStation && (
-        <>
-          {/* AI Toggle */}
-          <View style={styles.aiToggleContainer}>
-            <TouchableOpacity
-              style={[
-                styles.aiToggleButton,
-                {
-                  backgroundColor: useAiPredictions
-                    ? theme.colors.primary
-                    : theme.colors.surface,
-                  borderWidth: 1,
-                  borderColor: theme.colors.primary,
-                },
-              ]}
-              onPress={() => setUseAiPredictions(!useAiPredictions)}
-              disabled={aiLoading}
-            >
-              <Text
+      {((locationPermission && useCurrentLocation) ||
+        (!useCurrentLocation && customLocation)) &&
+        nearestStation && (
+          <>
+            {/* AI Toggle */}
+            <View style={styles.aiToggleContainer}>
+              <TouchableOpacity
                 style={[
-                  styles.aiToggleText,
+                  styles.aiToggleButton,
                   {
-                    color: useAiPredictions
-                      ? theme.colors.surface
-                      : theme.colors.primary,
+                    backgroundColor: useAiPredictions
+                      ? theme.colors.primary
+                      : theme.colors.surface,
+                    borderWidth: 1,
+                    borderColor: theme.colors.primary,
+                  },
+                ]}
+                onPress={() => setUseAiPredictions(!useAiPredictions)}
+                disabled={aiLoading}
+              >
+                <Text
+                  style={[
+                    styles.aiToggleText,
+                    {
+                      color: useAiPredictions
+                        ? theme.colors.surface
+                        : theme.colors.primary,
+                    },
+                  ]}
+                >
+                  🤖{" "}
+                  {useAiPredictions
+                    ? "AI Predictions ON"
+                    : "AI Predictions OFF"}
+                </Text>
+                {aiLoading && (
+                  <ActivityIndicator
+                    size="small"
+                    color={
+                      useAiPredictions
+                        ? theme.colors.surface
+                        : theme.colors.primary
+                    }
+                    style={{ marginLeft: 8 }}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {/* Weather Status */}
+            {weatherLoading ? (
+              <View style={styles.weatherStatus}>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text
+                  style={[
+                    styles.weatherStatusText,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Fetching weather data for enhanced predictions...
+                </Text>
+              </View>
+            ) : weatherData ? (
+              <View
+                style={[
+                  styles.weatherSummary,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
                   },
                 ]}
               >
-                🤖{" "}
-                {useAiPredictions ? "AI Predictions ON" : "AI Predictions OFF"}
-              </Text>
-              {aiLoading && (
-                <ActivityIndicator
-                  size="small"
-                  color={
-                    useAiPredictions
-                      ? theme.colors.surface
-                      : theme.colors.primary
-                  }
-                  style={{ marginLeft: 8 }}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {/* Weather Status */}
-          {weatherLoading ? (
-            <View style={styles.weatherStatus}>
-              <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text
+                  style={[
+                    styles.weatherSummaryTitle,
+                    { color: theme.colors.text },
+                  ]}
+                >
+                  Current Weather Conditions
+                </Text>
+                {weatherData.list && weatherData.list[0] && (
+                  <View style={styles.weatherDetails}>
+                    <Text
+                      style={[
+                        styles.weatherDetail,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      🌡️{" "}
+                      {(weatherData.list[0].main.temp - 273.15 || 0).toFixed(1)}
+                      °C
+                    </Text>
+                    <Text
+                      style={[
+                        styles.weatherDetail,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      💧 {weatherData.list[0].main.humidity || 0}% humidity
+                    </Text>
+                    <Text
+                      style={[
+                        styles.weatherDetail,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      🌧️ {(weatherData.list[0].rain?.["3h"] || 0).toFixed(1)}mm
+                      rainfall
+                    </Text>
+                    <Text
+                      style={[
+                        styles.weatherDetail,
+                        { color: theme.colors.textSecondary },
+                      ]}
+                    >
+                      📊 {weatherData.list[0].main.pressure || 0}hPa pressure
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ) : (
               <Text
                 style={[
                   styles.weatherStatusText,
-                  { color: theme.colors.textSecondary },
+                  { color: theme.colors.textSecondary, textAlign: "center" },
                 ]}
               >
-                Fetching weather data for enhanced predictions...
+                ⚠️ Using estimated patterns (weather data unavailable)
               </Text>
-            </View>
-          ) : weatherData ? (
-            <View
-              style={[
-                styles.weatherSummary,
-                {
-                  backgroundColor: theme.colors.surface,
-                  borderColor: theme.colors.border,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.weatherSummaryTitle,
-                  { color: theme.colors.text },
-                ]}
-              >
-                Current Weather Conditions
-              </Text>
-              {weatherData.list && weatherData.list[0] && (
-                <View style={styles.weatherDetails}>
+            )}
+
+            {/* AI Prediction Chart */}
+            {useAiPredictions &&
+              predictedChartData?.datasets?.[0]?.data?.length && (
+                <View
+                  style={[
+                    styles.chartCard,
+                    {
+                      backgroundColor: theme.colors.surface,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
+                >
                   <Text
                     style={[
-                      styles.weatherDetail,
-                      { color: theme.colors.textSecondary },
+                      styles.sectionTitle,
+                      {
+                        color: theme.colors.text,
+                        borderBottomColor: theme.colors.border,
+                      },
                     ]}
                   >
-                    🌡️{" "}
-                    {(weatherData.list[0].main.temp - 273.15 || 0).toFixed(1)}°C
+                    <MaterialCommunityIcons
+                      name="chart-line"
+                      size={18}
+                      color={theme.colors.text}
+                    />{" "}
+                    AI Predicted Groundwater Level
                   </Text>
                   <Text
                     style={[
-                      styles.weatherDetail,
+                      styles.chartDescription,
                       { color: theme.colors.textSecondary },
                     ]}
                   >
-                    💧 {weatherData.list[0].main.humidity || 0}% humidity
+                    🟠 Orange line shows AI-forecasted levels for the next 30
+                    days
                   </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={true}
+                    style={{ marginHorizontal: 8 }}
+                    contentContainerStyle={{ paddingHorizontal: 8 }}
+                  >
+                    <LineChart
+                      data={predictedChartData}
+                      width={Math.max(
+                        Dimensions.get("window").width - 32,
+                        predictedChartData.labels.length * 25
+                      )}
+                      height={260}
+                      chartConfig={{
+                        backgroundColor: theme.colors.surface,
+                        backgroundGradientFrom: theme.colors.surface,
+                        backgroundGradientTo: theme.colors.surface,
+                        decimalPlaces: 2,
+                        color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
+                        labelColor: (opacity = 1) =>
+                          theme.isDark
+                            ? `rgba(248, 250, 252, ${opacity})`
+                            : `rgba(15, 23, 42, ${opacity})`,
+                        propsForDots: {
+                          r: "3",
+                          strokeWidth: "1.5",
+                          stroke: "rgba(255, 152, 0, 1)",
+                          fill: "#ffffff",
+                        },
+                        propsForBackgroundLines: {
+                          stroke: theme.isDark ? "#374151" : "#e5e7eb",
+                        },
+                        propsForLabels: {
+                          fontSize: 11,
+                        },
+                      }}
+                      bezier={false}
+                      yAxisSuffix=" m"
+                      fromZero={false}
+                      style={styles.chart}
+                      verticalLabelRotation={45}
+                      withInnerLines={false}
+                      withOuterLines={true}
+                      withVerticalLines={false}
+                      withHorizontalLines={true}
+                    />
+                  </ScrollView>
                   <Text
                     style={[
-                      styles.weatherDetail,
+                      styles.axisLabel,
                       { color: theme.colors.textSecondary },
                     ]}
                   >
-                    🌧️ {(weatherData.list[0].rain?.["3h"] || 0).toFixed(1)}mm
-                    rainfall
-                  </Text>
-                  <Text
-                    style={[
-                      styles.weatherDetail,
-                      { color: theme.colors.textSecondary },
-                    ]}
-                  >
-                    📊 {weatherData.list[0].main.pressure || 0}hPa pressure
+                    Future Predictions - Next{" "}
+                    {selectedPeriod.replace(/[^0-9]/g, "")} Days
                   </Text>
                 </View>
               )}
-            </View>
-          ) : (
-            <Text
-              style={[
-                styles.weatherStatusText,
-                { color: theme.colors.textSecondary, textAlign: "center" },
-              ]}
-            >
-              ⚠️ Using estimated patterns (weather data unavailable)
-            </Text>
-          )}
 
-          {/* AI Prediction Chart */}
-          {useAiPredictions &&
-            predictedChartData?.datasets?.[0]?.data?.length && (
+            {/* AI Prediction Insights */}
+            {useAiPredictions && predictionInsights && (
               <View
                 style={[
                   styles.chartCard,
@@ -1575,11 +1743,11 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                   ]}
                 >
                   <MaterialCommunityIcons
-                    name="chart-line"
+                    name="brain"
                     size={18}
                     color={theme.colors.text}
                   />{" "}
-                  AI Predicted Groundwater Level
+                  AI Prediction Insights
                 </Text>
                 <Text
                   style={[
@@ -1587,329 +1755,506 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                     { color: theme.colors.textSecondary },
                   ]}
                 >
-                  🟠 Orange line shows AI-forecasted levels for the next 30 days
+                  🧠 Key prediction factors and trends (markdown format)
                 </Text>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={true}
-                  style={{ marginHorizontal: 8 }}
-                  contentContainerStyle={{ paddingHorizontal: 8 }}
-                >
-                  <LineChart
-                    data={predictedChartData}
-                    width={Math.max(
-                      Dimensions.get("window").width - 32,
-                      predictedChartData.labels.length * 25
-                    )}
-                    height={260}
-                    chartConfig={{
+
+                <View
+                  style={[
+                    styles.insightsContainer,
+                    {
                       backgroundColor: theme.colors.surface,
-                      backgroundGradientFrom: theme.colors.surface,
-                      backgroundGradientTo: theme.colors.surface,
-                      decimalPlaces: 2,
-                      color: (opacity = 1) => `rgba(255, 152, 0, ${opacity})`,
-                      labelColor: (opacity = 1) =>
-                        theme.isDark
-                          ? `rgba(248, 250, 252, ${opacity})`
-                          : `rgba(15, 23, 42, ${opacity})`,
-                      propsForDots: {
-                        r: "3",
-                        strokeWidth: "1.5",
-                        stroke: "rgba(255, 152, 0, 1)",
-                        fill: "#ffffff",
+                      borderColor: theme.colors.border,
+                    },
+                  ]}
+                >
+                  <Markdown
+                    style={{
+                      body: {
+                        color: theme.colors.text,
+                        fontSize: 14,
+                        lineHeight: 22,
+                        fontWeight: "500",
                       },
-                      propsForBackgroundLines: {
-                        stroke: theme.isDark ? "#374151" : "#e5e7eb",
+                      bullet_list: {
+                        marginVertical: 4,
                       },
-                      propsForLabels: {
-                        fontSize: 11,
+                      list_item: {
+                        flexDirection: "row",
+                        alignItems: "flex-start",
+                        marginVertical: 2,
+                      },
+                      bullet_list_icon: {
+                        color: theme.colors.primary,
+                        fontSize: 14,
+                        fontWeight: "bold",
+                        marginRight: 8,
+                        marginTop: 2,
+                      },
+                      bullet_list_content: {
+                        flex: 1,
+                        color: theme.colors.text,
+                        fontSize: 14,
+                        fontWeight: "500",
                       },
                     }}
-                    bezier={false}
-                    yAxisSuffix=" m"
-                    fromZero={false}
-                    style={styles.chart}
-                    verticalLabelRotation={45}
-                    withInnerLines={false}
-                    withOuterLines={true}
-                    withVerticalLines={false}
-                    withHorizontalLines={true}
-                  />
-                </ScrollView>
+                  >
+                    {predictionInsights}
+                  </Markdown>
+                </View>
+              </View>
+            )}
+          </>
+        )}
+
+      {/* Current Level & Prediction Cards */}
+      {((locationPermission && useCurrentLocation) ||
+        (!useCurrentLocation && customLocation)) &&
+        nearestStation &&
+        kpis && (
+          <View style={styles.kpiGrid}>
+            <View
+              style={[
+                styles.kpiCard,
+                styles.currentLevelCard,
+                { backgroundColor: theme.colors.surface },
+              ]}
+            >
+              <View style={[styles.kpiIcon, { backgroundColor: "#e6f4ff" }]}>
+                <Ionicons name="water" size={24} color={COLOR_PRIMARY} />
+              </View>
+              <Text
+                style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}
+              >
+                {t("predictions.currentLevel")}
+              </Text>
+              <Text
+                style={[styles.kpiValueLarge, { color: theme.colors.text }]}
+              >
+                {kpis.current.toFixed(2)} m
+              </Text>
+              <Text
+                style={[
+                  styles.kpiSubtext,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("predictions.belowGround")}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.kpiCard,
+                styles.predictionCard,
+                { backgroundColor: theme.colors.surface },
+              ]}
+            >
+              <View style={[styles.kpiIcon, { backgroundColor: "#fff7ed" }]}>
+                <MaterialCommunityIcons
+                  name="crystal-ball"
+                  size={24}
+                  color="#f97316"
+                />
+              </View>
+              <Text
+                style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}
+              >
+                {t("predictions.sevenDayPrediction")}
+              </Text>
+              <Text
+                style={[styles.kpiValueLarge, { color: theme.colors.text }]}
+              >
+                {kpis.prediction7Day.toFixed(2)} m
+              </Text>
+              <Text
+                style={[
+                  styles.kpiSubtext,
+                  {
+                    color:
+                      kpis.trend > 0.1
+                        ? "#ef4444"
+                        : kpis.trend < -0.1
+                        ? "#16a34a"
+                        : theme.colors.textSecondary,
+                  },
+                ]}
+              >
+                {kpis.trend > 0.1
+                  ? t("predictions.declining")
+                  : kpis.trend < -0.1
+                  ? t("predictions.rising")
+                  : t("predictions.stableArrow")}
+              </Text>
+            </View>
+          </View>
+        )}
+
+      {/* Statistics Grid */}
+      {((locationPermission && useCurrentLocation) ||
+        (!useCurrentLocation && customLocation)) &&
+        nearestStation &&
+        kpis && (
+          <View style={styles.statsGrid}>
+            <View
+              style={[
+                styles.statCard,
+                { backgroundColor: theme.colors.surface },
+              ]}
+            >
+              <Ionicons
+                name="analytics"
+                size={18}
+                color={theme.colors.primary}
+              />
+              <Text
+                style={[
+                  styles.statLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {selectedPeriod === "7d"
+                  ? "7-Day Average"
+                  : selectedPeriod === "30d"
+                  ? "30-Day Average"
+                  : selectedPeriod === "3m"
+                  ? "3-Month Average"
+                  : selectedPeriod === "6m"
+                  ? "6-Month Average"
+                  : "1-Year Average"}
+              </Text>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
+                {kpis.avg.toFixed(2)} m
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.statCard,
+                { backgroundColor: theme.colors.surface },
+              ]}
+            >
+              <Ionicons name="trending-down" size={18} color="#16a34a" />
+              <Text
+                style={[
+                  styles.statLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("predictions.minimum")}
+              </Text>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
+                {kpis.min.toFixed(2)} m
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.statCard,
+                { backgroundColor: theme.colors.surface },
+              ]}
+            >
+              <Ionicons name="trending-up" size={18} color="#ef4444" />
+              <Text
+                style={[
+                  styles.statLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("predictions.maximum")}
+              </Text>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
+                {kpis.max.toFixed(2)} m
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.statCard,
+                { backgroundColor: theme.colors.surface },
+              ]}
+            >
+              <MaterialCommunityIcons
+                name="chart-line"
+                size={18}
+                color={theme.colors.primary}
+              />
+              <Text
+                style={[
+                  styles.statLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("predictions.trendLabel")}
+              </Text>
+              <Text style={[styles.statValue, { color: theme.colors.text }]}>
+                {Math.abs(kpis.trend).toFixed(2)} m
+              </Text>
+            </View>
+          </View>
+        )}
+      {/* Insights Card */}
+      {((locationPermission && useCurrentLocation) ||
+        (!useCurrentLocation && customLocation)) &&
+        nearestStation &&
+        insights.length > 0 && (
+          <View
+            style={[
+              styles.insightsCard,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <View style={styles.insightsHeader}>
+              <Ionicons
+                name="bulb-outline"
+                size={20}
+                color={theme.colors.primary}
+              />
+              <Text
+                style={[styles.insightsTitle, { color: theme.colors.text }]}
+              >
+                {t("predictions.insightsAnalysis")}
+              </Text>
+            </View>
+            {insights.map((insight, index) => (
+              <View key={index} style={styles.insightRow}>
+                <Text style={styles.insightBullet}>•</Text>
                 <Text
                   style={[
-                    styles.axisLabel,
+                    styles.insightText,
                     { color: theme.colors.textSecondary },
                   ]}
                 >
-                  Future Predictions - Next{" "}
-                  {selectedPeriod.replace(/[^0-9]/g, "")} Days
+                  {insight}
                 </Text>
               </View>
-            )}
+            ))}
+          </View>
+        )}
 
-          {/* AI Prediction Insights */}
-          {useAiPredictions && predictionInsights && (
-            <View
+      {/* Location Selection Modal */}
+      <Modal
+        visible={showLocationModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <View
+          style={[
+            styles.modalContainer,
+            { backgroundColor: theme.colors.background },
+          ]}
+        >
+          <View
+            style={[
+              styles.modalHeader,
+              {
+                backgroundColor: theme.colors.surface,
+                borderBottomColor: theme.colors.border,
+              },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+              Select Location
+            </Text>
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={() => setShowLocationModal(false)}
+            >
+              <Ionicons name="close" size={24} color={theme.colors.text} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.locationOptions}>
+            <TouchableOpacity
               style={[
-                styles.chartCard,
+                styles.locationOption,
                 {
-                  backgroundColor: theme.colors.surface,
+                  backgroundColor: useCurrentLocation
+                    ? theme.colors.primary
+                    : theme.colors.surface,
                   borderColor: theme.colors.border,
                 },
               ]}
+              onPress={() => {
+                setUseCurrentLocation(true);
+                if (userLocation) {
+                  setShowLocationModal(false);
+                }
+              }}
             >
+              <Ionicons
+                name="location"
+                size={20}
+                color={useCurrentLocation ? "#ffffff" : theme.colors.primary}
+              />
               <Text
                 style={[
-                  styles.sectionTitle,
+                  styles.locationOptionText,
                   {
-                    color: theme.colors.text,
-                    borderBottomColor: theme.colors.border,
+                    color: useCurrentLocation ? "#ffffff" : theme.colors.text,
                   },
                 ]}
               >
-                <MaterialCommunityIcons
-                  name="brain"
-                  size={18}
-                  color={theme.colors.text}
-                />{" "}
-                AI Prediction Insights
+                Use Current Location
               </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.locationOption,
+                {
+                  backgroundColor: !useCurrentLocation
+                    ? theme.colors.primary
+                    : theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+              ]}
+              onPress={() => setUseCurrentLocation(false)}
+            >
+              <Ionicons
+                name="map"
+                size={20}
+                color={!useCurrentLocation ? "#ffffff" : theme.colors.primary}
+              />
               <Text
                 style={[
-                  styles.chartDescription,
-                  { color: theme.colors.textSecondary },
+                  styles.locationOptionText,
+                  {
+                    color: !useCurrentLocation ? "#ffffff" : theme.colors.text,
+                  },
                 ]}
               >
-                🧠 Key prediction factors and trends (markdown format)
+                Select Custom Location
               </Text>
+            </TouchableOpacity>
+          </View>
 
-              <View
+          {!useCurrentLocation && (
+            <View style={styles.mapContainer}>
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: customLocation?.latitude || 20.5937,
+                  longitude: customLocation?.longitude || 78.9629,
+                  latitudeDelta: 10,
+                  longitudeDelta: 10,
+                }}
+                onPress={(event) => {
+                  const { coordinate } = event.nativeEvent;
+                  setCustomLocation({
+                    latitude: coordinate.latitude,
+                    longitude: coordinate.longitude,
+                  });
+                }}
+              >
+                {/* Show all stations as markers */}
+                {stationsData
+                  .filter(
+                    (station: Station) =>
+                      station.station_status === "Active" &&
+                      station.latitude &&
+                      station.longitude
+                  )
+                  .map((station: Station, index: number) => (
+                    <Marker
+                      key={`station-${station.station_code}-${index}`}
+                      coordinate={{
+                        latitude: station.latitude,
+                        longitude: station.longitude,
+                      }}
+                      title={station.station_name}
+                      description={`${station.district}, ${station.state}`}
+                      pinColor="#0A84FF"
+                      onPress={() => {
+                        setCustomLocation({
+                          latitude: station.latitude,
+                          longitude: station.longitude,
+                        });
+                      }}
+                    />
+                  ))}
+
+                {/* Show selected custom location */}
+                {customLocation && (
+                  <Marker
+                    coordinate={customLocation}
+                    title="Selected Location"
+                    pinColor="#FF6B35"
+                  />
+                )}
+              </MapView>
+
+              <View style={styles.mapInstructions}>
+                <Text
+                  style={[
+                    styles.instructionText,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Tap on the map to select a location or tap on a station marker
+                </Text>
+              </View>
+
+              <TouchableOpacity
                 style={[
-                  styles.insightsContainer,
+                  styles.confirmLocationBtn,
                   {
-                    backgroundColor: theme.colors.surface,
+                    backgroundColor: customLocation
+                      ? theme.colors.primary
+                      : theme.colors.surface,
                     borderColor: theme.colors.border,
                   },
                 ]}
+                disabled={!customLocation}
+                onPress={() => {
+                  if (customLocation) {
+                    setShowLocationModal(false);
+                  }
+                }}
               >
-                <Markdown
-                  style={{
-                    body: {
-                      color: theme.colors.text,
-                      fontSize: 14,
-                      lineHeight: 22,
-                      fontWeight: "500",
+                <Text
+                  style={[
+                    styles.confirmLocationText,
+                    {
+                      color: customLocation
+                        ? "#ffffff"
+                        : theme.colors.textSecondary,
                     },
-                    bullet_list: {
-                      marginVertical: 4,
-                    },
-                    list_item: {
-                      flexDirection: "row",
-                      alignItems: "flex-start",
-                      marginVertical: 2,
-                    },
-                    bullet_list_icon: {
-                      color: theme.colors.primary,
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      marginRight: 8,
-                      marginTop: 2,
-                    },
-                    bullet_list_content: {
-                      flex: 1,
-                      color: theme.colors.text,
-                      fontSize: 14,
-                      fontWeight: "500",
-                    },
-                  }}
+                  ]}
                 >
-                  {predictionInsights}
-                </Markdown>
-              </View>
+                  Confirm Location
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
-        </>
-      )}
 
-      {/* Current Level & Prediction Cards */}
-      {locationPermission && nearestStation && kpis && (
-        <View style={styles.kpiGrid}>
-          <View
-            style={[
-              styles.kpiCard,
-              styles.currentLevelCard,
-              { backgroundColor: theme.colors.surface },
-            ]}
-          >
-            <View style={[styles.kpiIcon, { backgroundColor: "#e6f4ff" }]}>
-              <Ionicons name="water" size={24} color={COLOR_PRIMARY} />
-            </View>
-            <Text
-              style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}
-            >
-              {t("predictions.currentLevel")}
-            </Text>
-            <Text style={[styles.kpiValueLarge, { color: theme.colors.text }]}>
-              {kpis.current.toFixed(2)} m
-            </Text>
-            <Text
-              style={[styles.kpiSubtext, { color: theme.colors.textSecondary }]}
-            >
-              {t("predictions.belowGround")}
-            </Text>
-          </View>
-
-          <View
-            style={[
-              styles.kpiCard,
-              styles.predictionCard,
-              { backgroundColor: theme.colors.surface },
-            ]}
-          >
-            <View style={[styles.kpiIcon, { backgroundColor: "#fff7ed" }]}>
-              <MaterialCommunityIcons
-                name="crystal-ball"
-                size={24}
-                color="#f97316"
-              />
-            </View>
-            <Text
-              style={[styles.kpiLabel, { color: theme.colors.textSecondary }]}
-            >
-              {t("predictions.sevenDayPrediction")}
-            </Text>
-            <Text style={[styles.kpiValueLarge, { color: theme.colors.text }]}>
-              {kpis.prediction7Day.toFixed(2)} m
-            </Text>
-            <Text
-              style={[
-                styles.kpiSubtext,
-                {
-                  color:
-                    kpis.trend > 0.1
-                      ? "#ef4444"
-                      : kpis.trend < -0.1
-                      ? "#16a34a"
-                      : theme.colors.textSecondary,
-                },
-              ]}
-            >
-              {kpis.trend > 0.1
-                ? t("predictions.declining")
-                : kpis.trend < -0.1
-                ? t("predictions.rising")
-                : t("predictions.stableArrow")}
-            </Text>
-          </View>
-        </View>
-      )}
-
-      {/* Statistics Grid */}
-      {locationPermission && nearestStation && kpis && (
-        <View style={styles.statsGrid}>
-          <View
-            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
-          >
-            <Ionicons name="analytics" size={18} color={theme.colors.primary} />
-            <Text
-              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
-            >
-              {selectedPeriod === "7d"
-                ? "7-Day Average"
-                : selectedPeriod === "30d"
-                ? "30-Day Average"
-                : selectedPeriod === "3m"
-                ? "3-Month Average"
-                : selectedPeriod === "6m"
-                ? "6-Month Average"
-                : "1-Year Average"}
-            </Text>
-            <Text style={[styles.statValue, { color: theme.colors.text }]}>
-              {kpis.avg.toFixed(2)} m
-            </Text>
-          </View>
-
-          <View
-            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
-          >
-            <Ionicons name="trending-down" size={18} color="#16a34a" />
-            <Text
-              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
-            >
-              {t("predictions.minimum")}
-            </Text>
-            <Text style={[styles.statValue, { color: theme.colors.text }]}>
-              {kpis.min.toFixed(2)} m
-            </Text>
-          </View>
-
-          <View
-            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
-          >
-            <Ionicons name="trending-up" size={18} color="#ef4444" />
-            <Text
-              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
-            >
-              {t("predictions.maximum")}
-            </Text>
-            <Text style={[styles.statValue, { color: theme.colors.text }]}>
-              {kpis.max.toFixed(2)} m
-            </Text>
-          </View>
-
-          <View
-            style={[styles.statCard, { backgroundColor: theme.colors.surface }]}
-          >
-            <MaterialCommunityIcons
-              name="chart-line"
-              size={18}
-              color={theme.colors.primary}
-            />
-            <Text
-              style={[styles.statLabel, { color: theme.colors.textSecondary }]}
-            >
-              {t("predictions.trendLabel")}
-            </Text>
-            <Text style={[styles.statValue, { color: theme.colors.text }]}>
-              {Math.abs(kpis.trend).toFixed(2)} m
-            </Text>
-          </View>
-        </View>
-      )}
-      {/* Insights Card */}
-      {locationPermission && nearestStation && insights.length > 0 && (
-        <View
-          style={[
-            styles.insightsCard,
-            { backgroundColor: theme.colors.surface },
-          ]}
-        >
-          <View style={styles.insightsHeader}>
-            <Ionicons
-              name="bulb-outline"
-              size={20}
-              color={theme.colors.primary}
-            />
-            <Text style={[styles.insightsTitle, { color: theme.colors.text }]}>
-              {t("predictions.insightsAnalysis")}
-            </Text>
-          </View>
-          {insights.map((insight, index) => (
-            <View key={index} style={styles.insightRow}>
-              <Text style={styles.insightBullet}>•</Text>
+          {useCurrentLocation && !userLocation && (
+            <View style={styles.currentLocationContainer}>
               <Text
                 style={[
-                  styles.insightText,
+                  styles.permissionText,
                   { color: theme.colors.textSecondary },
                 ]}
               >
-                {insight}
+                Location permission is required to use current location
               </Text>
+              <TouchableOpacity
+                style={[
+                  styles.permissionBtn,
+                  { backgroundColor: theme.colors.primary },
+                ]}
+                onPress={() => {
+                  requestLocationPermission();
+                  setShowLocationModal(false);
+                }}
+              >
+                <Text style={styles.permissionBtnText}>
+                  Enable Location Permission
+                </Text>
+              </TouchableOpacity>
             </View>
-          ))}
+          )}
         </View>
-      )}
+      </Modal>
     </ScrollView>
   );
 };
@@ -1949,6 +2294,116 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#f1f5f9",
   },
+  headerControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  locationToggleBtn: {
+    padding: 8,
+    borderRadius: 8,
+  },
+  locationModeText: {
+    fontSize: 12,
+    marginTop: 2,
+    fontStyle: "italic",
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  closeBtn: {
+    padding: 4,
+  },
+  locationOptions: {
+    flexDirection: "row",
+    gap: 12,
+    margin: 16,
+  },
+  locationOption: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 8,
+  },
+  locationOptionText: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  mapContainer: {
+    flex: 1,
+    margin: 16,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  map: {
+    flex: 1,
+    minHeight: 400,
+  },
+  mapInstructions: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    right: 16,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: 12,
+    borderRadius: 8,
+  },
+  instructionText: {
+    color: "#ffffff",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  confirmLocationBtn: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  confirmLocationText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  currentLocationContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
+  permissionText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  permissionBtn: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  permissionBtnText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
   errorCard: {
     margin: 16,
     padding: 24,
@@ -1979,6 +2434,23 @@ const styles = StyleSheet.create({
   },
   retryBtnText: {
     color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  permissionActions: {
+    flexDirection: "column",
+    gap: 12,
+    alignItems: "stretch",
+    width: "100%",
+  },
+  customLocationBtn: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  customLocationBtnText: {
     fontSize: 16,
     fontWeight: "600",
   },
