@@ -91,7 +91,9 @@ export default function Layout() {
             edges={["top"]}
             style={{ backgroundColor: theme.colors.surface }}
           >
-            <AppHeader onLanguageSwitch={() => console.log("Switch Language")} />
+            <AppHeader
+              onLanguageSwitch={() => console.log("Switch Language")}
+            />
           </SafeAreaView>
         ),
       }}
@@ -138,12 +140,6 @@ export default function Layout() {
                 size={size}
                 color={color}
               />
-              {/* <MaterialCommunityIcons
-                name="trending-up"
-                size={Math.max(14, size - 4)}
-                color={color}
-                style={{ marginLeft: 4 }}
-              /> */}
             </View>
           ),
         }}
@@ -180,6 +176,19 @@ export default function Layout() {
         }}
       />
       <Drawer.Screen
+        name="alerts"
+        options={{
+          title: t("drawer.alerts") ?? "Alerts",
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="bell-alert-outline"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="settings"
         options={{
           title: t("drawer.settings"),
@@ -197,6 +206,30 @@ export default function Layout() {
           drawerIcon: () => null,
           swipeEnabled: false,
           headerShown: true,
+        }}
+      />
+      <Drawer.Screen
+        name="districts"
+        options={{
+          // hide item visually in the drawer
+          drawerItemStyle: { height: 0 },
+          // remove label and icon
+          drawerLabel: () => null,
+          drawerIcon: () => null,
+          // keep route accessible
+          title: "Districts",
+        }}
+      />
+      <Drawer.Screen
+        name="notifications"
+        options={{
+          // hide item visually
+          drawerItemStyle: { height: 0 },
+          // remove label and icon
+          drawerLabel: () => null,
+          drawerIcon: () => null,
+          // keep header/route accessible
+          title: "Notifications",
         }}
       />
     </Drawer>

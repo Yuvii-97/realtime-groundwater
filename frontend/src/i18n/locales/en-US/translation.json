@@ -12,7 +12,39 @@
     "maps": "Maps",
     "predictions": "Predictions",
     "reports": "Reports",
+    "alerts": "Alerts",
     "settings": "Settings"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "countLabel": "Alerts",
+    "recent": "Recent",
+    "all": "All",
+    "markAll": "Mark all",
+    "clear": "Clear",
+    "share": "Share",
+    "noAlerts": "No alerts",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "older": "Older",
+    "labels": {
+      "level": "Level",
+      "station": "Station",
+      "district": "District",
+      "timestamp": "Timestamp",
+      "createdAt": "Created"
+    },
+    "types": {
+      "threshold_breach": "Threshold breach",
+      "sudden_jump": "Sudden jump",
+      "trend_down": "Downward trend",
+      "trend_up": "Upward trend",
+      "default": "Alert"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch alerts",
+      "retry": "Retry"
+    }
   },
   "notifications": {
     "notifications": "Notifications",
