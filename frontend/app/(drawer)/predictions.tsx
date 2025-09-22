@@ -36,9 +36,9 @@ const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe"; // Weather API key
 const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 if (!GEMINI_API_KEY) {
-  console.error(
-    "Gemini API key not set. Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file."
-  );
+  // console.error(
+  //   "Gemini API key not set. Please set EXPO_PUBLIC_GEMINI_API_KEY in your .env file."
+  // );
 }
 
 const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
@@ -212,15 +212,15 @@ const PredictionsPage = () => {
   }, [chartData, selectedPeriod]);
 
   useEffect(() => {
-    console.log("🚀 Component mounted, requesting location permission...");
+    // console.log("🚀 Component mounted, requesting location permission...");
     requestLocationPermission();
   }, []);
 
   useEffect(() => {
-    console.log(
-      "📍 Location changed:",
-      useCurrentLocation ? userLocation : customLocation
-    );
+    // console.log(
+    //   "📍 Location changed:",
+    //   useCurrentLocation ? userLocation : customLocation
+    // );
     const currentCoords = useCurrentLocation ? userLocation : customLocation;
     if (currentCoords) {
       findNearestStation(currentCoords);
@@ -233,11 +233,11 @@ const PredictionsPage = () => {
   }, [userLocation, customLocation, useCurrentLocation]);
 
   useEffect(() => {
-    console.log(
-      "🏠 Nearest station or date range changed:",
-      nearestStation?.station_name,
-      selectedPeriod
-    );
+    // console.log(
+    //   "🏠 Nearest station or date range changed:",
+    //   nearestStation?.station_name,
+    //   selectedPeriod
+    // );
     if (nearestStation) {
       fetchGroundwaterData();
     }
@@ -246,13 +246,13 @@ const PredictionsPage = () => {
   // Request location permission and get user location
   const requestLocationPermission = async () => {
     try {
-      console.log("🔍 STEP 1: Requesting location permission...");
+      // console.log("🔍 STEP 1: Requesting location permission...");
       setLocationLoading(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
-      console.log("📍 Location permission status:", status);
+      // console.log("📍 Location permission status:", status);
 
       if (status !== "granted") {
-        console.log("❌ Location permission denied");
+        // console.log("❌ Location permission denied");
         setLocationPermission(false);
         Alert.alert(
           t("predictions.permissionDenied"),
@@ -261,19 +261,19 @@ const PredictionsPage = () => {
         return;
       }
 
-      console.log(
-        "✅ Location permission granted, getting current position..."
-      );
+      // console.log(
+      //   "✅ Location permission granted, getting current position..."
+      // );
       setLocationPermission(true);
       const location = await Location.getCurrentPositionAsync({});
       const coords = {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
-      console.log("📍 User location obtained:", coords);
+      // console.log("📍 User location obtained:", coords);
       setUserLocation(coords);
     } catch (error) {
-      console.error("❌ Location error:", error);
+      // console.error("❌ Location error:", error);
       Alert.alert(t("common.error"), t("predictions.locationError"));
     } finally {
       setLocationLoading(false);
@@ -286,11 +286,11 @@ const PredictionsPage = () => {
       coords || (useCurrentLocation ? userLocation : customLocation);
     if (!locationToUse) return;
 
-    console.log(
-      "🔍 STEP 2: Finding nearest station to location:",
-      locationToUse
-    );
-    console.log("📊 Total stations in database:", stationsData.length);
+    // console.log(
+    //   "🔍 STEP 2: Finding nearest station to location:",
+    //   locationToUse
+    // );
+    // console.log("📊 Total stations in database:", stationsData.length);
 
     const calculateDistance = (
       lat1: number,
@@ -337,26 +337,26 @@ const PredictionsPage = () => {
       }
     });
 
-    console.log("🟢 Active stations found:", activeStations);
+    // console.log("🟢 Active stations found:", activeStations);
     if (nearestStation) {
-      console.log(
-        "🎯 Nearest station:",
-        (nearestStation as Station).station_name,
-        "at",
-        minDistance.toFixed(2),
-        "km"
-      );
-      console.log("📍 Station details:", {
-        code: (nearestStation as Station).station_code,
-        name: (nearestStation as Station).station_name,
-        location: `${(nearestStation as Station).latitude}, ${
-          (nearestStation as Station).longitude
-        }`,
-        district: (nearestStation as Station).district,
-        state: (nearestStation as Station).state,
-      });
+      // console.log(
+      //   "🎯 Nearest station:",
+      //   (nearestStation as Station).station_name,
+      //   "at",
+      //   minDistance.toFixed(2),
+      //   "km"
+      // );
+      // console.log("📍 Station details:", {
+      //   code: (nearestStation as Station).station_code,
+      //   name: (nearestStation as Station).station_name,
+      //   location: `${(nearestStation as Station).latitude}, ${
+      //     (nearestStation as Station).longitude
+      //   }`,
+      //   district: (nearestStation as Station).district,
+      //   state: (nearestStation as Station).state,
+      // });
     } else {
-      console.log("❌ No nearest station found");
+      // console.log("❌ No nearest station found");
     }
 
     setNearestStation(nearestStation);
@@ -378,11 +378,11 @@ const PredictionsPage = () => {
       }
 
       const data = await response.json();
-      console.log("Weather data fetched successfully:", data.city.name);
+      // console.log("Weather data fetched successfully:", data.city.name);
       setWeatherData(data);
       setLocationName(data.city.name);
     } catch (error) {
-      console.error("Weather fetch error:", error);
+      // console.error("Weather fetch error:", error);
       setLocationName("Location unavailable");
     } finally {
       setWeatherLoading(false);
@@ -413,7 +413,7 @@ const PredictionsPage = () => {
     location: LocationInfo
   ): Promise<{ data: PredictionData[]; insights: string }> => {
     if (!genAI || !model) {
-      console.error("Gemini AI not configured properly");
+      // console.error("Gemini AI not configured properly");
       return {
         data: [],
         insights: "AI prediction unavailable - API not configured.",
@@ -423,7 +423,7 @@ const PredictionsPage = () => {
     setAiLoading(true);
 
     try {
-      console.log("🤖 Starting AI prediction generation...");
+      // console.log("🤖 Starting AI prediction generation...");
 
       // Prepare historical data for AI analysis
       const processedHistoricalData: PredictionData[] = historicalData.map(
@@ -578,7 +578,7 @@ IMPORTANT FOR SMOOTH CONTINUATION:
       )}m (current level)
 - Follow historical trend patterns and seasonal behavior`;
 
-      console.log("🤖 Sending prompt to Gemini AI...");
+      // console.log("🤖 Sending prompt to Gemini AI...");
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
@@ -593,24 +593,24 @@ IMPORTANT FOR SMOOTH CONTINUATION:
       cleanedText = cleanedText.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
       cleanedText = cleanedText.replace(/[^\x20-\x7E\n\r\t]/g, "");
 
-      console.log("🤖 AI response received and cleaned");
+      // console.log("🤖 AI response received and cleaned");
 
       let aiResponse;
       try {
         aiResponse = JSON.parse(cleanedText);
       } catch (parseError) {
-        console.error("JSON parse error:", parseError);
+        // console.error("JSON parse error:", parseError);
         throw new Error("Invalid JSON response from AI");
       }
 
       // Console log the AI prediction data
-      console.log("🤖 AI Raw Response:", aiResponse);
-      console.log(
-        "📊 AI Predictions Count:",
-        aiResponse.predictions?.length || 0
-      );
-      console.log("🔍 AI Predictions Data:", aiResponse.predictions);
-      console.log("💡 AI Insights:", aiResponse.insights);
+      // console.log("🤖 AI Raw Response:", aiResponse);
+      // console.log(
+      //   "📊 AI Predictions Count:",
+      //   aiResponse.predictions?.length || 0
+      // );
+      // console.log("🔍 AI Predictions Data:", aiResponse.predictions);
+      // console.log("💡 AI Insights:", aiResponse.insights);
 
       // Extract values and labels as lists
       if (aiResponse.predictions && Array.isArray(aiResponse.predictions)) {
@@ -627,17 +627,17 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           (pred: any) => pred.consumptionRate
         );
 
-        console.log("📈 Prediction Values List:", predictionValues);
-        console.log("🏷️ Prediction Labels List:", predictionLabels);
-        console.log("💧 Recharge Rates List:", rechargeRates);
-        console.log("🚰 Consumption Rates List:", consumptionRates);
+        // console.log("📈 Prediction Values List:", predictionValues);
+        // console.log("🏷️ Prediction Labels List:", predictionLabels);
+        // console.log("💧 Recharge Rates List:", rechargeRates);
+        // console.log("🚰 Consumption Rates List:", consumptionRates);
 
         // Update global variables
         values = predictionValues;
         labels = predictionLabels;
 
-        console.log("🌍 Global values updated:", values);
-        console.log("🌍 Global labels updated:", labels);
+        // console.log("🌍 Global values updated:", values);
+        // console.log("🌍 Global labels updated:", labels);
       }
 
       // Combine historical data with AI predictions
@@ -652,7 +652,7 @@ IMPORTANT FOR SMOOTH CONTINUATION:
         })),
       ];
 
-      console.log("✅ AI prediction completed successfully");
+      // console.log("✅ AI prediction completed successfully");
 
       return {
         data: combinedData,
@@ -661,7 +661,7 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           "- AI prediction analysis completed successfully using advanced machine learning algorithms and historical groundwater data patterns from regional monitoring stations\n- Statistical modeling incorporates seasonal variations, rainfall patterns, temperature fluctuations, and agricultural consumption cycles specific to your geographic location\n- Historical data analysis reveals typical groundwater behavior patterns for this region, accounting for geological composition and hydrological characteristics\n- Weather data integration provides enhanced accuracy by considering precipitation forecasts, evapotranspiration rates, and climate conditions affecting natural recharge processes\n- Prediction confidence levels are high due to comprehensive data availability and validated modeling techniques used in groundwater resource assessment",
       };
     } catch (error) {
-      console.error("AI Prediction Error:", error);
+      // console.error("AI Prediction Error:", error);
       // Fallback to basic prediction - always use 30 days
       const basicPrediction = generateBasicPrediction(historicalData, 30);
       return {
@@ -781,13 +781,13 @@ IMPORTANT FOR SMOOTH CONTINUATION:
     if (!nearestStation) return;
 
     try {
-      console.log("🔍 STEP 3: Fetching groundwater data...");
-      console.log("📡 API Request details:", {
-        station_code: nearestStation.station_code,
-        starttime: toISO(dateRange.startDate),
-        endtime: toISO(dateRange.endDate),
-        dataset: "GWATERLVL",
-      });
+      // console.log("🔍 STEP 3: Fetching groundwater data...");
+      // console.log("📡 API Request details:", {
+      //   station_code: nearestStation.station_code,
+      //   starttime: toISO(dateRange.startDate),
+      //   endtime: toISO(dateRange.endDate),
+      //   dataset: "GWATERLVL",
+      // });
 
       setLoading(true);
       const res = await fetch(
@@ -804,15 +804,15 @@ IMPORTANT FOR SMOOTH CONTINUATION:
         }
       );
 
-      console.log("📡 API Response status:", res.status);
+      // console.log("📡 API Response status:", res.status);
       const data = await res.json();
-      console.log("📊 Raw API response:", data);
+      // console.log("📊 Raw API response:", data);
 
       const records = Array.isArray(data.data) ? data.data : [];
-      console.log("📈 Data records received:", records.length);
+      // console.log("📈 Data records received:", records.length);
 
       if (records.length > 0) {
-        console.log("📝 Sample raw records (first 3):", records.slice(0, 3));
+        // console.log("📝 Sample raw records (first 3):", records.slice(0, 3));
 
         // Process data for chart
         const prepared = records
@@ -824,13 +824,13 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           .filter((d: any) => !isNaN(d.t.getTime()) && d.v > 0)
           .sort((a: any, b: any) => a.t.getTime() - b.t.getTime());
 
-        console.log("🔄 STEP 4: Data processing results:");
-        console.log("📊 Processed data points:", prepared.length);
-        console.log(
-          "📝 Sample processed data (first 5):",
-          prepared.slice(0, 5)
-        );
-        console.log("📝 Sample processed data (last 5):", prepared.slice(-5));
+        // console.log("🔄 STEP 4: Data processing results:");
+        // console.log("📊 Processed data points:", prepared.length);
+        // console.log(
+        //   "📝 Sample processed data (first 5):",
+        //   prepared.slice(0, 5)
+        // );
+        // console.log("📝 Sample processed data (last 5):", prepared.slice(-5));
 
         // Remove duplicate dates - keep only the latest value for each unique date
         const currentPeriod = timePeriods.find((p) => p.key === selectedPeriod);
@@ -870,31 +870,31 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           (a: any, b: any) => a.t.getTime() - b.t.getTime()
         );
 
-        console.log("🔄 STEP 4.1: Deduplication results:");
-        console.log("📊 Before deduplication:", prepared.length);
-        console.log("📊 After deduplication:", deduplicated.length);
-        console.log(
-          "📝 Removed",
-          prepared.length - deduplicated.length,
-          "duplicate entries"
-        );
-        console.log(
-          "📅 Time period:",
-          days,
-          "days, deduplication level:",
-          days <= 90 ? "daily" : days <= 365 ? "monthly" : "yearly"
-        );
+        // console.log("🔄 STEP 4.1: Deduplication results:");
+        // console.log("📊 Before deduplication:", prepared.length);
+        // console.log("📊 After deduplication:", deduplicated.length);
+        // console.log(
+        //   "📝 Removed",
+        //   prepared.length - deduplicated.length,
+        //   "duplicate entries"
+        // );
+        // console.log(
+        //   "📅 Time period:",
+        //   days,
+        //   "days, deduplication level:",
+        //   days <= 90 ? "daily" : days <= 365 ? "monthly" : "yearly"
+        // );
 
         // Keep more data points for scrollable chart - no aggressive downsampling
         let processed = deduplicated;
 
         // Only downsample if we have an excessive number of points (>50)
         if (deduplicated.length > 50) {
-          console.log(
-            "⬇️ Downsampling data from",
-            deduplicated.length,
-            "to ~30 points"
-          );
+          // console.log(
+          //   "⬇️ Downsampling data from",
+          //   deduplicated.length,
+          //   "to ~30 points"
+          // );
           const step = Math.floor(deduplicated.length / 30);
           processed = [];
 
@@ -911,13 +911,13 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           }
         }
 
-        console.log("📊 Final processed data points:", processed.length);
-        console.log(
-          "📈 Value range:",
-          Math.min(...processed.map((p: any) => p.v)),
-          "to",
-          Math.max(...processed.map((p: any) => p.v))
-        );
+        // console.log("📊 Final processed data points:", processed.length);
+        // console.log(
+        //   "📈 Value range:",
+        //   Math.min(...processed.map((p: any) => p.v)),
+        //   "to",
+        //   Math.max(...processed.map((p: any) => p.v))
+        // );
 
         // Create labels with dynamic formatting based on time period
         labels = processed.map((p: any, index: number) => {
@@ -960,23 +960,23 @@ IMPORTANT FOR SMOOTH CONTINUATION:
         const maxVal = Math.max(...values);
         const variance = maxVal - minVal;
 
-        console.log("📊 Chart data prepared:");
-        console.log("🏷️ Labels:", labels);
-        console.log("📈 Values:", values);
-        console.log("📏 Chart variance:", variance);
-        console.log("📍 Current level:", values[values.length - 1]);
-        console.log(
-          "📐 Chart will be scrollable with",
-          labels.length,
-          "data points"
-        );
+        // console.log("📊 Chart data prepared:");
+        // console.log("🏷️ Labels:", labels);
+        // console.log("📈 Values:", values);
+        // console.log("📏 Chart variance:", variance);
+        // console.log("📍 Current level:", values[values.length - 1]);
+        // console.log(
+        //   "📐 Chart will be scrollable with",
+        //   labels.length,
+        //   "data points"
+        // );
 
         setCurrentLevel(values[values.length - 1]);
         const chartWidth = Math.max(
           Dimensions.get("window").width - 32,
           labels.length * 60 // 60px per data point
         );
-        console.log("📐 Calculated chart width:", chartWidth, "px");
+        // console.log("📐 Calculated chart width:", chartWidth, "px");
 
         setChartData({
           labels,
@@ -989,11 +989,11 @@ IMPORTANT FOR SMOOTH CONTINUATION:
           ],
           legend: ["Groundwater Depth (m)"],
         });
-        console.log("✅ Chart data set successfully!");
+        // console.log("✅ Chart data set successfully!");
 
         // Generate AI predictions if enabled and data is available
         if (useAiPredictions && userLocation) {
-          console.log("🤖 Generating AI predictions...");
+          // console.log("🤖 Generating AI predictions...");
           const locationInfo: LocationInfo = {
             lat: userLocation.latitude,
             lon: userLocation.longitude,
@@ -1030,9 +1030,9 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                 (item) => item.predictedLevel
               );
 
-              console.log("📊 Chart Prediction Labels:", predictionLabels);
-              console.log("📈 Chart Prediction Values:", predictionValues);
-              console.log("📅 Future Data Count:", futureData.length);
+              // console.log("📊 Chart Prediction Labels:", predictionLabels);
+              // console.log("📈 Chart Prediction Values:", predictionValues);
+              // console.log("📅 Future Data Count:", futureData.length);
 
               setPredictedChartData({
                 labels: predictionLabels,
@@ -1046,45 +1046,45 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                 legend: ["Predicted Groundwater Depth (m)"],
               });
 
-              console.log("✅ AI prediction chart data prepared");
-              console.log("📋 Final Chart Data Structure:", {
-                labelsCount: predictionLabels.length,
-                valuesCount: predictionValues.length,
-                dataRange: {
-                  min: Math.min(...predictionValues),
-                  max: Math.max(...predictionValues),
-                },
-              });
+              // console.log("✅ AI prediction chart data prepared");
+              // console.log("📋 Final Chart Data Structure:", {
+              //   labelsCount: predictionLabels.length,
+              //   valuesCount: predictionValues.length,
+              //   dataRange: {
+              //     min: Math.min(...predictionValues),
+              //     max: Math.max(...predictionValues),
+              //   },
+              // });
             }
           } catch (aiError) {
-            console.error("❌ AI prediction failed:", aiError);
+            // console.error("❌ AI prediction failed:", aiError);
             setPredictionInsights(
               "- AI prediction system encountered technical difficulties while processing groundwater data analysis, potentially due to network connectivity issues or service overload\n- Falling back to basic statistical analysis using historical groundwater monitoring data from nearby stations and established hydrological patterns for the region\n- Current internet connection may be unstable or AI service temporarily unavailable, affecting real-time weather integration and advanced predictive modeling capabilities\n- Try refreshing the application data or toggling airplane mode to reset network connection, or wait a few minutes for service restoration\n- Historical data analysis remains available and provides reliable baseline predictions based on seasonal patterns and regional groundwater behavior trends"
             );
           }
         }
       } else {
-        console.log("❌ No data records received from API");
+        // console.log("❌ No data records received from API");
         setChartData(null);
         Alert.alert("No Data", t("predictions.noDataAvailable"));
       }
     } catch (error) {
-      console.error("❌ API fetch error:", error);
+      // console.error("❌ API fetch error:", error);
       Alert.alert(t("common.error"), "Failed to fetch groundwater data");
     } finally {
-      console.log("🏁 Data fetch completed");
+      // console.log("🏁 Data fetch completed");
       setLoading(false);
     }
   };
 
   // Refresh data
   const onRefresh = async () => {
-    console.log("🔄 Refresh triggered by user");
+    // console.log("🔄 Refresh triggered by user");
     setRefreshing(true);
     if (nearestStation) {
       await fetchGroundwaterData();
     } else {
-      console.log("❌ Cannot refresh: no nearest station available");
+      // console.log("❌ Cannot refresh: no nearest station available");
     }
     setRefreshing(false);
   };
@@ -1092,7 +1092,7 @@ IMPORTANT FOR SMOOTH CONTINUATION:
   // Add useEffect to regenerate predictions when AI toggle changes
   useEffect(() => {
     if (nearestStation && chartData && useAiPredictions && !aiLoading) {
-      console.log("🔄 AI toggle changed, regenerating predictions...");
+      // console.log("🔄 AI toggle changed, regenerating predictions...");
       const regenerateAI = async () => {
         if (userLocation) {
           const locationInfo: LocationInfo = {
@@ -1139,18 +1139,18 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                 (item) => item.predictedLevel
               );
 
-              console.log(
-                "🔄 Regenerated Chart Prediction Labels:",
-                predictionLabels
-              );
-              console.log(
-                "🔄 Regenerated Chart Prediction Values:",
-                predictionValues
-              );
-              console.log(
-                "🔄 Regenerated Future Data Count:",
-                futureData.length
-              );
+              // console.log(
+              //   "🔄 Regenerated Chart Prediction Labels:",
+              //   predictionLabels
+              // );
+              // console.log(
+              //   "🔄 Regenerated Chart Prediction Values:",
+              //   predictionValues
+              // );
+              // console.log(
+              //   "🔄 Regenerated Future Data Count:",
+              //   futureData.length
+              // );
 
               setPredictedChartData({
                 labels: predictionLabels,
@@ -1164,18 +1164,18 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                 legend: ["Predicted Groundwater Depth (m)"],
               });
 
-              console.log("✅ Regenerated AI prediction chart data prepared");
-              console.log("📋 Regenerated Final Chart Data Structure:", {
-                labelsCount: predictionLabels.length,
-                valuesCount: predictionValues.length,
-                dataRange: {
-                  min: Math.min(...predictionValues),
-                  max: Math.max(...predictionValues),
-                },
-              });
+              // console.log("✅ Regenerated AI prediction chart data prepared");
+              // console.log("📋 Regenerated Final Chart Data Structure:", {
+              //   labelsCount: predictionLabels.length,
+              //   valuesCount: predictionValues.length,
+              //   dataRange: {
+              //     min: Math.min(...predictionValues),
+              //     max: Math.max(...predictionValues),
+              //   },
+              // });
             }
           } catch (aiError) {
-            console.error("❌ AI prediction regeneration failed:", aiError);
+            // console.error("❌ AI prediction regeneration failed:", aiError);
             setPredictionInsights(
               "- AI prediction regeneration process failed during real-time analysis update, possibly due to temporary service interruption or data processing limitations\n- Toggle the AI predictions switch off and on again to reinitialize the prediction engine and retry the groundwater analysis with current data parameters\n- Check network connection stability as AI processing requires reliable internet connectivity for weather data integration and cloud-based machine learning computations\n- System is currently operating with historical data analysis only, providing basic trend predictions without advanced weather modeling and seasonal adjustment capabilities\n- Contact support if problem persists, or wait for service restoration while using available historical groundwater monitoring data for reference"
             );
