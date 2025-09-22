@@ -1,15 +1,11 @@
-# Use an official OpenJDK runtime as a parent image
-FROM eclipse-temurin:20-jdk-jammy
-
-# Set the working directory inside the container
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy the Gradle/Maven build artifact (jar) into the container
-# Make sure your Spring Boot jar is built already (./build/libs/*.jar or ./target/*.jar)
-COPY build/libs/backend-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port your Spring Boot app runs on (default 8080)
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Run the jar file
 ENTRYPOINT ["java","-jar","app.jar"]
