@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { colors } from "@/constants/theme";
 import { scale, verticalScale } from "@/utils/styling";
 import { useTheme } from "../hooks/useTheme";
@@ -9,7 +10,6 @@ import { useSettings } from "../contexts/SettingsContext";
 import { useTranslation } from "react-i18next"; // Use react-i18next directly
 import { useNotifications } from "../contexts/NotificationContext";
 import LanguageSelector from "./LanguageSelector";
-import { NotificationPanel } from "./NotificationPanel";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // For saving language
 
 interface AppHeaderProps {
@@ -25,11 +25,12 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   onLanguageSwitch,
   onNotificationsPress,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+  const router = useRouter();
   const theme = useTheme();
   const { notificationsEnabled } = useSettings();
   const { t, i18n } = useTranslation(); // Use i18next's translation hook
-  const { unreadCount = 0, showNotificationPanel, openNotificationPanel, closeNotificationPanel } = useNotifications() || {};
+  const { unreadCount = 0 } = useNotifications() || {};
 
   // Language change handler
   const handleLanguageChange = useCallback(
@@ -49,7 +50,16 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   );
 
   const handleNotificationPress = () => {
-    openNotificationPanel();
+    // navigate to the notifications screen (expo-router)
+    try {
+      // cast to any to satisfy expo-router path typing in this file
+      (router.push as any)("/notifications");
+    } catch {
+      // fallback to navigation if router isn't available
+      // @ts-ignore
+      navigation.navigate?.("Notifications");
+    }
+
     if (onNotificationsPress) {
       onNotificationsPress();
     }
@@ -119,10 +129,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         </TouchableOpacity>
       </View>
 
-      <NotificationPanel
-        visible={showNotificationPanel}
-        onClose={() => closeNotificationPanel()}
-      />
+      {/* NotificationPanel modal removed - full screen route /notifications is used instead */}
     </View>
   );
 };
