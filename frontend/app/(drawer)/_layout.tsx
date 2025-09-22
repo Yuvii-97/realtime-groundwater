@@ -128,15 +128,23 @@ export default function Layout() {
         }}
       />
       <Drawer.Screen
-        name="Predictions"
+        name="predictions"
         options={{
           title: t("drawer.predictions"),
-          drawerIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="trending-up" // changed from "chart-line"
-              size={size}
-              color={color}
-            />
+          drawerIcon: ({ color, size, focused }) => (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <MaterialCommunityIcons
+                name={focused ? "robot" : "robot-outline"}
+                size={size}
+                color={color}
+              />
+              {/* <MaterialCommunityIcons
+                name="trending-up"
+                size={Math.max(14, size - 4)}
+                color={color}
+                style={{ marginLeft: 4 }}
+              /> */}
+            </View>
           ),
         }}
       />
@@ -183,12 +191,12 @@ export default function Layout() {
       <Drawer.Screen
         name="StationDetail"
         options={{
-          drawerItemStyle: { height: 0 }, 
-          drawerLabel: () => null, 
-          title: "Station Detail", 
-          drawerIcon: () => null, 
-          swipeEnabled: false, 
-          headerShown: true, 
+          drawerItemStyle: { height: 0 },
+          drawerLabel: () => null,
+          title: "Station Detail",
+          drawerIcon: () => null,
+          swipeEnabled: false,
+          headerShown: true,
         }}
       />
     </Drawer>
