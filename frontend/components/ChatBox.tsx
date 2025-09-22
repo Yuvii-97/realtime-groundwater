@@ -4,51 +4,7 @@ import * as Speech from "expo-speech";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 
-/*
- * SPEECH-TO-TEXT INTEGRATION GUIDE:
- *
- * For production speech-to-text, you can integrate with:
- *
- * 1. Google Cloud Speech-to-Text:
- *    - Install: npm install @google-cloud/speech
- *    - Send recorded audio file to Google's API
- *
- * 2. Azure Cognitive Services:
- *    - Install: npm install microsoft-cognitiveservices-speech-sdk
- *    - Use Azure Speech SDK for real-time transcription
- *
- * 3. AWS Transcribe:
- *    - Install: npm install aws-sdk
- *    - Upload audio to S3 and use Transcribe service
- *
- * 4. OpenAI Whisper API:
- *    - Send audio file to OpenAI's Whisper endpoint
- *    - More cost-effective for smaller applications
- *
- * Example function for OpenAI Whisper:
- *
- * const transcribeAudio = async (audioUri) => {
- *   const formData = new FormData();
- *   formData.append('file', {
- *     uri: audioUri,
- *     type: 'audio/m4a',
- *     name: 'recording.m4a',
- *   });
- *   formData.append('model', 'whisper-1');
- *
- *   const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
- *     method: 'POST',
- *     headers: {
- *       'Authorization': `Bearer ${OPENAI_API_KEY}`,
- *       'Content-Type': 'multipart/form-data',
- *     },
- *     body: formData,
- *   });
- *
- *   const result = await response.json();
- *   return result.text;
- * };
- */
+
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -72,6 +28,7 @@ import {
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
+import Markdown from "react-native-markdown-display";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -96,7 +53,7 @@ const ChatBox = () => {
     {
       role: "assistant",
       content:
-        "Hello! I'm your Groundwater Assistant. I can help you with information about groundwater data, monitoring, predictions, analytics, and guide you through the app.\nHow can I assist you today?",
+        "**Hello! I'm your Groundwater Assistant** 🤖\n\nI can help you with:\n- Information about **groundwater data** and monitoring\n- App navigation and features\n- **Predictions** and analytics\n- Understanding **CGWB data sources**\n\n*How can I assist you today?*",
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -631,9 +588,19 @@ INSTRUCTIONS FOR YOUR RESPONSES:
 9. Use relevant emojis occasionally to make responses more engaging
 10. Always maintain a helpful and friendly tone
 
+FORMATTING INSTRUCTIONS:
+- Use **bold** for important terms and headings
+- Use *italics* for emphasis
+- Use \`inline code\` for technical terms, settings, or menu items
+- Use numbered lists (1. 2. 3.) for step-by-step instructions
+- Use bullet points (-) for feature lists or options
+- Use > blockquotes for important notes or warnings
+- Use ### headings to organize longer responses
+- Use code blocks (\`\`\`) for any technical examples
+
 USER QUESTION: ${input}
 
-Respond based on the context provided and these instructions. If the user is asking about app features, guide them to the right section. If they need technical help, provide clear steps. If they want to understand data, explain it clearly with proper context.`;
+Respond based on the context provided and these instructions. If the user is asking about app features, guide them to the right section. If they need technical help, provide clear steps. If they want to understand data, explain it clearly with proper context. Format your response using markdown for better readability.`;
 
       const result = await model.generateContent(agenticPrompt);
       const resp = await result.response;
@@ -760,8 +727,10 @@ Respond based on the context provided and these instructions. If the user is ask
                             },
                         ]}
                       >
-                        <Text style={styles.assistantMsg}>
-                          {msg.content}
+                        <View style={styles.assistantMsg}>
+                          <Markdown style={markdownStyles}>
+                            {msg.content}
+                          </Markdown>
                           {isStreaming &&
                             messages.indexOf(msg) === messages.length - 1 && (
                               <Animated.Text
@@ -770,7 +739,7 @@ Respond based on the context provided and these instructions. If the user is ask
                                 |
                               </Animated.Text>
                             )}
-                        </Text>
+                        </View>
                         <TouchableOpacity
                           style={styles.speakerButton}
                           onPress={() => speakText(msg.content, idx)}
@@ -939,7 +908,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e5e7eb",
     overflow: "hidden",
-    maxWidth: screenWidth - 40,
+    maxWidth: screenWidth - 5,
     maxHeight: screenHeight - 100,
   },
   expandedHeader: {
@@ -967,20 +936,20 @@ const styles = StyleSheet.create({
   },
   chatArea: {
     flex: 1,
-    paddingHorizontal: isTablet ? 20 : 16,
-    paddingVertical: isTablet ? 12 : 8,
+    paddingHorizontal: isTablet ? 20 : 12,
+    paddingVertical: isTablet ? 12 : 6,
   },
   chatContent: {
     flexGrow: 1,
-    paddingBottom: isTablet ? 12 : 8,
+    paddingBottom: isTablet ? 12 : 6,
   },
   userMsgContainer: {
     alignItems: "flex-end",
-    marginVertical: isTablet ? 6 : 4,
+    marginVertical: isTablet ? 6 : 3,
   },
   assistantMsgContainer: {
     alignItems: "flex-start",
-    marginVertical: isTablet ? 6 : 4,
+    marginVertical: isTablet ? 6 : 3,
   },
   assistantMsgWrapper: {
     flexDirection: "row",
@@ -990,7 +959,7 @@ const styles = StyleSheet.create({
   userMsg: {
     backgroundColor: "#075a7dff",
     color: "#fff",
-    padding: isTablet ? 16 : 12,
+    padding: isTablet ? 16 : 10,
     borderRadius: isTablet ? 20 : 16,
     borderBottomRightRadius: 4,
     maxWidth: "85%",
@@ -999,13 +968,11 @@ const styles = StyleSheet.create({
   },
   assistantMsg: {
     backgroundColor: "#f3f4f6",
-    color: "#374151",
-    padding: isTablet ? 16 : 12,
+    padding: isTablet ? 16 : 10,
     borderRadius: isTablet ? 20 : 16,
     borderBottomLeftRadius: 4,
     flex: 1,
-    fontSize: isTablet ? 16 : 14,
-    lineHeight: isTablet ? 22 : 18,
+    // Remove default text styling since markdown handles it
   },
   speakerButton: {
     marginLeft: 8,
@@ -1119,5 +1086,124 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+// Markdown styles optimized for mobile - reduced padding and spacing
+const markdownStyles = {
+  body: {
+    fontSize: isTablet ? 16 : 14,
+    lineHeight: isTablet ? 22 : 18,
+    color: "#374151",
+    margin: 0,
+    padding: 0,
+  },
+  heading1: {
+    fontSize: isTablet ? 22 : 18,
+    fontWeight: "bold" as const,
+    color: "#075a7dff",
+    marginTop: isTablet ? 12 : 8,
+    marginBottom: isTablet ? 6 : 4,
+  },
+  heading2: {
+    fontSize: isTablet ? 18 : 16,
+    fontWeight: "bold" as const,
+    color: "#075a7dff",
+    marginTop: isTablet ? 10 : 6,
+    marginBottom: isTablet ? 4 : 3,
+  },
+  heading3: {
+    fontSize: isTablet ? 16 : 15,
+    fontWeight: "bold" as const,
+    color: "#075a7dff",
+    marginTop: isTablet ? 8 : 5,
+    marginBottom: isTablet ? 3 : 2,
+  },
+  paragraph: {
+    marginBottom: isTablet ? 6 : 4,
+    fontSize: isTablet ? 16 : 14,
+    lineHeight: isTablet ? 22 : 18,
+    marginTop: 0,
+  },
+  strong: {
+    fontWeight: "bold" as const,
+    color: "#1f2937",
+  },
+  em: {
+    fontStyle: "italic" as const,
+  },
+  code_inline: {
+    backgroundColor: "#f3f4f6",
+    paddingHorizontal: isTablet ? 4 : 3,
+    paddingVertical: isTablet ? 2 : 1,
+    borderRadius: 3,
+    fontSize: isTablet ? 13 : 12,
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  code_block: {
+    backgroundColor: "#f3f4f6",
+    padding: isTablet ? 10 : 8,
+    borderRadius: 6,
+    marginVertical: isTablet ? 6 : 4,
+    fontSize: isTablet ? 13 : 11,
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  fence: {
+    backgroundColor: "#f3f4f6",
+    padding: isTablet ? 10 : 8,
+    borderRadius: 6,
+    marginVertical: isTablet ? 6 : 4,
+    fontSize: isTablet ? 13 : 11,
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  blockquote: {
+    backgroundColor: "#f9fafb",
+    borderLeftWidth: 3,
+    borderLeftColor: "#075a7dff",
+    paddingLeft: isTablet ? 10 : 8,
+    paddingVertical: isTablet ? 6 : 4,
+    marginVertical: isTablet ? 6 : 4,
+    fontStyle: "italic" as const,
+  },
+  list_item: {
+    flexDirection: "row" as const,
+    alignItems: "flex-start" as const,
+    marginBottom: isTablet ? 3 : 2,
+  },
+  bullet_list: {
+    marginVertical: isTablet ? 6 : 4,
+    paddingLeft: 0,
+  },
+  ordered_list: {
+    marginVertical: isTablet ? 6 : 4,
+    paddingLeft: 0,
+  },
+  bullet_list_icon: {
+    marginRight: isTablet ? 6 : 5,
+    marginTop: 1,
+    fontSize: isTablet ? 14 : 13,
+    minWidth: isTablet ? 12 : 10,
+  },
+  ordered_list_icon: {
+    marginRight: isTablet ? 6 : 5,
+    marginTop: 1,
+    fontSize: isTablet ? 13 : 12,
+    fontWeight: "bold" as const,
+    minWidth: isTablet ? 16 : 14,
+  },
+  link: {
+    color: "#075a7dff",
+    textDecorationLine: "underline" as const,
+  },
+  // Additional mobile-specific styles
+  text: {
+    fontSize: isTablet ? 16 : 14,
+    lineHeight: isTablet ? 22 : 18,
+    color: "#374151",
+  },
+  // Reduce spacing between list items and content
+  list_item_content: {
+    flex: 1,
+    marginTop: 0,
+  },
+};
 
 export default ChatBox;
