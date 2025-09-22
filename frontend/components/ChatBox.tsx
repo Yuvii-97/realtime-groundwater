@@ -4,8 +4,6 @@ import * as Speech from "expo-speech";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 
-
-
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
@@ -24,11 +22,14 @@ import {
   ScrollView,
   Keyboard,
   Animated,
+  Image,
 } from "react-native";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import Markdown from "react-native-markdown-display";
+
+const ChatIcon = require("../assets/images/ChatIcon.png");
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -637,15 +638,14 @@ Respond based on the context provided and these instructions. If the user is ask
         activeOpacity={0.8}
         onPress={() => setExpanded(true)}
       >
-        <Text
+        <Image
+          source={ChatIcon}
           style={[
-            styles.circleText,
-            isTablet && styles.circleTextTablet,
-            isSmallScreen && styles.circleTextSmall,
+            styles.chatIcon,
+            isTablet && styles.chatIconTablet,
+            isSmallScreen && styles.chatIconSmall,
           ]}
-        >
-          🤖
-        </Text>
+        />
       </TouchableOpacity>
       <Modal
         visible={expanded}
@@ -862,29 +862,22 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   circle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#075a7dff",
+    width: 72,
+    height: 72,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 8,
-    borderWidth: 2,
-    borderColor: "#fff",
+    backgroundColor: "transparent",
+    borderRadius: 36,
   },
   circleTablet: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+  },
+  circleSmall: {
     width: 64,
     height: 64,
     borderRadius: 32,
-  },
-  circleSmall: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
   },
   circleText: {
     color: "#fff",
@@ -896,6 +889,19 @@ const styles = StyleSheet.create({
   },
   circleTextSmall: {
     fontSize: 18,
+  },
+  chatIcon: {
+    width: 68,
+    height: 68,
+    resizeMode: "contain",
+  },
+  chatIconTablet: {
+    width: 80,
+    height: 80,
+  },
+  chatIconSmall: {
+    width: 60,
+    height: 60,
   },
   expandedBox: {
     backgroundColor: "#fff",
