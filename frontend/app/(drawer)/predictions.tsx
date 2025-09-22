@@ -218,7 +218,7 @@ const PredictionsPage = () => {
 
   useEffect(() => {
     // console.log(
-    //   "📍 Location changed:",
+    //   " Location changed:",
     //   useCurrentLocation ? userLocation : customLocation
     // );
     const currentCoords = useCurrentLocation ? userLocation : customLocation;
@@ -1237,8 +1237,8 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                 ]}
               >
                 {useCurrentLocation
-                  ? "📍 Current Location"
-                  : "🗺️ Custom Location"}
+                  ? "Current Location"
+                  : "Custom Location"}
               </Text>
             </View>
           </View>
@@ -1525,7 +1525,6 @@ IMPORTANT FOR SMOOTH CONTINUATION:
                     },
                   ]}
                 >
-                  🤖{" "}
                   {useAiPredictions
                     ? "AI Predictions ON"
                     : "AI Predictions OFF"}
