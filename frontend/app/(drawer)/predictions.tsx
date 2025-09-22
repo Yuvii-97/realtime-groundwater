@@ -29,8 +29,8 @@ const COLOR_CARD_BG = "#f8fafc";
 const COLOR_TEXT = "#0f172a";
 const COLOR_MUTED = "#475569";
 const COLOR_BORDER = "#e2e8f0";
-var values: number[] = [];
-var labels: string[] = [];
+let values: number[] = [];
+let labels: string[] = [];
 // Weather and AI configuration
 const API_KEY = "b5b84711ac2109d5da0b3329b81c62fe"; // Weather API key
 const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
