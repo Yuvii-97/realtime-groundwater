@@ -319,6 +319,59 @@ ${payloadJson}
     });
   };
 
+  // Helper functions for recharge calculation
+  const getSeason = (month: number): string => {
+    if (month >= 5 && month <= 8) return "Monsoon";
+    if (month >= 3 && month <= 5) return "Summer";
+    if (month >= 11 || month <= 1) return "Winter";
+    return "Post-monsoon";
+  };
+
+  // Calculate recharge rate based on weather parameters
+  const calculateRechargeRate = (
+    rainfall: number,
+    temp: number,
+    humidity: number,
+    month: number
+  ): number => {
+    let baseRecharge = 0;
+
+    // Rainfall contribution (primary factor)
+    if (rainfall > 10) {
+      baseRecharge += rainfall * 0.3; // 30% of rainfall contributes to recharge
+    } else if (rainfall > 5) {
+      baseRecharge += rainfall * 0.2; // 20% for moderate rain
+    } else if (rainfall > 0) {
+      baseRecharge += rainfall * 0.1; // 10% for light rain
+    }
+
+    // Temperature impact (high temp reduces recharge due to evaporation)
+    if (temp > 35) {
+      baseRecharge *= 0.6; // 40% reduction in hot weather
+    } else if (temp > 25) {
+      baseRecharge *= 0.8; // 20% reduction in warm weather
+    }
+
+    // Humidity impact (high humidity reduces evaporation)
+    if (humidity > 80) {
+      baseRecharge *= 1.1; // 10% increase in high humidity
+    } else if (humidity < 40) {
+      baseRecharge *= 0.9; // 10% decrease in low humidity
+    }
+
+    // Seasonal adjustment
+    const seasonMultiplier =
+      getSeason(month) === "Monsoon"
+        ? 1.5
+        : getSeason(month) === "Summer"
+        ? 0.5
+        : 1.0;
+    baseRecharge *= seasonMultiplier;
+
+    // Ensure realistic bounds (0-15 mm/day)
+    return Math.max(0, Math.min(15, baseRecharge));
+  };
+
   const tempChartData = useMemo(() => {
     if (!weatherData?.list) return null;
     const labels = generateChartLabels(weatherData.list);
@@ -354,6 +407,58 @@ ${payloadJson}
       datasets: [{ data }],
     };
   }, [weatherData]);
+
+  // Recharge Estimation based on weather data
+  const rechargeEstimationData = useMemo(() => {
+    if (!weatherData?.list) return null;
+
+    const rechargeData = weatherData.list.map((item: any, index: number) => {
+      const rainfall = item.rain?.["3h"] || 0; // mm in 3 hours
+      const temp = item.main.temp - 273.15; // Convert to Celsius
+      const humidity = item.main.humidity || 0;
+      const date = new Date(item.dt_txt);
+      const month = date.getMonth();
+
+      // Calculate recharge rate based on weather parameters
+      let rechargeRate = calculateRechargeRate(rainfall, temp, humidity, month);
+      return rechargeRate;
+    });
+
+    const labels = generateChartLabels(weatherData.list);
+    return {
+      labels,
+      datasets: [
+        {
+          data: rechargeData,
+          color: (opacity = 1) => `rgba(75, 192, 192, ${opacity})`,
+          strokeWidth: 2,
+        },
+      ],
+    };
+  }, [weatherData]);
+
+  // Calculate recharge statistics
+  const rechargeStats = useMemo(() => {
+    if (!rechargeEstimationData?.datasets?.[0]?.data) return null;
+
+    const data = rechargeEstimationData.datasets[0].data as number[];
+    const totalRecharge = data.reduce((sum, val) => sum + val, 0);
+    const avgRecharge = totalRecharge / data.length;
+    const maxRecharge = Math.max(...data);
+    const minRecharge = Math.min(...data);
+
+    // Count days with significant recharge (>2mm/day)
+    const significantRechargeDays = data.filter((val) => val > 2).length;
+
+    return {
+      total: totalRecharge.toFixed(1),
+      average: avgRecharge.toFixed(2),
+      maximum: maxRecharge.toFixed(1),
+      minimum: minRecharge.toFixed(1),
+      significantDays: significantRechargeDays,
+      totalDays: data.length,
+    };
+  }, [rechargeEstimationData]);
 
   const weatherPieData = useMemo(() => {
     if (!weatherData?.list) return [];
@@ -654,6 +759,120 @@ ${payloadJson}
               />
             </ScrollView>
           )}
+        </View>
+
+        {/* Recharge Estimation Chart */}
+        <View
+          style={[
+            styles.chartCard,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              { color: colors.text, borderBottomColor: colors.border },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="water-plus"
+              size={18}
+              color={colors.text}
+            />{" "}
+            Groundwater Recharge Estimation
+          </Text>
+
+          {/* Recharge Statistics Cards */}
+          {rechargeStats && (
+            <View style={styles.statsContainer}>
+              <View
+                style={[
+                  styles.statCard,
+                  { backgroundColor: colors.background },
+                ]}
+              >
+                <Text style={[styles.statValue, { color: colors.primary }]}>
+                  {rechargeStats.total}mm
+                </Text>
+                <Text
+                  style={[styles.statLabel, { color: colors.textSecondary }]}
+                >
+                  Total Recharge (5-day)
+                </Text>
+              </View>
+
+              <View
+                style={[
+                  styles.statCard,
+                  { backgroundColor: colors.background },
+                ]}
+              >
+                <Text style={[styles.statValue, { color: "#2F855A" }]}>
+                  {rechargeStats.average}mm/day
+                </Text>
+                <Text
+                  style={[styles.statLabel, { color: colors.textSecondary }]}
+                >
+                  Average Daily
+                </Text>
+              </View>
+
+              <View
+                style={[
+                  styles.statCard,
+                  { backgroundColor: colors.background },
+                ]}
+              >
+                <Text style={[styles.statValue, { color: "#3182CE" }]}>
+                  {rechargeStats.significantDays}/{rechargeStats.totalDays}
+                </Text>
+                <Text
+                  style={[styles.statLabel, { color: colors.textSecondary }]}
+                >
+                  High Recharge Days
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {rechargeEstimationData && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginBottom: 8 }}
+            >
+              <LineChart
+                data={rechargeEstimationData}
+                width={dynamicChartWidth(rechargeEstimationData.labels.length)}
+                height={220}
+                yAxisLabel=""
+                yAxisSuffix="mm"
+                chartConfig={{
+                  ...chartConfig,
+                  color: (opacity = 1) => `rgba(75, 192, 192, ${opacity})`,
+                }}
+                style={styles.chart}
+                fromZero
+                bezier
+              />
+            </ScrollView>
+          )}
+
+          {/* Recharge Explanation */}
+          <View style={styles.explanationContainer}>
+            <Text style={[styles.explanationTitle, { color: colors.text }]}>
+              How Recharge is Calculated:
+            </Text>
+            <Text
+              style={[styles.explanationText, { color: colors.textSecondary }]}
+            >
+              • Rainfall contribution: 10-30% of precipitation depending on
+              intensity{"\n"}• Temperature impact: High temperatures ({">"}35°C)
+              reduce recharge by 40%{"\n"}• Humidity effect: High humidity (
+              {">"}80%) increases recharge by 10%{"\n"}• Seasonal adjustment:
+              Monsoon season multiplier of 1.5x applied
+            </Text>
+          </View>
         </View>
 
         {/* Weather Conditions Pie Chart */}
@@ -1140,5 +1359,45 @@ const styles = StyleSheet.create({
   pickerBtnText: {
     fontSize: 14,
     fontWeight: "600",
+  },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  statCard: {
+    flex: 1,
+    alignItems: "center",
+    padding: 12,
+    marginHorizontal: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.1)",
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    textAlign: "center",
+    lineHeight: 14,
+  },
+  explanationContainer: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: "rgba(0,0,0,0.05)",
+  },
+  explanationTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  explanationText: {
+    fontSize: 12,
+    lineHeight: 18,
   },
 });
