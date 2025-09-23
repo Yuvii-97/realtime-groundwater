@@ -103,12 +103,115 @@
 - Comparative analysis tools
 
 ### 4. PREDICTIONS (predictions.tsx)
-**Status**: Currently in development
-**Planned Features**:
-- AI-powered forecasting models
-- Seasonal trend predictions
-- Risk assessment algorithms
-- Early warning systems
+**Purpose**: AI-powered groundwater level forecasting and predictive analytics
+**Status**: Fully functional with advanced AI integration
+
+**Core Features**:
+- Real-time groundwater level predictions using Google Gemini AI
+- Weather-integrated forecasting with OpenWeatherMap API
+- Location-based prediction analysis (GPS or manual location selection)
+- Multiple time period predictions (7 days to 1 year)
+- Interactive prediction charts with historical comparison
+- Comprehensive insights and recommendations
+
+**AI Integration**:
+- Google Gemini 2.5 Pro model for advanced predictions
+- Weather data correlation for enhanced accuracy
+- Seasonal pattern recognition and agricultural cycle analysis
+- Regional geological and hydrological factor consideration
+- Multi-parameter prediction including recharge and consumption rates
+
+**Location Services**:
+- Automatic GPS location detection with permission handling
+- Manual location selection via interactive map
+- Nearest monitoring station identification from 31,574+ stations
+- Distance-based station matching with accuracy indicators
+- Location permission fallback with custom location input
+
+**Prediction Capabilities**:
+- **Time Periods**: 7 days, 30 days, 3 months, 6 months, 1 year
+- **Data Points**: Daily predictions with realistic variations
+- **Parameters**: Groundwater level, recharge rate, consumption rate
+- **Insights**: AI-generated bullet-point analysis with 15-20 word details
+
+**Weather Integration**:
+- Real-time weather data fetching for user location
+- 5-day weather forecast integration
+- Temperature, humidity, rainfall, and pressure correlation
+- Weather impact analysis on groundwater predictions
+- Seasonal adjustment based on meteorological data
+
+**Data Visualization**:
+- Interactive scrollable charts for historical data
+- Separate prediction charts with different styling
+- KPI cards showing current level, 7-day prediction, trends
+- Statistics grid with average, minimum, maximum values
+- Color-coded alerts for critical groundwater levels
+
+**Interactive Features**:
+- Pull-to-refresh data updates
+- Time period selector with dynamic chart updates
+- AI prediction toggle (enable/disable AI features)
+- Location mode switching (GPS vs. manual)
+- Export capabilities for prediction data
+
+**Prediction Analysis**:
+- Current groundwater level assessment
+- 7-day trend predictions with confidence indicators
+- Seasonal impact analysis (Monsoon, Summer, Winter, Post-monsoon)
+- Agricultural cycle consideration for irrigation demands
+- Regional geological factors and soil type analysis
+- Long-term sustainability recommendations
+
+**Key Performance Indicators (KPIs)**:
+- Current water level (meters below ground)
+- 7-day prediction with trend direction
+- Average levels over selected period
+- Minimum and maximum recorded levels
+- Trend analysis (Rising/Declining/Stable)
+
+**AI-Generated Insights Format**:
+- Detailed bullet points with 20-30 words each
+- Weather pattern analysis and seasonal impacts
+- Agricultural cycle and consumption pattern analysis
+- Regional geological and hydrological factors
+- Short-term predictions with specific details
+- Long-term recommendations and monitoring suggestions
+
+**Critical Level Monitoring**:
+- Threshold-based alerts (10+ meters = critical)
+- Color-coded status indicators
+- Trend warnings for declining levels
+- Recommendations for water conservation
+- Emergency contact information for critical situations
+
+**Data Sources Integration**:
+- CGWB station network data
+- OpenWeatherMap API for weather forecasts
+- Google Gemini AI for prediction modeling
+- Historical groundwater level databases
+- Regional agricultural and consumption patterns
+
+**Error Handling & Fallbacks**:
+- Location permission denial handling
+- Internet connectivity error management
+- AI service unavailability fallbacks
+- Weather API failure graceful degradation
+- Data loading error recovery
+
+**User Experience Features**:
+- Loading indicators for all async operations
+- Pull-to-refresh for data updates
+- Smooth scrolling charts with touch interaction
+- Responsive design for different screen sizes
+- Accessibility support for screen readers
+
+**Technical Implementation**:
+- Advanced statistical modeling with trend analysis
+- Machine learning integration via Google Gemini
+- Real-time data processing and visualization
+- Efficient API call management and caching
+- Background data synchronization
 
 ### 5. ANALYTICS (analytics.tsx)
 **Purpose**: Advanced data analysis with AI integration
@@ -263,24 +366,40 @@
 - "Where can I see the latest data?" → Direct to Dashboard
 - "How do I change the language?" → Settings > Language selection
 - "Can I export data?" → Reports section with export options
+- "How do I access predictions?" → Navigate to Predictions section
+- "Where can I see future groundwater trends?" → Predictions page with AI forecasting
 
 ### Data Understanding
 - "What do the water level numbers mean?" → Explain depth measurements
-- "How accurate is the prediction data?" → Explain AI model confidence
+- "How accurate is the prediction data?" → Explain AI model confidence and weather integration
 - "Why are some stations showing no data?" → Explain monitoring status
 - "What is the normal groundwater level?" → Provide regional context
+- "How far into the future can predictions go?" → Explain 7 days to 1 year prediction capabilities
+- "What factors affect groundwater predictions?" → Weather, seasonal patterns, agricultural cycles
+
+### Prediction Features
+- "How do AI predictions work?" → Explain Google Gemini AI integration with weather data
+- "Can I predict groundwater for any location?" → Guide to location selection (GPS or manual)
+- "What time periods are available for predictions?" → List options: 7 days, 30 days, 3 months, 6 months, 1 year
+- "How often should I check predictions?" → Suggest daily for short-term, weekly for long-term planning
+- "What should I do if predictions show critical levels?" → Provide conservation recommendations
+- "Are predictions affected by weather?" → Explain weather integration and seasonal analysis
 
 ### Feature Access
 - "How do I get alerts for low water levels?" → Settings > Notifications
 - "Can I compare data between regions?" → Analytics section capabilities
 - "How often is the data updated?" → Explain refresh intervals
 - "Is this data official?" → Confirm CGWB data source
+- "How do I enable location for predictions?" → Guide through GPS permission settings
+- "Can I turn off AI predictions?" → Show AI toggle option in Predictions page
 
 ### Technical Support
 - "App is running slowly" → Suggest cache clearing in Settings
 - "Maps not loading" → Check internet connection and location permissions
 - "Charts not displaying" → Verify data availability and connection
 - "Language not changing" → Guide through language selection process
+- "Predictions not working" → Check internet connection, location services, and API availability
+- "Location not detected for predictions" → Enable GPS permissions or use manual location selection
 
 ## DATA SOURCES & ACCURACY
 
@@ -310,18 +429,28 @@
 3. **Language not applying** → Restart app after language change
 4. **Export failing** → Verify storage permissions and available space
 5. **Notifications not working** → Enable notifications in device settings
+6. **Predictions not generating** → Check internet connection and verify location services
+7. **AI insights unavailable** → Ensure Google Gemini API key is configured and internet is stable
+8. **Weather data not loading** → Verify internet connection and location permissions
+9. **Prediction charts empty** → Check if nearest monitoring station has sufficient historical data
+10. **Location permission denied** → Use manual location selection or re-enable GPS permissions
 
 ### Performance Tips
 - Regular cache clearing for optimal performance
 - Close background apps for better memory management
 - Update app regularly for latest features
 - Use WiFi for data-heavy operations
+- For predictions: Allow location access for better accuracy
+- Refresh prediction data during peak hours for latest weather integration
 
 ### Feature Limitations
-- Predictions feature under development
+- Predictions feature requires internet connection for AI and weather data
 - Some rural stations may have delayed data
 - Export size limited by device storage
 - AI insights require internet connection
+- Prediction accuracy depends on historical data availability at nearest station
+- Weather integration limited to OpenWeatherMap API coverage areas
+- AI predictions may take 10-30 seconds to generate depending on data complexity
 
 ## CONTACT & SUPPORT
 
