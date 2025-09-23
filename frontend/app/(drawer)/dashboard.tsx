@@ -8,12 +8,65 @@ import {
   SafeAreaView,
   Dimensions,
   Alert,
+  Modal,
+  FlatList,
+  Animated,
 } from "react-native";
 import { LineChart, BarChart } from "react-native-chart-kit";
 import * as Location from "expo-location";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { scale, verticalScale } from "@/utils/styling";
 import { useTheme } from "@/hooks/useTheme";
+import Constants from "expo-constants";
+import { useRouter } from "expo-router";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+
+// Weather service (add this as a separate file if preferred)
+const API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY || "YOUR_API_KEY_HERE";
+const BASE_URL = "https://api.api-ninjas.com/v1/weather";
+
+const fetchWeather = async (lat: number, lon: number): Promise<WeatherData> => {
+  const url = `${BASE_URL}?lat=${lat}&lon=${lon}`;
+  const response = await fetch(url, {
+    headers: {
+      "X-Api-Key": API_KEY,
+    },
+  });
+  if (!response.ok) throw new Error(`Weather API error: ${response.status}`);
+  return response.json();
+};
+
+// Update WeatherData interface to match API-Ninjas response
+interface WeatherData {
+  temp: number;
+  feels_like: number;
+  humidity: number;
+  min_temp: number;
+  max_temp: number;
+  wind_speed: number;
+  wind_degrees: number;
+  sunrise: number;
+  sunset: number;
+  // Note: No daily/rain data in this API
+}
+
+// Updated Station interface to match your JSON
+interface Station {
+  state: string;
+  district: string;
+  station_code: string;
+  station_name: string;
+  latitude: number;
+  longitude: number;
+  well_type?: string | null;
+  station_status: string;
+  latest_depth?: number;
+  latest_status?: string;
+  latest_data_time?: string;
+}
+
+// New type for stations with computed distance
+type StationWithDistance = Station & { distance: number };
 
 interface WellData {
   currentLevel: number;
@@ -29,12 +82,6 @@ interface WellData {
       strokeWidth: number;
     }[];
   };
-  rechargeData: {
-    labels: string[];
-    datasets: {
-      data: number[];
-    }[];
-  };
   regions: {
     id: string;
     name: string;
@@ -44,7 +91,7 @@ interface WellData {
     status: "normal" | "critical" | "warning" | "good";
     totalStations: number;
     monitoredStations: number;
-    rechargeTrend?: number[]; // Add this
+    rechargeTrend?: number[];
   }[];
 }
 
@@ -75,27 +122,6 @@ const sampleWellData: WellData = {
         data: [8.5, 7.8, 7.2, 6.8, 6.5, 6.2],
         color: (opacity = 1) => `rgba(0, 180, 216, ${opacity})`,
         strokeWidth: 2,
-      },
-    ],
-  },
-  rechargeData: {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    datasets: [
-      {
-        data: [30, 35, 40, 45, 42, 45, 50, 48, 46, 44, 42, 40],
       },
     ],
   },
@@ -183,7 +209,6 @@ const sampleWellData: WellData = {
       monitoredStations: 1200,
       rechargeTrend: [3, 4, 6, 8, 10, 14, 12, 10, 8, 6, 5, 4],
     },
-    // Add more as needed
   ],
 };
 
@@ -210,6 +235,7 @@ const farmerGuidance: FarmerGuidance = {
 
 export default function Dashboard() {
   const theme = useTheme();
+  const router = useRouter();
   const [selectedRegion, setSelectedRegion] = useState<string>("National");
   const [selectedRole, setSelectedRole] = useState<string>("Policymaker");
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -220,7 +246,46 @@ export default function Dashboard() {
   const [locationLoading, setLocationLoading] = useState<boolean>(true);
   const [wellData, setWellData] = useState<WellData>(sampleWellData);
 
+  // New states for station selection and weather
+  const [stations, setStations] = useState<Station[]>([]);
+  const [nearestStations, setNearestStations] = useState<StationWithDistance[]>(
+    []
+  );
+  const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+  const [stationModalVisible, setStationModalVisible] =
+    useState<boolean>(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState<boolean>(false);
+  const [weatherError, setWeatherError] = useState<string | null>(null); // Add this
+  const [firstOpen, setFirstOpen] = useState<boolean>(true); // Track first open
+
+  // Add loading state for stations
+  const [stationsLoading, setStationsLoading] = useState<boolean>(true);
+
+  // Map ref and centering state
+  const mapRef = useRef<MapView | null>(null);
+  const [didCenterOnUser, setDidCenterOnUser] = useState(false);
+
   const roles: string[] = ["Policymaker", "Researcher", "Farmer"];
+
+  const handleDecisionSupport = () => {
+    router.push("/predictions");
+  };
+
+  // Animated segmented control for role switcher
+  const [segWidth, setSegWidth] = useState(0);
+  const indicatorAnim = useRef(new Animated.Value(0)).current;
+  const segmentWidth = segWidth > 0 ? segWidth / roles.length : 0;
+
+  useEffect(() => {
+    const idx = Math.max(0, roles.indexOf(selectedRole));
+    const target = segmentWidth * idx + scale(3);
+    Animated.timing(indicatorAnim, {
+      toValue: target,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  }, [selectedRole, segmentWidth]);
 
   // Scrolling to role-specific section
   const scrollRef = useRef<ScrollView | null>(null);
@@ -234,7 +299,112 @@ export default function Dashboard() {
     });
   };
 
-  // DWLR Stations data for Tamil Nadu
+  // Load stations from JSON (with loading state)
+  useEffect(() => {
+    const loadStations = async () => {
+      setStationsLoading(true);
+      try {
+        const response = require("@/assets/Coordinates/stations.json");
+        const data: Station[] = Array.isArray(response) ? response : [];
+        setStations(data);
+      } catch (error: unknown) {
+        console.error("Failed to load stations:", error);
+        Alert.alert(
+          "Error",
+          "Unable to load station data. Please check the file."
+        );
+      } finally {
+        setStationsLoading(false);
+      }
+    };
+    loadStations();
+  }, []);
+
+  // Location and station selection logic (with loading)
+  useEffect(() => {
+    (async () => {
+      if (!firstOpen || stationsLoading) return; // Wait for stations to load
+      setLocationLoading(true);
+      setStationModalVisible(true); // Show modal immediately for loading
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        setLocationLoading(false);
+        setStationModalVisible(false); // Hide modal if permission denied
+        return;
+      }
+      let currentLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      setLocation(currentLocation);
+      setLocationLoading(false);
+      setFirstOpen(false); // Mark as not first open
+
+      // Find nearest stations
+      if (stations.length > 0) {
+        const nearest: StationWithDistance[] = stations
+          .map((station) => ({
+            ...station,
+            distance: getDistance(
+              currentLocation.coords.latitude,
+              currentLocation.coords.longitude,
+              station.latitude,
+              station.longitude
+            ),
+          }))
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 5); // Top 5 nearest
+        setNearestStations(nearest);
+        // Keep modal open to show stations
+      } else {
+        setStationModalVisible(false); // Hide if no stations
+      }
+    })();
+  }, [firstOpen, stations, stationsLoading]);
+
+  // Fetch weather when station is selected
+  useEffect(() => {
+    if (selectedStation) {
+      setWeatherLoading(true);
+      fetchWeather(selectedStation.latitude, selectedStation.longitude)
+        .then(setWeather)
+        .catch((error: unknown) => {
+          console.error("Weather fetch error:", error);
+          setWeatherError("Failed to fetch weather data");
+        })
+        .finally(() => setWeatherLoading(false));
+    }
+  }, [selectedStation]);
+
+  // Helper to calculate distance (Haversine formula)
+  const getDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => {
+    const R = 6371; // Radius of Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  };
+
+  // Compute recharge status from depth
+  const getRechargeStatus = (depth: number) => {
+    if (depth <= 10) return "SAFE";
+    if (depth <= 20) return "WARNING";
+    if (depth <= 40) return "CRITICAL";
+    return "DANGEROUS";
+  };
+
+  // DWLR Stations data for Tamil Nadu (existing)
   const dwlrStations = [
     {
       id: 1,
@@ -392,6 +562,23 @@ export default function Dashboard() {
     })();
   }, []);
 
+  // Center map on user location once when available
+  useEffect(() => {
+    if (location && !didCenterOnUser && mapRef.current) {
+      const { latitude, longitude } = location.coords;
+      mapRef.current.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: 0.2,
+          longitudeDelta: 0.2,
+        },
+        600
+      );
+      setDidCenterOnUser(true);
+    }
+  }, [location, didCenterOnUser]);
+
   const handleRegionChange = (region: string) => {
     setSelectedRegion(region);
     Alert.alert("Region Changed", `Now viewing data for ${region}`);
@@ -448,34 +635,117 @@ export default function Dashboard() {
           <View
             style={[
               styles.roleSection,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
             ]}
           >
-            <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Policy Metrics & Insights</Text>
+            <View style={styles.roleHeaderRow}>
+              <MaterialCommunityIcons
+                name="account-tie"
+                size={scale(18)}
+                color={theme.colors.primary}
+              />
+              <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Policy Metrics & Insights</Text>
+            </View>
             <View style={styles.metricsRow}>
-              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Groundwater Index</Text>
-                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>
+              <View
+                style={[
+                  styles.metricBox,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.metricLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Groundwater Index
+                </Text>
+                <Text
+                  style={[styles.metricValue, { color: theme.colors.primary }]}
+                >
                   {policyMetrics.currentYear}%
                 </Text>
-                <Text style={[styles.metricSub, { color: theme.colors.primary }]}>
+                <Text
+                  style={[styles.metricSub, { color: theme.colors.primary }]}
+                >
                   Target: {policyMetrics.target}%
                 </Text>
               </View>
-              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Last Year</Text>
-                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>
+              <View
+                style={[
+                  styles.metricBox,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.metricLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Last Year
+                </Text>
+                <Text
+                  style={[styles.metricValue, { color: theme.colors.primary }]}
+                >
                   {policyMetrics.lastYear}%
                 </Text>
               </View>
             </View>
-            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Recent Improvements</Text>
-            <View style={styles.improvementsList}>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>
+              Recent Improvements
+            </Text>
+            <View style={styles.chipRow}>
               {policyMetrics.improvements.map((item, idx) => (
-                <Text key={idx} style={[styles.improvementItem, { color: theme.colors.text }]}>
-                  • {item}
-                </Text>
+                <View
+                  key={idx}
+                  style={[
+                    styles.chip,
+                    { borderColor: theme.colors.border, backgroundColor: theme.colors.surface },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name="check-decagram-outline"
+                    size={scale(12)}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={[styles.chipText, { color: theme.colors.text }]}>{item}</Text>
+                </View>
               ))}
+            </View>
+            <TouchableOpacity
+              style={[
+                styles.actionBtn,
+                {
+                  backgroundColor: theme.colors.primary,
+                  alignSelf: "flex-start",
+                  marginTop: verticalScale(6),
+                },
+              ]}
+              onPress={handleDecisionSupport}
+            >
+              <Text
+                style={[styles.actionBtnText, { color: theme.colors.surface }]}
+              >
+                Decision Support
+              </Text>
+            </TouchableOpacity>
+            <View style={{ marginTop: verticalScale(8), gap: verticalScale(4) }}>
+              <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>How this helps decisions</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Allocate recharge funds to lowest-index districts.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Prioritize adding stations where coverage is low.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Trigger drought advisories on falling weekly trends.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Track progress against targets to adjust policies.</Text>
             </View>
           </View>
         );
@@ -484,22 +754,49 @@ export default function Dashboard() {
           <View
             style={[
               styles.roleSection,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
             ]}
           >
-            <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Data Analysis Tools</Text>
+            <View style={styles.roleHeaderRow}>
+              <MaterialCommunityIcons
+                name="chart-line"
+                size={scale(18)}
+                color={theme.colors.primary}
+              />
+              <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Data Analysis Tools</Text>
+            </View>
             <View style={styles.metricsRow}>
-              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}>
-                <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Export Data</Text>
+              <TouchableOpacity
+                style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}
+              >
+                <View style={styles.actionBtnContent}>
+                  <MaterialCommunityIcons name="database-export" size={scale(14)} color={theme.colors.surface} />
+                  <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Export Data</Text>
+                </View>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}>
-                <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Compare Regions</Text>
+              <TouchableOpacity
+                style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}
+              >
+                <View style={styles.actionBtnContent}>
+                  <MaterialCommunityIcons name="compare" size={scale(14)} color={theme.colors.surface} />
+                  <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Compare Regions</Text>
+                </View>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}>
-                <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Generate Report</Text>
+              <TouchableOpacity
+                style={[styles.actionBtn, { backgroundColor: theme.colors.primary }]}
+              >
+                <View style={styles.actionBtnContent}>
+                  <MaterialCommunityIcons name="file-chart-outline" size={scale(14)} color={theme.colors.surface} />
+                  <Text style={[styles.actionBtnText, { color: theme.colors.surface }]}>Generate Report</Text>
+                </View>
               </TouchableOpacity>
             </View>
-            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Historical Trends</Text>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>
+              Historical Trends
+            </Text>
             <LineChart
               data={wellData.trendData}
               width={Dimensions.get("window").width - scale(48)}
@@ -508,6 +805,30 @@ export default function Dashboard() {
               bezier
               style={styles.chart}
             />
+            <TouchableOpacity
+              style={[
+                styles.actionBtn,
+                {
+                  backgroundColor: theme.colors.primary,
+                  alignSelf: "flex-start",
+                  marginTop: verticalScale(6),
+                },
+              ]}
+              onPress={handleDecisionSupport}
+            >
+              <Text
+                style={[styles.actionBtnText, { color: theme.colors.surface }]}
+              >
+                Decision Support
+              </Text>
+            </TouchableOpacity>
+            <View style={{ marginTop: verticalScale(8), gap: verticalScale(4) }}>
+              <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>How this helps decisions</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Detect anomalous wells for field validation.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Compare regions’ time-series to find regime shifts.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Correlate levels with rainfall and usage signals.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Export clean datasets for modeling and reports.</Text>
+            </View>
           </View>
         );
       case "Farmer":
@@ -515,37 +836,125 @@ export default function Dashboard() {
           <View
             style={[
               styles.roleSection,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
             ]}
           >
-            <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Farm Guidance</Text>
+            <View style={styles.roleHeaderRow}>
+              <MaterialCommunityIcons
+                name="sprout-outline"
+                size={scale(18)}
+                color={theme.colors.primary}
+              />
+              <Text style={[styles.roleTitle, { color: theme.colors.text }]}>Farm Guidance</Text>
+            </View>
             <View style={styles.metricsRow}>
-              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Water Availability</Text>
-                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>
+              <View
+                style={[
+                  styles.metricBox,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.metricLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Water Availability
+                </Text>
+                <Text
+                  style={[styles.metricValue, { color: theme.colors.primary }]}
+                >
                   {farmerGuidance.waterAvailability}
                 </Text>
               </View>
-              <View style={[styles.metricBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-                <Text style={[styles.metricLabel, { color: theme.colors.textSecondary }]}>Advice</Text>
-                <Text style={[styles.metricValue, { color: theme.colors.primary }]}>{farmerGuidance.advice}</Text>
+              <View
+                style={[
+                  styles.metricBox,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.metricLabel,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                >
+                  Advice
+                </Text>
+                <Text
+                  style={[styles.metricValue, { color: theme.colors.primary }]}
+                >
+                  {farmerGuidance.advice}
+                </Text>
               </View>
             </View>
-            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Recommended Crops</Text>
-            <View style={styles.improvementsList}>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>
+              Recommended Crops
+            </Text>
+            <View style={styles.chipRow}>
               {farmerGuidance.recommendedCrops.map((crop, idx) => (
-                <Text key={idx} style={[styles.improvementItem, { color: theme.colors.text }]}>
-                  • {crop}
-                </Text>
+                <View
+                  key={idx}
+                  style={[
+                    styles.chip,
+                    { borderColor: theme.colors.border, backgroundColor: theme.colors.surface },
+                  ]}
+                >
+                  <MaterialCommunityIcons name="leaf" size={scale(12)} color={theme.colors.primary} />
+                  <Text style={[styles.chipText, { color: theme.colors.text }]}>{crop}</Text>
+                </View>
               ))}
             </View>
-            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>Weather Alerts</Text>
-            <View style={styles.improvementsList}>
+            <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>
+              Weather Alerts
+            </Text>
+            <View style={styles.chipRow}>
               {farmerGuidance.weatherAlerts.map((alert, idx) => (
-                <Text key={idx} style={[styles.improvementItem, { color: theme.colors.text }]}>
-                  ⚠️ {alert}
-                </Text>
+                <View
+                  key={idx}
+                  style={[
+                    styles.chip,
+                    { borderColor: "#ffe08a", backgroundColor: theme.isDark ? "#5a4500" : "#fff7da" },
+                  ]}
+                >
+                  <Ionicons name="warning-outline" size={scale(12)} color="#b7791f" />
+                  <Text style={[styles.chipText, { color: theme.colors.text }]}>{alert}</Text>
+                </View>
               ))}
+            </View>
+            <TouchableOpacity
+              style={[
+                styles.actionBtn,
+                {
+                  backgroundColor: theme.colors.primary,
+                  alignSelf: "flex-start",
+                  marginTop: verticalScale(6),
+                },
+              ]}
+              onPress={handleDecisionSupport}
+            >
+              <Text
+                style={[styles.actionBtnText, { color: theme.colors.surface }]}
+              >
+                Decision Support
+              </Text>
+            </TouchableOpacity>
+            <View style={{ marginTop: verticalScale(8), gap: verticalScale(4) }}>
+              <Text style={[styles.roleSubTitle, { color: theme.colors.text }]}>How this helps decisions</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Select crops matching current water availability.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Plan irrigation schedule using near-term weather.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Act on alerts for heatwaves and dry spells.</Text>
+              <Text style={[styles.improvementItem, { color: theme.colors.text }]}>• Use nearest station data for local guidance.</Text>
             </View>
           </View>
         );
@@ -554,42 +963,145 @@ export default function Dashboard() {
     }
   };
 
+  // Update top stats to use selected station data
+  const getDynamicWellData = () => {
+    if (!selectedStation) return sampleWellData;
+    return {
+      ...sampleWellData,
+      currentLevel: selectedStation.latest_depth || sampleWellData.currentLevel,
+      rechargeStatus:
+        selectedStation.latest_status || sampleWellData.rechargeStatus,
+      rainfallForecast: 0, // No rain data in this API, set to 0 or sample
+    };
+  };
+
+  const dynamicWellData = getDynamicWellData();
+
+  // Render station selection modal (with loading)
+  const renderStationModal = () => (
+    <Modal visible={stationModalVisible} animationType="slide" transparent>
+      <View style={styles.modalOverlay}>
+        <View
+          style={[
+            styles.modalContent,
+            { backgroundColor: theme.colors.surface },
+          ]}
+        >
+          <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+            Select Nearest Station
+          </Text>
+          {stationsLoading ||
+          locationLoading ||
+          nearestStations.length === 0 ? (
+            <View style={styles.loadingContainer}>
+              <Text
+                style={[
+                  styles.loadingText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {stationsLoading
+                  ? "Loading stations..."
+                  : locationLoading
+                  ? "Getting your location..."
+                  : "Finding nearest stations..."}
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={nearestStations}
+              keyExtractor={(item) => item.station_code}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.stationItem}
+                  onPress={() => {
+                    setSelectedStation(item);
+                    setStationModalVisible(false);
+                  }}
+                >
+                  <Text
+                    style={[styles.stationName, { color: theme.colors.text }]}
+                  >
+                    {item.station_name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.stationDistance,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    {item.distance.toFixed(1)} km away
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+          <TouchableOpacity
+            style={[
+              styles.closeButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
+            onPress={() => setStationModalVisible(false)}
+          >
+            <Text
+              style={[styles.closeButtonText, { color: theme.colors.surface }]}
+            >
+              Close
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.surface }]}
+    >
       {/* Role Switcher */}
       <View
         style={[
           styles.roleSwitcher,
           {
             backgroundColor: theme.colors.surface,
-            marginHorizontal: 0,
-            marginTop: 0,
+            borderColor: theme.colors.border,
           },
         ]}
+        onLayout={({ nativeEvent }) => setSegWidth(nativeEvent.layout.width)}
       >
-        {roles.map((role) => (
-          <TouchableOpacity
-            key={role}
-            style={[
-              styles.roleBtn,
-              { borderColor: theme.colors.border },
-              selectedRole === role && {
-                backgroundColor: theme.colors.primary,
-              },
-            ]}
-            onPress={() => handleRoleSelect(role)}
-          >
-            <Text
-              style={[
-                styles.roleBtnText,
-                { color: theme.colors.text },
-                selectedRole === role && { color: theme.colors.surface },
-              ]}
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.roleIndicatorPill,
+            {
+              width: Math.max(0, segmentWidth - scale(6)),
+              backgroundColor: theme.colors.primary,
+              transform: [{ translateX: indicatorAnim }],
+            },
+          ]}
+        />
+        {roles.map((role) => {
+          const isActive = selectedRole === role;
+          return (
+            <TouchableOpacity
+              key={role}
+              style={styles.roleBtn}
+              onPress={() => handleRoleSelect(role)}
+              activeOpacity={0.85}
             >
-              {role}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                style={[
+                  styles.roleBtnText,
+                  { color: isActive ? theme.colors.surface : theme.colors.text },
+                  isActive && { fontWeight: "700" },
+                ]}
+                numberOfLines={1}
+              >
+                {role}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       <ScrollView
@@ -617,18 +1129,21 @@ export default function Dashboard() {
               Current Level
             </Text>
             <Text style={[styles.topStatValue, { color: theme.colors.text }]}>
-              {wellData.currentLevel} m
+              {typeof dynamicWellData.currentLevel === "number"
+                ? dynamicWellData.currentLevel.toFixed(2)
+                : "N/A"}{" "}
+              m
             </Text>
             <Text
               style={[
                 styles.topStatTrend,
-                wellData.trend < 0
+                dynamicWellData.trend < 0
                   ? styles.negativeTrend
                   : styles.positiveTrend,
               ]}
             >
-              {wellData.trend > 0 ? "↑" : "↓"} {Math.abs(wellData.trend)}% this
-              week
+              {dynamicWellData.trend > 0 ? "↑" : "↓"}{" "}
+              {Math.abs(dynamicWellData.trend)}% this week
             </Text>
           </View>
           <View
@@ -646,12 +1161,12 @@ export default function Dashboard() {
               Recharge Status
             </Text>
             <Text style={[styles.topStatValue, { color: theme.colors.text }]}>
-              {wellData.rechargeStatus}
+              {dynamicWellData.rechargeStatus}
             </Text>
             <Text
               style={[styles.topStatSub, { color: theme.colors.textSecondary }]}
             >
-              {wellData.rechargeValue}% capacity
+              {dynamicWellData.rechargeValue}% capacity
             </Text>
           </View>
           <View
@@ -669,7 +1184,7 @@ export default function Dashboard() {
               Rainfall Forecast
             </Text>
             <Text style={[styles.topStatValue, { color: theme.colors.text }]}>
-              {wellData.rainfallForecast} mm
+              {dynamicWellData.rainfallForecast} mm
             </Text>
             <Text
               style={[styles.topStatSub, { color: theme.colors.textSecondary }]}
@@ -798,6 +1313,7 @@ export default function Dashboard() {
 
               {/* MapView */}
               <MapView
+                ref={mapRef}
                 provider={PROVIDER_GOOGLE}
                 style={styles.mapView}
                 initialRegion={{
@@ -922,28 +1438,13 @@ export default function Dashboard() {
           </View>
         </View>
 
-        {/* Trend Graph */}
-        <View style={styles.trendSection}>
-          <Text style={styles.regionStatsTitle}>Recharge Trend</Text>
-          <View style={styles.chartWrapper}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <BarChart
-                data={wellData.rechargeData}
-                width={Dimensions.get("window").width * 2} // Wider for scrolling
-                height={verticalScale(180)}
-                yAxisLabel=""
-                yAxisSuffix="%"
-                chartConfig={chartConfig}
-                style={styles.chart}
-              />
-            </ScrollView>
-          </View>
-        </View>
 
-  {/* Anchor for role-specific content */}
-  <View onLayout={({ nativeEvent }) => setRoleAnchorY(nativeEvent.layout.y)} />
+        {/* Anchor for role-specific content */}
+        <View
+          onLayout={({ nativeEvent }) => setRoleAnchorY(nativeEvent.layout.y)}
+        />
 
-  {/* Role-specific content */}
+        {/* Role-specific content */}
         {renderRoleSpecificContent()}
 
         {/* Footer */}
@@ -953,6 +1454,9 @@ export default function Dashboard() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Station Selection Modal */}
+      {renderStationModal()}
     </SafeAreaView>
   );
 }
@@ -1010,23 +1514,27 @@ const styles = StyleSheet.create({
   roleSwitcher: {
     flexDirection: "row",
     backgroundColor: "transparent",
-    padding: scale(6),
-    marginHorizontal: 0,
-    marginTop: 0,
+    padding: scale(3),
+    marginHorizontal: scale(12),
+    marginTop: verticalScale(4),
     borderRadius: scale(10),
     gap: scale(6),
+    borderWidth: StyleSheet.hairlineWidth,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: verticalScale(1) },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: scale(2),
-    elevation: 2,
+    elevation: 1,
+    overflow: "hidden",
   },
   roleBtn: {
     flex: 1,
-    paddingVertical: verticalScale(12),
+    paddingVertical: verticalScale(10),
+    paddingHorizontal: scale(8),
     alignItems: "center",
     borderRadius: scale(8),
     backgroundColor: "transparent",
+    zIndex: 1,
   },
   roleBtnActive: {
     backgroundColor: "#1976d2",
@@ -1040,6 +1548,13 @@ const styles = StyleSheet.create({
     color: "#1976d2",
     fontWeight: "500",
     fontSize: scale(14),
+  },
+  roleIndicatorPill: {
+    position: "absolute",
+    top: scale(3),
+    bottom: scale(3),
+    left: scale(3),
+    borderRadius: scale(8),
   },
   roleBtnTextActive: {
     color: "#ffffff",
@@ -1236,25 +1751,9 @@ const styles = StyleSheet.create({
   mapLegendText: {
     fontSize: scale(10),
   },
-  trendSection: {
-    backgroundColor: "#ffffff",
-    borderRadius: scale(12),
-    padding: scale(15),
-    marginBottom: verticalScale(15),
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#e0e0e0",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: scale(6),
-    elevation: 3,
-  },
   chart: {
     borderRadius: scale(10),
     marginVertical: verticalScale(8),
-  },
-  chartWrapper: {
-    alignItems: "center",
-    justifyContent: "center",
   },
   roleSection: {
     backgroundColor: "transparent",
@@ -1272,6 +1771,12 @@ const styles = StyleSheet.create({
     fontSize: scale(16),
     fontWeight: "700",
     color: "#1976d2",
+    marginBottom: verticalScale(8),
+  },
+  roleHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scale(8),
     marginBottom: verticalScale(8),
   },
   metricsRow: {
@@ -1318,6 +1823,26 @@ const styles = StyleSheet.create({
     gap: verticalScale(3),
     marginBottom: verticalScale(6),
   },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: scale(8),
+    marginTop: verticalScale(6),
+    marginBottom: verticalScale(6),
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scale(6),
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: scale(14),
+    paddingHorizontal: scale(10),
+    paddingVertical: verticalScale(5),
+  },
+  chipText: {
+    fontSize: scale(11),
+    fontWeight: "600",
+  },
   improvementItem: {
     fontSize: scale(12),
     color: "#424242",
@@ -1335,6 +1860,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: scale(2),
     elevation: 2,
+  },
+  actionBtnContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scale(6),
   },
   actionBtnText: {
     color: "#ffffff",
@@ -1367,5 +1897,52 @@ const styles = StyleSheet.create({
   locationStatus: {
     fontSize: scale(11),
     fontStyle: "italic",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "80%",
+    borderRadius: scale(12),
+    padding: scale(20),
+    maxHeight: "60%",
+  },
+  modalTitle: {
+    fontSize: scale(18),
+    fontWeight: "bold",
+    marginBottom: verticalScale(10),
+  },
+  stationItem: {
+    padding: scale(10),
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  stationName: {
+    fontSize: scale(16),
+    fontWeight: "600",
+  },
+  stationDistance: {
+    fontSize: scale(12),
+  },
+  closeButton: {
+    marginTop: verticalScale(10),
+    padding: scale(10),
+    borderRadius: scale(8),
+    alignItems: "center",
+  },
+  closeButtonText: {
+    fontSize: scale(14),
+    fontWeight: "600",
+  },
+  loadingContainer: {
+    padding: scale(20),
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: scale(14),
+    fontWeight: "500",
   },
 });

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import {
   View,
@@ -15,10 +14,10 @@ import { LineChart, BarChart } from "react-native-chart-kit";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
-import ViewShot, { captureRef } from "react-native-view-shot";  // ✅ add captureRef
+import ViewShot, { captureRef } from "react-native-view-shot"; // ✅ add captureRef
 import { useTheme } from "@/hooks/useTheme";
 
-import * as Print from "expo-print"; 
+import * as Print from "expo-print";
 const { PDFDocument, PDFPage } = require("react-native-pdf-lib");
 
 const screenWidth = Dimensions.get("window").width;
@@ -30,7 +29,6 @@ const Reports: React.FC = () => {
   const [timePeriod, setTimePeriod] = useState("7days");
   const [modalVisible, setModalVisible] = useState(false);
 
- 
   const groundwaterData = [12, 14, 13, 15, 16];
   const rainfallData = [10, 5, 20, 15, 30];
   const rechargeLevel = [12, 14, 13, 15, 16];
@@ -47,16 +45,21 @@ const Reports: React.FC = () => {
 
   // Chart configuration - will be moved inside component
   const chartConfig = {
-    
     backgroundColor: colors.surface,
     backgroundGradientFrom: colors.surface,
     backgroundGradientTo: colors.background,
     decimalPlaces: 0,
     color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`, // Use hex primary
-    labelColor: (opacity = 1) => colors.text.includes('rgb') 
-      ? colors.text.replace('rgb', 'rgba').replace(')', `, ${opacity})`)
-      : `rgba(55, 65, 81, ${opacity})`, // Fallback for hex colors
+    labelColor: (opacity = 1) =>
+      colors.text.includes("rgb")
+        ? colors.text.replace("rgb", "rgba").replace(")", `, ${opacity})`)
+        : `rgba(55, 65, 81, ${opacity})`, // Fallback for hex colors
   };
+
+  const FILESYSTEM_DIR: string =
+    ((FileSystem as any).documentDirectory as string | undefined) ??
+    ((FileSystem as any).cacheDirectory as string | undefined) ??
+    "";
 
   const exportCSV = async () => {
     const csv =
@@ -78,7 +81,7 @@ const Reports: React.FC = () => {
       link.download = filename;
       link.click();
     } else {
-      const fileUri = FileSystem.documentDirectory + filename;
+      const fileUri = FILESYSTEM_DIR + filename;
       await FileSystem.writeAsStringAsync(fileUri, csv);
       await Sharing.shareAsync(fileUri);
     }
@@ -105,24 +108,28 @@ const Reports: React.FC = () => {
       link.download = filename;
       link.click();
     } else {
-      const fileUri = FileSystem.documentDirectory + filename;
+      const fileUri = FILESYSTEM_DIR + filename;
       await FileSystem.writeAsStringAsync(fileUri, content);
       await Sharing.shareAsync(fileUri);
     }
   };
 
-const exportPDF = async () => {
-  try {
-  const groundwaterUri = await captureRef(groundwaterRef, { result: "base64" });
+  const exportPDF = async () => {
+    try {
+      const groundwaterUri = await captureRef(groundwaterRef, {
+        result: "base64",
+      });
       const rainfallUri = await captureRef(rainfallRef, { result: "base64" });
       const tempUri = await captureRef(tempRef, { result: "base64" });
-      const predictionUri = await captureRef(predictionRef, { result: "base64" });
+      const predictionUri = await captureRef(predictionRef, {
+        result: "base64",
+      });
 
-    if (!groundwaterUri || !rainfallUri || !tempUri || !predictionUri) {
-      throw new Error("Failed to capture one or more charts.");
-    }
+      if (!groundwaterUri || !rainfallUri || !tempUri || !predictionUri) {
+        throw new Error("Failed to capture one or more charts.");
+      }
 
-    const html = `
+      const html = `
       <html>
         <body style="font-family: Arial; padding: 20px;">
           <h1 style="color:#2563eb;">Reports & Analysis</h1>
@@ -151,19 +158,18 @@ const exportPDF = async () => {
       </html>
     `;
 
-    const { uri } = await Print.printToFileAsync({ html });
-    console.log("PDF generated at:", uri);
+      const { uri } = await Print.printToFileAsync({ html });
+      console.log("PDF generated at:", uri);
 
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(uri);
-    } else {
-      alert("Sharing not available on this device");
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri);
+      } else {
+        alert("Sharing not available on this device");
+      }
+    } catch (err) {
+      console.error("PDF export error:", err);
     }
-  } catch (err) {
-    console.error("PDF export error:", err);
-  }
-};
-
+  };
 
   const handleDownload = (format: string) => {
     setModalVisible(false);
@@ -173,16 +179,25 @@ const exportPDF = async () => {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ paddingBottom: 40 }}>
-     
-      <Text style={[styles.title, { color: colors.text }]}>📊 Reports & Analysis</Text>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
+      <Text style={[styles.title, { color: colors.text }]}>
+        📊 Reports & Analysis
+      </Text>
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-        Download detailed groundwater and weather insights for selected time periods.
+        Download detailed groundwater and weather insights for selected time
+        periods.
       </Text>
 
       <View style={[styles.filterCard, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: colors.text }]}>Select Location:</Text>
-        <View style={[styles.pickerWrapper, { backgroundColor: colors.background }]}>
+        <Text style={[styles.sectionLabel, { color: colors.text }]}>
+          Select Location:
+        </Text>
+        <View
+          style={[styles.pickerWrapper, { backgroundColor: colors.background }]}
+        >
           <Picker
             selectedValue={location}
             onValueChange={setLocation}
@@ -195,8 +210,12 @@ const exportPDF = async () => {
           </Picker>
         </View>
 
-        <Text style={[styles.sectionLabel, { color: colors.text }]}>Select Time Period:</Text>
-        <View style={[styles.pickerWrapper, { backgroundColor: colors.background }]}>
+        <Text style={[styles.sectionLabel, { color: colors.text }]}>
+          Select Time Period:
+        </Text>
+        <View
+          style={[styles.pickerWrapper, { backgroundColor: colors.background }]}
+        >
           <Picker
             selectedValue={timePeriod}
             onValueChange={setTimePeriod}
@@ -208,15 +227,19 @@ const exportPDF = async () => {
           </Picker>
         </View>
 
-        <TouchableOpacity style={[styles.downloadMain, { backgroundColor: colors.primary }]} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity
+          style={[styles.downloadMain, { backgroundColor: colors.primary }]}
+          onPress={() => setModalVisible(true)}
+        >
           <MaterialCommunityIcons name="download" size={22} color="white" />
           <Text style={styles.buttonText}> Download Report</Text>
         </TouchableOpacity>
       </View>
 
-     
       <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.chartTitle, { color: colors.text }]}>Groundwater Level Trend</Text>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>
+          Groundwater Level Trend
+        </Text>
         <ViewShot ref={groundwaterRef} options={{ format: "png", quality: 1 }}>
           <LineChart
             data={{ labels, datasets: [{ data: groundwaterData }] }}
@@ -230,7 +253,9 @@ const exportPDF = async () => {
       </View>
 
       <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.chartTitle, { color: colors.text }]}>Rainfall vs Groundwater Recharge</Text>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>
+          Rainfall vs Groundwater Recharge
+        </Text>
         <ViewShot ref={rainfallRef} options={{ format: "png", quality: 1 }}>
           <BarChart
             data={{ labels, datasets: [{ data: rainfallData }] }}
@@ -245,7 +270,9 @@ const exportPDF = async () => {
       </View>
 
       <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.chartTitle, { color: colors.text }]}>Temperature & Humidity Trends</Text>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>
+          Temperature & Humidity Trends
+        </Text>
         <ViewShot ref={tempRef} options={{ format: "png", quality: 1 }}>
           <LineChart
             data={{
@@ -265,11 +292,21 @@ const exportPDF = async () => {
       </View>
 
       <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.chartTitle, { color: colors.text }]}>Prediction vs Actual</Text>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>
+          Prediction vs Actual
+        </Text>
         <ViewShot ref={predictionRef} options={{ format: "png", quality: 1 }}>
           <LineChart
             data={{
-              labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"],
+              labels: [
+                "Day 1",
+                "Day 2",
+                "Day 3",
+                "Day 4",
+                "Day 5",
+                "Day 6",
+                "Day 7",
+              ],
               datasets: [
                 { data: actualData, color: () => "#4f46e5" },
                 { data: predictedData, color: () => "#22c55e" },
@@ -284,20 +321,25 @@ const exportPDF = async () => {
         </ViewShot>
       </View>
 
-      
       <View style={[styles.chartCard, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.chartTitle, { color: colors.text }]}>Insights & Recommendations</Text>
-        <Text style={[styles.insight, { color: colors.textSecondary }]}>📉 Groundwater dropped by 8% compared to last week</Text>
-        <Text style={[styles.insight, { color: colors.textSecondary }]}>🌧 High rainfall expected in next 2 days (Recharge opportunity)</Text>
-        <Text style={[styles.insight, { color: colors.textSecondary }]}>⚠ Rising temperature may cause water stress</Text>
+        <Text style={[styles.chartTitle, { color: colors.text }]}>
+          Insights & Recommendations
+        </Text>
+        <Text style={[styles.insight, { color: colors.textSecondary }]}>
+          📉 Groundwater dropped by 8% compared to last week
+        </Text>
+        <Text style={[styles.insight, { color: colors.textSecondary }]}>
+          🌧 High rainfall expected in next 2 days (Recharge opportunity)
+        </Text>
+        <Text style={[styles.insight, { color: colors.textSecondary }]}>
+          ⚠ Rising temperature may cause water stress
+        </Text>
       </View>
 
-     
       <Text style={[styles.footer, { color: colors.textSecondary }]}>
         Reports are auto-generated from DWLR station data & AI models.
       </Text>
 
-      
       <Modal
         transparent
         visible={modalVisible}
@@ -306,18 +348,40 @@ const exportPDF = async () => {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalBox, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Download As</Text>
-            <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.background }]} onPress={() => handleDownload("CSV")}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              Download As
+            </Text>
+            <TouchableOpacity
+              style={[
+                styles.modalButton,
+                { backgroundColor: colors.background },
+              ]}
+              onPress={() => handleDownload("CSV")}
+            >
               <Text style={{ color: colors.text }}>📑 CSV </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.background }]} onPress={() => handleDownload("JSON")}>
+            <TouchableOpacity
+              style={[
+                styles.modalButton,
+                { backgroundColor: colors.background },
+              ]}
+              onPress={() => handleDownload("JSON")}
+            >
               <Text style={{ color: colors.text }}>🗂 JSON </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.background }]} onPress={() => handleDownload("PDF")}>
+            <TouchableOpacity
+              style={[
+                styles.modalButton,
+                { backgroundColor: colors.background },
+              ]}
+              onPress={() => handleDownload("PDF")}
+            >
               <Text style={{ color: colors.text }}>📊 PDF </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={[styles.cancelText, { color: colors.primary }]}>Cancel</Text>
+              <Text style={[styles.cancelText, { color: colors.primary }]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -330,7 +394,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 6 },
   subtitle: { fontSize: 14, marginBottom: 16 },
-  sectionLabel: { fontSize: 14, fontWeight: "600", marginTop: 8, marginBottom: 4 },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 8,
+    marginBottom: 4,
+  },
   filterCard: {
     padding: 16,
     borderRadius: 12,
@@ -395,7 +464,12 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 5,
   },
-  modalTitle: { fontSize: 18, fontWeight: "700", marginBottom: 16, textAlign: "center" },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 16,
+    textAlign: "center",
+  },
   modalButton: {
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -405,4 +479,3 @@ const styles = StyleSheet.create({
 });
 
 export default Reports;
-
