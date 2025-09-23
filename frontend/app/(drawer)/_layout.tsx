@@ -220,18 +220,6 @@ export default function Layout() {
           title: "Districts",
         }}
       />
-      <Drawer.Screen
-        name="notifications"
-        options={{
-          // hide item visually
-          drawerItemStyle: { height: 0 },
-          // remove label and icon
-          drawerLabel: () => null,
-          drawerIcon: () => null,
-          // keep header/route accessible
-          title: "Notifications",
-        }}
-      />
     </Drawer>
   );
 }

@@ -9,10 +9,11 @@ import {
   StyleSheet,
   Share,
   TextInput,
+  Modal,
+  ScrollView,
 } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
 type AlertItem = {
   _id?: string;
@@ -32,13 +33,16 @@ const API_BASE = "https://realtime-groundwater.onrender.com/api";
 
 export default function Alerts() {
   const theme = useTheme();
-  const router = useRouter();
 
   const [mode, setMode] = useState<"recent" | "all">("recent");
   const [items, setItems] = useState<AlertItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal state for showing notification details
+  const [selectedAlert, setSelectedAlert] = useState<AlertItem | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   // UI filters
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
@@ -184,10 +188,9 @@ export default function Alerts() {
     return Array.from(map.entries()).map(([k, v]) => ({ title: k, data: v }));
   }, [stations]);
 
-  const openDetail = (id?: string) => {
-    if (!id) return;
-    // encode id and cast to any to satisfy expo-router's strict route union types
-    router.push(`/(drawer)/notifications/${encodeURIComponent(id)}` as any);
+  const openDetail = (alert: AlertItem) => {
+    setSelectedAlert(alert);
+    setShowDetailModal(true);
   };
 
   const renderStation = ({ item }: { item: any }) => {
@@ -196,7 +199,7 @@ export default function Alerts() {
     return (
       <TouchableOpacity
         style={[styles.item, item.latest.read ? styles.itemRead : null]}
-        onPress={() => openDetail(latest._id || latest.id)}
+        onPress={() => openDetail(latest)}
         activeOpacity={0.85}
       >
         <View style={styles.rowTop}>
@@ -439,6 +442,119 @@ export default function Alerts() {
           }
         />
       )}
+
+      {/* Detail Modal */}
+      <Modal
+        visible={showDetailModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowDetailModal(false)}
+      >
+        <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => setShowDetailModal(false)}
+              style={styles.modalCloseButton}
+            >
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={theme.colors.text}
+              />
+            </TouchableOpacity>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+              Alert Details
+            </Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          {selectedAlert && (
+            <ScrollView style={styles.modalContent}>
+              <View
+                style={[
+                  styles.modalCard,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderLeftColor: typeColor(selectedAlert.alertType),
+                  },
+                ]}
+              >
+                <View style={styles.modalHeaderRow}>
+                  <MaterialCommunityIcons
+                    name={iconName(selectedAlert.alertType)}
+                    size={28}
+                    color="#fff"
+                    style={[
+                      styles.modalIcon,
+                      { backgroundColor: typeColor(selectedAlert.alertType) },
+                    ]}
+                  />
+                  <View style={{ marginLeft: 12, flex: 1 }}>
+                    <Text style={[styles.modalStationTitle, { color: theme.colors.text }]}>
+                      {selectedAlert.stationName || selectedAlert.stationCode}
+                    </Text>
+                    <Text style={[styles.modalStationSub, { color: theme.colors.textSecondary }]}>
+                      {selectedAlert.district || "—"}
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={[styles.modalMessage, { color: theme.colors.text }]}>
+                  {selectedAlert.message}
+                </Text>
+
+                <View style={styles.modalRow}>
+                  <Text style={[styles.modalMeta, { color: theme.colors.textSecondary }]}>
+                    Level: {String(selectedAlert.level ?? "—")}
+                  </Text>
+                  <Text style={[styles.modalMeta, { color: theme.colors.textSecondary }]}>
+                    Type: {labelForType(selectedAlert.alertType)}
+                  </Text>
+                </View>
+
+                <View style={styles.modalRow}>
+                  <Text style={[styles.modalMeta, { color: theme.colors.textSecondary }]}>
+                    Station: {selectedAlert.stationCode || "—"}
+                  </Text>
+                  <Text style={[styles.modalMeta, { color: theme.colors.textSecondary }]}>
+                    Timestamp: {formatTime(selectedAlert.timestamp)}
+                  </Text>
+                </View>
+
+                <Text style={[styles.modalMeta, { color: theme.colors.textSecondary }]}>
+                  Created: {formatTime(selectedAlert.createdAt)}
+                </Text>
+
+                {/* Action buttons */}
+                <View style={styles.modalActions}>
+                  <TouchableOpacity
+                    onPress={() => shareAlert(selectedAlert)}
+                    style={[styles.modalActionBtn, { backgroundColor: theme.colors.primary }]}
+                  >
+                    <MaterialCommunityIcons name="share" size={16} color="#fff" />
+                    <Text style={styles.modalActionText}>Share</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Raw data for debugging */}
+                <View style={styles.modalRaw}>
+                  <Text
+                    style={[
+                      styles.modalRawTitle,
+                      { color: theme.colors.text }
+                    ]}
+                  >
+                    Raw Data
+                  </Text>
+                  <Text style={[styles.modalRawText, { color: theme.colors.textSecondary }]}>
+                    {JSON.stringify(selectedAlert, null, 2)}
+                  </Text>
+                </View>
+              </View>
+            </ScrollView>
+          )}
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -632,5 +748,107 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     backgroundColor: "transparent",
+  },
+
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#F0FFFE",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  modalCloseButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "#f3f4f6",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  modalContent: {
+    flex: 1,
+    padding: 12,
+  },
+  modalCard: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 6,
+    marginBottom: 16,
+  },
+  modalHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  modalIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    padding: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalStationTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+  },
+  modalStationSub: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 12,
+    lineHeight: 22,
+  },
+  modalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  modalMeta: {
+    fontSize: 13,
+    flex: 1,
+  },
+  modalActions: {
+    marginTop: 14,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  modalActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  modalActionText: {
+    color: "#fff",
+    marginLeft: 4,
+    fontWeight: "600",
+  },
+  modalRaw: {
+    marginTop: 14,
+    backgroundColor: "#f3f4f6",
+    padding: 10,
+    borderRadius: 8,
+  },
+  modalRawTitle: {
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+  modalRawText: {
+    fontSize: 12,
+    fontFamily: "monospace",
   },
 });
