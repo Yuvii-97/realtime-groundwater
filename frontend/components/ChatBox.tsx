@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Speech from "expo-speech";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
@@ -42,7 +42,7 @@ const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 const model: any = genAI
-  ? genAI.getGenerativeModel({ model: "gemini-2.5-pro" })
+  ? genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
   : null;
 
 const ChatBox = () => {
